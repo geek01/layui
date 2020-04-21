@@ -1,27 +1,27 @@
 /*!
 
- @Name：layer mobile v2.0.0 弹层组件移动版
- @Author：贤心
+ @Name：layer mobile v2.0.0 彈層組件移動版
+ @Author：賢心
  @Site：http://layer.layui.com/mobie/
  @License：MIT
-    
+
  */
 
 layui.define(function(exports){
-  
+
   "use strict";
 
   var win = window, doc = document, query = 'querySelectorAll', claname = 'getElementsByClassName', S = function(s){
     return doc[query](s);
   };
 
-  //默认配置
+  //默認配置
   var config = {
     type: 0
     ,shade: true
     ,shadeClose: true
     ,fixed: true
-    ,anim: 'scale' //默认动画类型
+    ,anim: 'scale' //默認動畫類型
   };
 
   var ready = {
@@ -31,11 +31,11 @@ layui.define(function(exports){
         newobj[i] = obj[i];
       }
       return newobj;
-    }, 
+    },
     timer: {}, end: {}
   };
 
-  //点触事件
+  //點觸事件
   ready.touch = function(elem, fn){
     elem.addEventListener('click', function(e){
       fn.call(this, e);
@@ -54,16 +54,16 @@ layui.define(function(exports){
     that.id = layerbox.id = classs[0] + index;
     layerbox.setAttribute('class', classs[0] + ' ' + classs[0]+(config.type || 0));
     layerbox.setAttribute('index', index);
-    
-    //标题区域
+
+    //標題區域
     var title = (function(){
       var titype = typeof config.title === 'object';
       return config.title
       ? '<h3 style="'+ (titype ? config.title[1] : '') +'">'+ (titype ? config.title[0] : config.title)  +'</h3>'
       : '';
     }());
-    
-    //按钮区域
+
+    //按鈕區域
     var button = (function(){
       typeof config.btn === 'string' && (config.btn = [config.btn]);
       var btns = (config.btn || []).length, btndom;
@@ -76,20 +76,20 @@ layui.define(function(exports){
       }
       return '<div class="layui-m-layerbtn">'+ btndom + '</div>';
     }());
-    
+
     if(!config.fixed){
       config.top = config.hasOwnProperty('top') ?  config.top : 100;
       config.style = config.style || '';
       config.style += ' top:'+ ( doc.body.scrollTop + config.top) + 'px';
     }
-    
+
     if(config.type === 2){
       config.content = '<i></i><i class="layui-m-layerload"></i><i></i><p>'+ (config.content||'') +'</p>';
     }
-    
+
     if(config.skin) config.anim = 'up';
     if(config.skin === 'msg') config.shade = false;
-    
+
     layerbox.innerHTML = (config.shade ? '<div '+ (typeof config.shade === 'string' ? 'style="'+ config.shade +'"' : '') +' class="layui-m-layershade"></div>' : '')
     +'<div class="layui-m-layermain" '+ (!config.fixed ? 'style="position:static;"' : '') +'>'
       +'<div class="layui-m-layersection">'
@@ -100,33 +100,33 @@ layui.define(function(exports){
         +'</div>'
       +'</div>'
     +'</div>';
-    
+
     if(!config.type || config.type === 2){
       var dialogs = doc[claname](classs[0] + config.type), dialen = dialogs.length;
       if(dialen >= 1){
         layer.close(dialogs[0].getAttribute('index'))
       }
     }
-    
+
     document.body.appendChild(layerbox);
     var elem = that.elem = S('#'+that.id)[0];
     config.success && config.success(elem);
-    
+
     that.index = index++;
     that.action(config, elem);
   };
 
   Layer.prototype.action = function(config, elem){
     var that = this;
-    
-    //自动关闭
+
+    //自動關閉
     if(config.time){
       ready.timer[that.index] = setTimeout(function(){
         layer.close(that.index);
       }, config.time*1000);
     }
-    
-    //确认取消
+
+    //確認取消
     var btn = function(){
       var type = this.getAttribute('type');
       if(type == 0){
@@ -142,8 +142,8 @@ layui.define(function(exports){
         ready.touch(btns[ii], btn);
       }
     }
-    
-    //点遮罩关闭
+
+    //點遮罩關閉
     if(config.shade && config.shadeClose){
       var shade = elem[claname]('layui-m-layershade')[0];
       ready.touch(shade, function(){
@@ -157,13 +157,13 @@ layui.define(function(exports){
   var layer = {
     v: '2.0 m',
     index: index,
-    
+
     //核心方法
     open: function(options){
       var o = new Layer(options || {});
       return o.index;
     },
-    
+
     close: function(index){
       var ibox = S('#'+classs[0]+index)[0];
       if(!ibox) return;
@@ -174,8 +174,8 @@ layui.define(function(exports){
       typeof ready.end[index] === 'function' && ready.end[index]();
       delete ready.end[index];
     },
-    
-    //关闭所有layer层
+
+    //關閉所有layer層
     closeAll: function(){
       var boxs = doc[claname](classs[0]);
       for(var i = 0, len = boxs.length; i < len; i++){

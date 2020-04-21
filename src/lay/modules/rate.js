@@ -1,6 +1,6 @@
 /**
 
- @Title: layui.rate 评分评星
+ @Title: layui.rate 評分評星
  @Author: star1029
  @License：MIT
 
@@ -15,24 +15,24 @@ layui.define('jquery',function(exports){
     config: {}
     ,index: layui.rate ? (layui.rate.index + 10000) : 0
 
-    //设置全局项
+    //設置全局項
     ,set: function(options){
       var that = this;
       that.config = $.extend({}, that.config, options);
       return that;
     }
-    
-    //事件监听
+
+    //事件監聽
     ,on: function(events, callback){
       return layui.onevent.call(this, MOD_NAME, events, callback);
     }
   }
 
-  //操作当前实例
+  //操作當前實例
   ,thisRate = function(){
     var that = this
     ,options = that.config;
-    
+
     return {
       setvalue: function(value){
         that.setvalue.call(that, value);
@@ -43,10 +43,10 @@ layui.define('jquery',function(exports){
 
   //字符常量
   ,MOD_NAME = 'rate',ELEM_VIEW = 'layui-rate', ICON_RATE = 'layui-icon-rate', ICON_RATE_SOLID = 'layui-icon-rate-solid', ICON_RATE_HALF = 'layui-icon-rate-half'
-  
+
   ,ICON_SOLID_HALF = 'layui-icon-rate-solid layui-icon-rate-half',  ICON_SOLID_RATE = 'layui-icon-rate-solid layui-icon-rate',  ICON_HALF_RATE = 'layui-icon-rate layui-icon-rate-half'
 
-  //构造器
+  //構造器
   ,Class = function(options){
     var that = this;
     that.index = ++rate.index;
@@ -54,17 +54,17 @@ layui.define('jquery',function(exports){
     that.render();
   };
 
-  //默认配置
+  //默認配置
   Class.prototype.config = {
-    length: 5  //初始长度
-    ,text: false  //是否显示评分等级
-    ,readonly: false  //是否只读
+    length: 5  //初始長度
+    ,text: false  //是否顯示評分等級
+    ,readonly: false  //是否只讀
     ,half: false  //是否可以半星
-    ,value: 0 //星星选中个数
+    ,value: 0 //星星選中個數
     ,theme: ''
   };
 
-  //评分渲染
+  //評分渲染
   Class.prototype.render = function(){
     var that = this
     ,options = that.config
@@ -72,14 +72,14 @@ layui.define('jquery',function(exports){
 
     options.elem = $(options.elem);
 
-    //如果没有选择半星的属性，却给了小数的数值，统一向上或向下取整
+    //如果沒有選擇半星的屬性，卻給了小數的數值，統一向上或向下取整
     if(parseInt(options.value) !== options.value){
       if(!options.half){
         options.value = (Math.ceil(options.value) - options.value) < 0.5 ? Math.ceil(options.value): Math.floor(options.value)
       }
     }
 
-    //组件模板
+    //組件模板
     var temp = '<ul class="layui-rate" '+ (options.readonly ? 'readonly' : '') +'>';
     for(var i = 1;i <= options.length;i++){
       var item = '<li class="layui-inline"><i class="layui-icon '
@@ -91,8 +91,8 @@ layui.define('jquery',function(exports){
           if(i == Math.ceil(options.value)){
             temp = temp + '<li><i class="layui-icon layui-icon-rate-half" '+ style +'></i></li>';
           }else{
-            temp = temp + item 
-          } 
+            temp = temp + item
+          }
         }else{
           temp = temp + item
         }
@@ -102,15 +102,15 @@ layui.define('jquery',function(exports){
     }
     temp += '</ul>' + (options.text ? ('<span class="layui-inline">'+ options.value + '星') : '') + '</span>';
 
-    //开始插入替代元素
+    //開始插入替代元素
     var othis = options.elem
     ,hasRender = othis.next('.' + ELEM_VIEW);
-    
+
     //生成替代元素
-    hasRender[0] && hasRender.remove(); //如果已经渲染，则Rerender
+    hasRender[0] && hasRender.remove(); //如果已經渲染，則Rerender
 
     that.elemTemp = $(temp);
-    
+
     options.span = that.elemTemp.next('span');
 
     options.setText && options.setText(options.value);
@@ -119,12 +119,12 @@ layui.define('jquery',function(exports){
 
     othis.addClass("layui-inline");
 
-    //如果不是只读，那么进行触控事件
-    if(!options.readonly) that.action(); 
+    //如果不是隻讀，那麼進行觸控事件
+    if(!options.readonly) that.action();
 
   };
 
-  //评分重置
+  //評分重置
   Class.prototype.setvalue = function(value){
     var that = this
     ,options = that.config ;
@@ -133,7 +133,7 @@ layui.define('jquery',function(exports){
     that.render();
   };
 
-  //li触控事件
+  //li觸控事件
   Class.prototype.action = function(){
     var that = this
     ,options = that.config
@@ -144,12 +144,12 @@ layui.define('jquery',function(exports){
       var ind = index + 1
       ,othis = $(this);
 
-      //点击
+      //點擊
       othis.on('click', function(e){
-        //将当前点击li的索引值赋给value
+        //將當前點擊li的索引值賦給value
         options.value = ind;
         if(options.half){
-          //获取鼠标在li上的位置
+          //獲取鼠標在li上的位置
           var x = e.pageX - $(this).offset().left;
           if(x <= wide / 2){
             options.value = options.value - 0.5;
@@ -164,19 +164,19 @@ layui.define('jquery',function(exports){
 
       //移入
       othis.on('mousemove', function(e){
-        _ul.find("i").each(function(){      
+        _ul.find("i").each(function(){
           $(this).addClass(ICON_RATE).removeClass(ICON_SOLID_HALF)
         });
         _ul.find("i:lt(" + ind + ")").each(function(){
           $(this).addClass(ICON_RATE_SOLID).removeClass(ICON_HALF_RATE)
         });
-        // 如果设置可选半星，那么判断鼠标相对li的位置
+        // 如果設置可選半星，那麼判斷鼠標相對li的位置
         if(options.half){
           var x = e.pageX - $(this).offset().left;
           if(x <= wide / 2){
             othis.children("i").addClass(ICON_RATE_HALF).removeClass(ICON_RATE_SOLID)
           }
-        }         
+        }
       })
 
       //移出
@@ -187,18 +187,18 @@ layui.define('jquery',function(exports){
         _ul.find("i:lt(" + Math.floor(options.value) + ")").each(function(){
           $(this).addClass(ICON_RATE_SOLID).removeClass(ICON_HALF_RATE)
         });
-        //如果设置可选半星，根据分数判断是否有半星
+        //如果設置可選半星，根據分數判斷是否有半星
         if(options.half){
           if(parseInt(options.value) !== options.value){
-            _ul.children("li:eq(" + Math.floor(options.value) + ")").children("i").addClass(ICON_RATE_HALF).removeClass(ICON_SOLID_RATE)             
+            _ul.children("li:eq(" + Math.floor(options.value) + ")").children("i").addClass(ICON_RATE_HALF).removeClass(ICON_SOLID_RATE)
           }
-        } 
+        }
       })
 
     })
   };
-  
-  //事件处理
+
+  //事件處理
   Class.prototype.events = function(){
      var that = this
     ,options = that.config;
@@ -209,6 +209,6 @@ layui.define('jquery',function(exports){
     var inst = new Class(options);
     return thisRate.call(inst);
   };
-  
+
   exports(MOD_NAME, rate);
 })

@@ -1,12 +1,12 @@
 /**
 
- @Name：layui 移动模块入口 | 构建后则为移动模块集合
- @Author：贤心
+ @Name：layui 移動模組入口 | 構建後則為移動模組集合
+ @Author：賢心
  @License：MIT
-    
+
  */
 
- 
+
 if(!layui['layui.mobile']){
   layui.config({
     base: layui.cache.dir + 'lay/modules/mobile/'
@@ -16,7 +16,7 @@ if(!layui['layui.mobile']){
     ,'upload-mobile': 'upload-mobile'
     ,'layim-mobile': 'layim-mobile'
   });
-}  
+}
 
 layui.define([
   'layer-mobile'
@@ -24,7 +24,7 @@ layui.define([
   ,'layim-mobile'
 ], function(exports){
   exports('mobile', {
-    layer: layui['layer-mobile'] //弹层
+    layer: layui['layer-mobile'] //彈層
     ,layim: layui['layim-mobile'] //WebIM
   });
 });

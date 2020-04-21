@@ -1,11 +1,11 @@
 /**
 
- @Name：layim mobile 开源包
- @Author：贤心
+ @Name：layim mobile 開源包
+ @Author：賢心
  @License：MIT
-    
+
  */
- 
+
 layui.define(function(exports){
   exports('layim-mobile', layui.v);
 });

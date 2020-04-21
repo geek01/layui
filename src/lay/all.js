@@ -1,11 +1,11 @@
 ﻿/**
 
- @Name：用于打包PC完整版，即包含layui.js和所有模块的完整合并（该文件不会存在于构建后的目录）
- @Author：贤心
+ @Name：用於打包PC完整版，即包含layui.js和所有模塊的完整合並（該文件不會存在於構建後的目錄）
+ @Author：賢心
  @License：LGPL
-    
+
  */
- 
+
 layui.define(function(exports){
   var cache = layui.cache;
   layui.config({
