@@ -1,9 +1,9 @@
 ﻿/**
 
- @Name：用于打包聚合版，该文件不会存在于构建后的目录
-    
+ @Name：用於打包聚合版，該文件不會存在於構建後的目錄
+
  */
- 
+
 layui.define(function(exports){
   var cache = layui.cache;
   layui.config({

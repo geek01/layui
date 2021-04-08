@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <title>下拉菜单 - layui</title>
+  <title>下拉菜單 - layui</title>
 
   <link rel="stylesheet" href="../src/css/layui.css">
 
@@ -14,23 +14,23 @@
 
   <div class="layui-btn-container" style="padding: 30px 0;">
     <button class="layui-btn" id="demo1">
-      按钮下拉
+      按鈕下拉
       <i class="layui-icon layui-icon-down layui-font-12"></i>
     </button>
     <button class="layui-btn layui-btn-primary" id="demo2">
-      
-      按钮下拉
+
+      按鈕下拉
       <i class="layui-icon layui-icon-down layui-font-12"></i>
     </button>
-    
+
   </div>
-  
+
   <div class="layui-text">
     <a href="javascript:;" id="demo3">文字下拉 <i class="layui-icon layui-icon-down"></i></a>
   </div>
-  
+
   <div class="layui-bg-gray" style="margin-top: 30px; width: 100%; height: 300px; text-align: center;" id="demo20">
-    <span class="layui-font-gray" style="position: relative; top:50%;">鼠标右键菜单</span>
+    <span class="layui-font-gray" style="position: relative; top:50%;">鼠標右鍵菜單</span>
   </div>
 </div>
 
@@ -47,7 +47,7 @@ layui.use('dropdown', function(){
       ,templet: '<i class="layui-icon layui-icon-light"></i> {{d.title}} <span class="layui-badge-dot"></span>'
       ,id: ''
       ,href: ''
-      ,type: '' //菜单类型，支持：normal/group/parent
+      ,type: '' //菜單類型，支持：normal/group/parent
     },{
       title: 'menu item 2'
       ,templet: '<img src="//cdn.layui.com/avatar/168.jpg?t=123" style="width: 16px;"> {{d.title}}'
@@ -151,15 +151,15 @@ layui.use('dropdown', function(){
         ,id: ''
       }]
     }]
-    
+
     ,id: 'demo1'
-    
-    //菜单被点击的事件
+
+    //菜單被點擊的事件
     ,click: function(obj){
       console.log(obj);
     }
   });
-  
+
   var inst = dropdown.render({
     elem: '#demo2'
     //,show: true
@@ -174,22 +174,22 @@ layui.use('dropdown', function(){
       ,href: '#3'
     }]
     ,click: function(){
-    
+
     }
   });
 
-  
+
   dropdown.render({
     elem: '#demo3'
-    ,content: '自定义内容  123 '
+    ,content: '自定義內容  123 '
     ,style: 'background:#666;color:#fff;padding:15px;'
     ,trigger: 'hover'
   });
-  
-  
-  //右键
+
+
+  //右鍵
   dropdown.render({
-    elem: document//'#demo20' //也可绑定到 document，从而重置整个右键
+    elem: document//'#demo20' //也可綁定到 document，從而重置整個右鍵
     ,trigger: 'contextmenu' //contextmenu
     ,isAllowSpread: false
     //,style: 'width: 200px'
@@ -228,12 +228,12 @@ layui.use('dropdown', function(){
       }
     }
   });
-  
-  
-  
-  
+
+
+
+
   return;
-  
+
   dropdown.render({
     elem: document
     ,content: '123'

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>分页 - layui</title>
+<title>分頁 - layui</title>
 
 <link rel="stylesheet" href="../src/css/layui.css">
 
@@ -13,23 +13,23 @@ body{padding: 10px;}
 </head>
 <body>
 
-总页数低于页码总数：<div id="demo0"></div>
-总页数大于页码总数：<div id="demo1"></div>
-自定义主题：<div id="demo2"></div>
-自定义首页、尾页、上一页、下一页文本：<div id="demo3"></div>
-不显示首页尾页：<div id="demo4"></div>
-开启HASH：<div id="demo5"></div>
-只显示上一页、下一页：<div id="demo6"></div>
-显示完整功能：<div id="demo7"></div>
-自定义排版：<div id="demo8"></div>
+總頁數低於頁碼總數：<div id="demo0"></div>
+總頁數大於頁碼總數：<div id="demo1"></div>
+自定義主題：<div id="demo2"></div>
+自定義首頁、尾頁、上一頁、下一頁文本：<div id="demo3"></div>
+不顯示首頁尾頁：<div id="demo4"></div>
+開啟HASH：<div id="demo5"></div>
+只顯示上一頁、下一頁：<div id="demo6"></div>
+顯示完整功能：<div id="demo7"></div>
+自定義排版：<div id="demo8"></div>
 
 <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
-  <legend>将一段已知数组分页展示</legend>
+  <legend>將一段已知數組分頁展示</legend>
 </fieldset>
- 
+
 <div id="demo9"></div>
- 
-<ul id="biuuu_city_list"></ul>  
+
+<ul id="biuuu_city_list"></ul>
 
 
 <script src="../src/layui.js"></script>
@@ -39,67 +39,67 @@ layui.use(['laypage', 'layer'], function(){
   var laypage = layui.laypage
   ,layer = layui.layer;
 
-  
-  //总页数低于页码总数
+
+  //總頁數低於頁碼總數
   laypage.render({
     elem: 'demo0'
-    ,count: 50 //数据总数
+    ,count: 50 //數據總數
   });
-  
-  //总页数大于页码总数
+
+  //總頁數大於頁碼總數
   laypage.render({
     elem: 'demo1'
-    ,count: 70 //数据总数
+    ,count: 70 //數據總數
     ,jump: function(obj){
       console.log(obj)
     }
   });
-  
-  //自定义样式
+
+  //自定義樣式
   laypage.render({
     elem: 'demo2'
     ,count: 100
     ,theme: '#1E9FFF'
   });
-  
-  //自定义首页、尾页、上一页、下一页文本
+
+  //自定義首頁、尾頁、上一頁、下一頁文本
   laypage.render({
     elem: 'demo3'
     ,count: 100
-    ,first: '首页'
-    ,last: '尾页'
+    ,first: '首頁'
+    ,last: '尾頁'
     ,prev: '<em>←</em>'
     ,next: '<em>→</em>'
   });
-  
-  //不显示首页尾页
+
+  //不顯示首頁尾頁
   laypage.render({
     elem: 'demo4'
     ,count: 100
     ,first: false
     ,last: false
   });
-  
-  //开启HASH
+
+  //開啟HASH
   laypage.render({
     elem: 'demo5'
     ,count: 500
-    ,curr: location.hash.replace('#!fenye=', '') //获取hash值为fenye的当前页
-    ,hash: 'fenye' //自定义hash值
+    ,curr: location.hash.replace('#!fenye=', '') //獲取hash值為fenye的當前頁
+    ,hash: 'fenye' //自定義hash值
   });
-  
-  //只显示上一页、下一页
+
+  //只顯示上一頁、下一頁
   laypage.render({
     elem: 'demo6'
     ,count: 50
     ,layout: ['prev', 'next']
     ,jump: function(obj, first){
       if(!first){
-        layer.msg('第 '+ obj.curr +' 页');
+        layer.msg('第 '+ obj.curr +' 頁');
       }
     }
   });
-  
+
   //完整功能
   laypage.render({
     elem: 'demo7'
@@ -110,8 +110,8 @@ layui.use(['laypage', 'layer'], function(){
       console.log(obj)
     }
   });
-  
-  //自定义排版
+
+  //自定義排版
   laypage.render({
     elem: 'demo8'
     ,count: 1000
@@ -119,59 +119,59 @@ layui.use(['laypage', 'layer'], function(){
     //,limits: [100, 200, 300]
     ,limit: 200
   });
-  
-  
-  
-  //将一段数组分页展示
-  
-  //测试数据
+
+
+
+  //將一段數組分頁展示
+
+  //測試數據
   var data = [
     '北京',
     '上海',
-    '广州',
+    '廣州',
     '深圳',
     '杭州',
-    '长沙',
+    '長沙',
     '合肥',
-    '宁夏',
+    '寧夏',
     '成都',
     '西安',
     '南昌',
-    '上饶',
-    '沈阳',
-    '济南',
-    '厦门',
+    '上饒',
+    '瀋陽',
+    '濟南',
+    '廈門',
     '福州',
     '九江',
     '宜春',
-    '赣州',
-    '宁波',
-    '绍兴',
-    '无锡',
-    '苏州',
+    '贛州',
+    '寧波',
+    '紹興',
+    '無錫',
+    '蘇州',
     '徐州',
-    '东莞',
+    '東莞',
     '佛山',
     '中山',
     '成都',
-    '武汉',
-    '青岛',
+    '武漢',
+    '青島',
     '天津',
-    '重庆',
+    '重慶',
     '南京',
     '九江',
     '香港',
-    '澳门',
-    '台北'
+    '澳門',
+    '臺北'
   ];
-  
-  //调用分页
+
+  //調用分頁
   laypage.render({
     elem: 'demo9'
     ,count: data.length
     ,layout: ['prev', 'page', 'next', 'refresh', 'skip']
     ,jump: function(obj){
-      //模拟渲染
+      //模擬渲染
       document.getElementById('biuuu_city_list').innerHTML = function(){
         var arr = []
         ,thisData = data.concat().splice(obj.curr*obj.limit - obj.limit, obj.limit);
@@ -182,7 +182,7 @@ layui.use(['laypage', 'layer'], function(){
       }();
     }
   });
-  
+
 });
 </script>
 </body>

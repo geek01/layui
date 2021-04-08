@@ -1,5 +1,5 @@
 /**
- * @file laydate - 测试
+ * @file laydate - 測試
  * @author xuexb <fe.xiaowu@gmail.com>
  */
 
@@ -11,7 +11,7 @@ var laydate = layui.laydate;
 var lay = window.lay;
 
 /**
- * 是否基于`phantomjs`测试, 因为有些特殊的case在ie中是不可用的, 比如: `window.event = {}`
+ * 是否基於`phantomjs`測試, 因為有些特殊的case在ie中是不可用的, 比如: `window.event = {}`
  *
  * @const
  * @type {boolean}
@@ -19,11 +19,11 @@ var lay = window.lay;
 var IS_PHANTOMJS = layui.device('phantomjs').phantomjs;
 
 /**
- * 创建dom元素, 并返回 jquery 对象
+ * 創建dom元素, 並返回 jquery 對象
  *
  * @inner
  *
- * @param  {string} html 标签
+ * @param  {string} html 標籤
  *
  * @return {jQuery}
  */
@@ -38,7 +38,7 @@ var createNode = function (html) {
  * @inner
  *
  * @param {string} str 格式
- * @param {Date|number|string} date 时间对象或者时间缀
+ * @param {Date|number|string} date 時間對象或者時間綴
  * @return {string}
  *
  * @example
@@ -77,7 +77,7 @@ var dateFormat = function (str, date) {
 
   // 如果有年
   if (/(y+)/i.test(str)) {
-    // RegExp.$1为上次正则匹配的第1个结果，那么length就不用说了吧
+    // RegExp.$1為上次正則匹配的第1個結果，那麼length就不用說了吧
     str = str.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
   }
 
@@ -93,13 +93,13 @@ var dateFormat = function (str, date) {
 };
 
 describe('laydate', function () {
-  // 输出测试节点
+  // 輸出測試節點
   beforeEach(function () {
     createNode('<div id="test-div"></div>');
     createNode('<input id="test-input" type="text">');
   });
 
-  // 删除节点
+  // 刪除節點
   afterEach(function () {
     $('.layui-laydate, .test-node').remove();
   });
@@ -110,19 +110,19 @@ describe('laydate', function () {
   });
 
   it('loaded css link', function () {
-    // 验证页面元素
-    expect($('#layuicss-laydate').length).to.equal(1, '加载laydate.css的link标签必须存在');
-    expect($('#layuicss-laydate').css('display')).to.equal('none', '验证laydate.css是否生效');
+    // 驗證頁面元素
+    expect($('#layuicss-laydate').length).to.equal(1, '加載laydate.css的link標籤必須存在');
+    expect($('#layuicss-laydate').css('display')).to.equal('none', '驗證laydate.css是否生效');
 
-    // 验证一个不存在的元素
+    // 驗證一個不存在的元素
     expect($('#layuicss-laydate-no-suceess').css('display')).to.be.undefined;
   });
 
   describe('laydate.render()', function () {
     it('check params and return value', function () {
-      expect(laydate.render()).to.be.a('object', 'render() 返回值必须是对象');
+      expect(laydate.render()).to.be.a('object', 'render() 返回值必須是對象');
       expect(laydate.render('str')).to.have.property('hint');
-      expect(laydate.render().hint).to.be.a('function', 'render() 返回值必须包含 hint()');
+      expect(laydate.render().hint).to.be.a('function', 'render() 返回值必須包含 hint()');
       expect(laydate.render({})).to.have.property('config');
     });
 
@@ -168,10 +168,10 @@ describe('laydate', function () {
         expect(laydate.render().config.type).to.equal('date');
         expect(laydate.render({
           elem: '#test-div'
-        }).config.type).to.equal('date', 'render 方法 options.type 默认值必须是 date');
+        }).config.type).to.equal('date', 'render 方法 options.type 默認值必須是 date');
       });
 
-      // 先不作错误值的校验了
+      // 先不作錯誤值的校驗了
       // it('error value', function () {
       //   expect(function () {
       //     laydate.render({
@@ -191,11 +191,11 @@ describe('laydate', function () {
         expect(result.config.type).to.equal('year');
 
         setTimeout(function () {
-          expect($('.laydate-set-ym').length).to.equal(1, '标头年月元素必须存在');
-          expect($('.laydate-year-list .layui-this').text()).to.equal(dateFormat('yyyy年'), '默认高亮显示当前年');
+          expect($('.laydate-set-ym').length).to.equal(1, '標頭年月元素必須存在');
+          expect($('.laydate-year-list .layui-this').text()).to.equal(dateFormat('yyyy年'), '默認高亮顯示當前年');
 
           $('.laydate-btns-confirm').click();
-          expect($('#test-div').text()).to.equal(dateFormat('yyyy'), '确认后输出选中的值');
+          expect($('#test-div').text()).to.equal(dateFormat('yyyy'), '確認後輸出選中的值');
           done();
         }, 100);
       });
@@ -212,10 +212,10 @@ describe('laydate', function () {
         setTimeout(function () {
           expect($('.laydate-set-ym').length).to.equal(1);
           expect($('.laydate-month-list .layui-this').attr('lay-ym'))
-            .to.equal(dateFormat('M') - 1 + '', '默认高亮显示当前月');
+            .to.equal(dateFormat('M') - 1 + '', '默認高亮顯示當前月');
 
           $('.laydate-btns-confirm').click();
-          expect($('#test-div').text()).to.equal(dateFormat('yyyy-MM'), '确认后输出选中的值');
+          expect($('#test-div').text()).to.equal(dateFormat('yyyy-MM'), '確認後輸出選中的值');
           done();
         });
       });
@@ -230,12 +230,12 @@ describe('laydate', function () {
         expect(result.config.type).to.equal('date');
 
         setTimeout(function () {
-          expect($('.laydate-set-ym').text()).to.equal(dateFormat('yyyy年M月'), '标头内显示当前年+月');
+          expect($('.laydate-set-ym').text()).to.equal(dateFormat('yyyy年M月'), '標頭內顯示當前年+月');
           expect($('.layui-laydate-content .layui-this').attr('lay-ymd'))
-            .to.equal(dateFormat('yyyy-M-d'), '默认高亮显示当前日');
+            .to.equal(dateFormat('yyyy-M-d'), '默認高亮顯示當前日');
 
           $('.laydate-btns-confirm').click();
-          expect($('#test-div').text()).to.equal(dateFormat('yyyy-MM-dd'), '确认后输出选中的值');
+          expect($('#test-div').text()).to.equal(dateFormat('yyyy-MM-dd'), '確認後輸出選中的值');
           done();
         });
       });
@@ -250,7 +250,7 @@ describe('laydate', function () {
         expect(result.config.type).to.equal('time');
 
         setTimeout(function () {
-          expect($('.laydate-time-text').text()).to.equal('选择时间', '标头内显示当前年+月');
+          expect($('.laydate-time-text').text()).to.equal('選擇時間', '標頭內顯示當前年+月');
           expect($('.laydate-time-list').length).to.equal(1);
 
           expect($('#test-div').text()).to.equal('');
@@ -273,25 +273,25 @@ describe('laydate', function () {
         setTimeout(function () {
           expect($('.laydate-set-ym').text()).to.equal(
             now.getFullYear() + '年' + (now.getMonth() + 1) + '月',
-            '标头内显示当前年+月'
+            '標頭內顯示當前年+月'
           );
           expect($('.layui-laydate-content .layui-this').attr('lay-ymd')).to.equal(
             now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate(),
-            '默认高亮显示当前日'
+            '默認高亮顯示當前日'
           );
-          expect($('.laydate-btns-time').text()).to.equal('选择时间');
+          expect($('.laydate-btns-time').text()).to.equal('選擇時間');
           expect($('.laydate-time-text').text()).to.equal('');
 
-          // 断定选择时间的切换
+          // 斷定選擇時間的切換
           $('.laydate-btns-time').click();
-          expect($('.laydate-time-text').text()).to.equal('选择时间');
+          expect($('.laydate-time-text').text()).to.equal('選擇時間');
           expect($('.laydate-btns-time').text()).to.equal('返回日期');
           $('.laydate-btns-time').click();
           expect($('.laydate-time-text').text()).to.equal('');
-          expect($('.laydate-btns-time').text()).to.equal('选择时间');
+          expect($('.laydate-btns-time').text()).to.equal('選擇時間');
 
           $('.laydate-btns-confirm').click();
-          expect($('#test-div').text()).to.equal(dateFormat('yyyy-MM-dd 00:00:00'), '确认后输出选中的值');
+          expect($('#test-div').text()).to.equal(dateFormat('yyyy-MM-dd 00:00:00'), '確認後輸出選中的值');
           done();
         });
       });
@@ -309,7 +309,7 @@ describe('laydate', function () {
         setTimeout(function () {
           expect($('.laydate-time-text').length).to.equal(2);
           $('.laydate-btns-confirm').click();
-          expect($('#test-div').text()).to.equal('00:00:00 - 00:00:00', '确认后输出范围值');
+          expect($('#test-div').text()).to.equal('00:00:00 - 00:00:00', '確認後輸出範圍值');
           done();
         });
       });
@@ -323,7 +323,7 @@ describe('laydate', function () {
         });
 
         $('.laydate-btns-confirm').click();
-        expect($('#test-div').text()).to.match(/\d+\s到\s\d+/, '确认后输出范围值');
+        expect($('#test-div').text()).to.match(/\d+\s到\s\d+/, '確認後輸出範圍值');
       });
     });
 
@@ -332,24 +332,24 @@ describe('laydate', function () {
         expect(laydate.render().config.format).to.equal('yyyy-MM-dd');
         expect(laydate.render({
           elem: '#test-div'
-        }).config.format).to.equal('yyyy-MM-dd', 'render 方法 options.format 默认值必须是 yyyy-MM-dd');
+        }).config.format).to.equal('yyyy-MM-dd', 'render 方法 options.format 默認值必須是 yyyy-MM-dd');
       });
 
-      it('yyyy年MM月dd日 HH时mm分ss秒', function () {
+      it('yyyy年MM月dd日 HH時mm分ss秒', function () {
         var result = laydate.render({
-          format: 'yyyy年MM月dd日 HH时mm分ss秒',
+          format: 'yyyy年MM月dd日 HH時mm分ss秒',
           elem: '#test-div'
         });
 
-        expect(result.config.format).to.equal('yyyy年MM月dd日 HH时mm分ss秒', '设置 option.format 返回配置内必须相等');
+        expect(result.config.format).to.equal('yyyy年MM月dd日 HH時mm分ss秒', '設置 option.format 返回配置內必須相等');
         $('#test-div').click();
         $('.laydate-btns-confirm').click();
-        expect($('#test-div').text()).to.equal(dateFormat('yyyy年MM月dd日 00时00分00秒'), '确认后输出选中的值');
+        expect($('#test-div').text()).to.equal(dateFormat('yyyy年MM月dd日 00時00分00秒'), '確認後輸出選中的值');
       });
 
-      it('datetime type and yyyy年的M月某天晚上，大概H点', function () {
+      it('datetime type and yyyy年的M月某天晚上，大概H點', function () {
         laydate.render({
-          format: 'yyyy年的M月某天晚上，大概H点',
+          format: 'yyyy年的M月某天晚上，大概H點',
           elem: '#test-div',
           type: 'datetime'
         });
@@ -358,7 +358,7 @@ describe('laydate', function () {
         $('.laydate-btns-time').click();
         $('.laydate-time-list li').eq(0).find('li').eq(5).click();
         $('.laydate-btns-confirm').click();
-        expect($('#test-div').text()).to.equal(dateFormat('yyyy年的M月某天晚上，大概5点'), '确认后输出选中的值');
+        expect($('#test-div').text()).to.equal(dateFormat('yyyy年的M月某天晚上，大概5點'), '確認後輸出選中的值');
       });
 
       it('format and error value', function () {
@@ -368,16 +368,16 @@ describe('laydate', function () {
           format: 'yyyy~MM~dd'
         });
 
-        expect($('#test-div').text()).to.equal('2017年7月7日', '默认输出value的值到元素中');
+        expect($('#test-div').text()).to.equal('2017年7月7日', '默認輸出value的值到元素中');
         $('#test-div').click();
-        expect($('#test-div').text()).to.equal(dateFormat('yyyy~MM~dd'), '根据options.format修正value为当天');
+        expect($('#test-div').text()).to.equal(dateFormat('yyyy~MM~dd'), '根據options.format修正value為當天');
 
-        // 错误提示
+        // 錯誤提示
         expect($('.layui-laydate-hint').text()).to.match(/日期格式不合法/);
         expect($('.layui-laydate-hint').text()).to.match(/yyyy~MM~dd/);
       });
 
-      // 验证当format为 yyyyMMdd 和 value=20170707 时是否通过
+      // 驗證當format為 yyyyMMdd 和 value=20170707 時是否通過
       it('format and number value', function (done) {
         laydate.render({
           elem: '#test-div',
@@ -393,12 +393,12 @@ describe('laydate', function () {
           show: true
         });
 
-        expect($('#test-div').text()).to.equal('20170707', '默认输出value的值到元素中');
-        expect($('#test-input').val()).to.equal('201777', '默认输出value的值到元素中');
+        expect($('#test-div').text()).to.equal('20170707', '默認輸出value的值到元素中');
+        expect($('#test-input').val()).to.equal('201777', '默認輸出value的值到元素中');
 
         setTimeout(function () {
-          // 错误提示
-          expect($('.layui-laydate-hint').length).to.equal(0, '格式正确没有错误提示');
+          // 錯誤提示
+          expect($('.layui-laydate-hint').length).to.equal(0, '格式正確沒有錯誤提示');
 
           done();
         });
@@ -412,7 +412,7 @@ describe('laydate', function () {
           show: true,
           value: '2017-06-31',
           done: function (value) {
-            expect(value).to.equal('2017-06-30', '6月最大为30号');
+            expect(value).to.equal('2017-06-30', '6月最大為30號');
             done();
           }
         });
@@ -446,7 +446,7 @@ describe('laydate', function () {
 
         $('#test-div').click();
         $('.laydate-btns-confirm').click();
-        expect($('#test-div').text()).to.equal('1990年11月27日', '确认后输出选中的值');
+        expect($('#test-div').text()).to.equal('1990年11月27日', '確認後輸出選中的值');
       });
 
       it('yyyy-MM-dd not format value', function () {
@@ -458,12 +458,12 @@ describe('laydate', function () {
 
         $('#test-div').click();
 
-        // 错误提示
+        // 錯誤提示
         expect($('.layui-laydate-hint').text()).to.match(/日期格式不合法/);
         expect($('.layui-laydate-hint').text()).to.match(/yyyy年MM月dd日/);
 
         $('.laydate-btns-confirm').click();
-        expect($('#test-div').text()).to.equal(dateFormat('yyyy年MM月dd日'), '确认后输出选中的值');
+        expect($('#test-div').text()).to.equal(dateFormat('yyyy年MM月dd日'), '確認後輸出選中的值');
       });
 
       it('number not format value', function () {
@@ -474,7 +474,7 @@ describe('laydate', function () {
 
         $('#test-div').click();
 
-        // 错误提示
+        // 錯誤提示
         expect($('.layui-laydate-hint').text()).to.match(/日期格式不合法/);
       });
 
@@ -486,7 +486,7 @@ describe('laydate', function () {
 
         $('#test-div').text('layui').click();
 
-        // 错误提示
+        // 錯誤提示
         expect($('.layui-laydate-hint').text()).to.match(/日期格式不合法/);
       });
 
@@ -498,14 +498,14 @@ describe('laydate', function () {
           show: true
         });
 
-        // 错误提示
+        // 錯誤提示
         setTimeout(function () {
           expect($('.layui-laydate-hint').text()).to.match(/日期格式不合法/);
           done();
         });
       });
 
-      // 当元素值更新后, 再次显示日历时会更新
+      // 當元素值更新後, 再次顯示日曆時會更新
       it('change value', function () {
         laydate.render({
           show: true,
@@ -513,11 +513,11 @@ describe('laydate', function () {
           elem: '#test-div'
         });
 
-        expect($('.layui-this').text()).to.equal('7', '显示默认的7');
+        expect($('.layui-this').text()).to.equal('7', '顯示默認的7');
 
         $('.laydate-btns-confirm').click();
         $('#test-div').text('2017-7-10').click();
-        expect($('.layui-this').text()).to.equal('10', '显示更新后的10');
+        expect($('.layui-this').text()).to.equal('10', '顯示更新後的10');
       });
     });
 
@@ -546,7 +546,7 @@ describe('laydate', function () {
         expect($('.laydate-month-list [lay-ym="7"]').hasClass('laydate-disabled')).to.be.true;
       });
 
-      // 错误字符串时直接设为当天最小
+      // 錯誤字符串時直接設為當天最小
       it('error string', function () {
         laydate.render({
           elem: '#test-div',
@@ -556,15 +556,15 @@ describe('laydate', function () {
 
         $('#test-div').click();
 
-        expect($('.layui-laydate-content .layui-this').attr('lay-ymd')).to.equal(dateFormat('yyyy-M-d'), '默认选中日期');
+        expect($('.layui-laydate-content .layui-this').attr('lay-ymd')).to.equal(dateFormat('yyyy-M-d'), '默認選中日期');
 
-        // 昨天不可用, 判断是为了处理跨月
+        // 昨天不可用, 判斷是為了處理跨月
         var $elem = $('.layui-laydate-content [lay-ymd="' + dateFormat('yyyy-M-d', -1) + '"]');
         if ($elem.length) {
           expect($elem.hasClass('laydate-disabled')).to.be.true;
         }
 
-        // 明天不可用, 判断是为了处理跨月
+        // 明天不可用, 判斷是為了處理跨月
         $elem = $('.layui-laydate-content [lay-ymd="' + dateFormat('yyyy-M-d', 1) + '"]');
         if ($elem.length) {
           expect($elem.hasClass('laydate-disabled')).to.be.true;
@@ -580,25 +580,25 @@ describe('laydate', function () {
 
         $('#test-div').click();
 
-        // 前两天应该是可用, 判断是为了处理跨月
+        // 前兩天應該是可用, 判斷是為了處理跨月
         var $elem = $('.layui-laydate-content [lay-ymd="' + dateFormat('yyyy-M-d', -2) + '"]');
         if ($elem.length) {
           expect($elem.hasClass('laydate-disabled')).to.be.false;
         }
 
-        // 前三天应该是禁用的
+        // 前三天應該是禁用的
         $elem = $('.layui-laydate-content [lay-ymd="' + dateFormat('yyyy-M-d', -3) + '"]');
         if ($elem.length) {
           expect($elem.hasClass('laydate-disabled')).to.be.true;
         }
 
-        // 后两天可用
+        // 後兩天可用
         $elem = $('.layui-laydate-content [lay-ymd="' + dateFormat('yyyy-M-d', 2) + '"]');
         if ($elem.length) {
           expect($elem.hasClass('laydate-disabled')).to.be.false;
         }
 
-        // 后三天禁用
+        // 後三天禁用
         $elem = $('.layui-laydate-content [lay-ymd="' + dateFormat('yyyy-M-d', 3) + '"]');
         if ($elem.length) {
           expect($elem.hasClass('laydate-disabled')).to.be.true;
@@ -609,7 +609,7 @@ describe('laydate', function () {
         var date = new Date();
         var date2 = new Date();
 
-        // 获取前三天的时间缀
+        // 獲取前三天的時間綴
         date.setDate(date.getDate() + -3);
         date2.setDate(date2.getDate() + 3);
 
@@ -633,13 +633,13 @@ describe('laydate', function () {
           expect($elem.hasClass('laydate-disabled')).to.be.true;
         }
 
-        // 后三天可用
+        // 後三天可用
         $elem = $('.layui-laydate-content [lay-ymd="' + dateFormat('yyyy-M-d', 3) + '"]');
         if ($elem.length) {
           expect($elem.hasClass('laydate-disabled')).to.be.false;
         }
 
-        // 后四天不可用
+        // 後四天不可用
         $elem = $('.layui-laydate-content [lay-ymd="' + dateFormat('yyyy-M-d', 4) + '"]');
         if ($elem.length) {
           expect($elem.hasClass('laydate-disabled')).to.be.true;
@@ -656,12 +656,12 @@ describe('laydate', function () {
 
         $('#test-div').click();
 
-        expect($('.layui-laydate-content .layui-this').attr('lay-ymd')).to.equal('2017-7-7', '默认选中日期');
+        expect($('.layui-laydate-content .layui-this').attr('lay-ymd')).to.equal('2017-7-7', '默認選中日期');
         expect($('.layui-laydate-content [lay-ymd="2017-7-6"]').hasClass('laydate-disabled')).to.be.true;
         expect($('.layui-laydate-content [lay-ymd="2017-7-8"]').hasClass('laydate-disabled')).to.be.true;
       });
 
-      // 当最大小于最小时, 日期选择都不可用
+      // 當最大小於最小時, 日期選擇都不可用
       it('options.max < options.min', function () {
         laydate.render({
           elem: '#test-div',
@@ -699,7 +699,7 @@ describe('laydate', function () {
         result = laydate.render({
           elem: '#test-div'
         });
-        // div会默认转成click
+        // div會默認轉成click
         expect(result.config.trigger).to.equal('click');
       });
 
@@ -735,9 +735,9 @@ describe('laydate', function () {
         });
       });
 
-      // 以下2个是测试和`options.closeStop`的配合
+      // 以下2個是測試和`options.closeStop`的配合
       it('element trigger show', function (done) {
-        createNode('<button id="test-trigger-show">显示</button>');
+        createNode('<button id="test-trigger-show">顯示</button>');
         $('#test-trigger-show').on('click', function () {
           laydate.render({
             elem: '#test-div',
@@ -751,7 +751,7 @@ describe('laydate', function () {
         }, 100);
       });
       it('element trigger show and options.closeStop', function (done) {
-        createNode('<button id="test-trigger-show">显示</button>');
+        createNode('<button id="test-trigger-show">顯示</button>');
         $('#test-trigger-show').on('click', function () {
           laydate.render({
             elem: '#test-div',
@@ -906,11 +906,11 @@ describe('laydate', function () {
         var weeks = $('.layui-laydate-content').find('thead th').map(function () {
           return $(this).text();
         }).get();
-        expect(weeks).to.deep.equal(['日', '一', '二', '三', '四', '五', '六'], 'cn版本星期的标头');
+        expect(weeks).to.deep.equal(['日', '一', '二', '三', '四', '五', '六'], 'cn版本星期的標頭');
 
-        expect($('.laydate-btns-confirm').text()).to.equal('确定', 'cn版本确定按钮');
-        expect($('.laydate-btns-now').text()).to.equal('现在', 'cn版本当前按钮');
-        expect($('.laydate-btns-clear').text()).to.equal('清空', 'cn版本清除按钮');
+        expect($('.laydate-btns-confirm').text()).to.equal('確定', 'cn版本確定按鈕');
+        expect($('.laydate-btns-now').text()).to.equal('現在', 'cn版本當前按鈕');
+        expect($('.laydate-btns-clear').text()).to.equal('清空', 'cn版本清除按鈕');
         expect(result.config.lang).to.equal('cn');
       });
 
@@ -924,11 +924,11 @@ describe('laydate', function () {
         var weeks = $('.layui-laydate-content').find('thead th').map(function () {
           return $(this).text();
         }).get();
-        expect(weeks).to.deep.equal(['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'], 'en版本星期的标头');
+        expect(weeks).to.deep.equal(['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'], 'en版本星期的標頭');
 
-        expect($('.laydate-btns-confirm').text()).to.equal('Confirm', 'en版本确定按钮');
-        expect($('.laydate-btns-now').text()).to.equal('Now', 'en版本当前按钮');
-        expect($('.laydate-btns-clear').text()).to.equal('Clear', 'en版本清除按钮');
+        expect($('.laydate-btns-confirm').text()).to.equal('Confirm', 'en版本確定按鈕');
+        expect($('.laydate-btns-now').text()).to.equal('Now', 'en版本當前按鈕');
+        expect($('.laydate-btns-clear').text()).to.equal('Clear', 'en版本清除按鈕');
         expect(result.config.lang).to.equal('en');
       });
 
@@ -939,7 +939,7 @@ describe('laydate', function () {
           elem: '#test-div'
         });
 
-        expect($('.laydate-btns-confirm').text()).to.equal('确定', 'lang错误时默认为中文');
+        expect($('.laydate-btns-confirm').text()).to.equal('確定', 'lang錯誤時默認為中文');
         expect(result.config.lang).to.equal('layui');
       });
 
@@ -954,7 +954,7 @@ describe('laydate', function () {
           theme: 'molv'
         });
 
-        expect($('.laydate-theme-molv').length).to.equal(1, '墨绿主题class存在');
+        expect($('.laydate-theme-molv').length).to.equal(1, '墨綠主題class存在');
       });
 
       it('grid', function () {
@@ -964,7 +964,7 @@ describe('laydate', function () {
           theme: 'grid'
         });
 
-        expect($('.laydate-theme-grid').length).to.equal(1, '格子主题class存在');
+        expect($('.laydate-theme-grid').length).to.equal(1, '格子主題class存在');
       });
 
       it('error value', function () {
@@ -974,11 +974,11 @@ describe('laydate', function () {
           theme: 'layui-test'
         });
 
-        expect($('.laydate-theme-layui-test').length).to.equal(1, '自定义主题class存在');
+        expect($('.laydate-theme-layui-test').length).to.equal(1, '自定義主題class存在');
       });
 
       it('#color', function () {
-        // 主要处理多浏览器兼容
+        // 主要處理多瀏覽器兼容
         var colors = [
           'rgb(0, 0, 0)',
           'rgba(0, 0, 0, 0)',
@@ -995,7 +995,7 @@ describe('laydate', function () {
           '.layui-this',
           '.layui-laydate-header'
         ], function (index, selector) {
-          expect(colors).to.includes($(selector).css('background-color'), '标头和当前选中颜色必须是设置的');
+          expect(colors).to.includes($(selector).css('background-color'), '標頭和當前選中顏色必須是設置的');
         });
       });
     });
@@ -1008,8 +1008,8 @@ describe('laydate', function () {
           value: '2017-3-8'
         });
 
-        expect(result.config.calendar).to.equal(false, '默认值为false');
-        expect($('.layui-this').text()).to.equal('8', '显示数字');
+        expect(result.config.calendar).to.equal(false, '默認值為false');
+        expect($('.layui-this').text()).to.equal('8', '顯示數字');
       });
 
       it('is true', function () {
@@ -1020,8 +1020,8 @@ describe('laydate', function () {
           calendar: true
         });
 
-        expect(result.config.calendar).to.equal(true, '默认值为false');
-        expect($('.layui-this').text()).to.equal('妇女', '显示妇女节');
+        expect(result.config.calendar).to.equal(true, '默認值為false');
+        expect($('.layui-this').text()).to.equal('婦女', '顯示婦女節');
       });
 
       it('options.lang is en', function () {
@@ -1032,7 +1032,7 @@ describe('laydate', function () {
           value: '2017-3-8'
         });
 
-        expect($('.layui-this').text()).to.equal('8', '国际版显示数字');
+        expect($('.layui-this').text()).to.equal('8', '國際版顯示數字');
       });
     });
 
@@ -1047,12 +1047,12 @@ describe('laydate', function () {
           elem: '#test-div'
         });
 
-        expect($('.layui-this').text()).to.equal('妹子', '显示自定义的妹子');
+        expect($('.layui-this').text()).to.equal('妹子', '顯示自定義的妹子');
 
         // 再看下4月7日
         $('.laydate-btns-confirm').click();
         $('#test-div').text('2017-4-7').click();
-        expect($('.layui-this').text()).to.equal('7', '显示日期');
+        expect($('.layui-this').text()).to.equal('7', '顯示日期');
       });
 
       it('every year and month', function () {
@@ -1065,12 +1065,12 @@ describe('laydate', function () {
           elem: '#test-div'
         });
 
-        expect($('.layui-this').text()).to.equal('妹子', '显示自定义的妹子');
+        expect($('.layui-this').text()).to.equal('妹子', '顯示自定義的妹子');
 
         // 再看下4月7日
         $('.laydate-btns-confirm').click();
         $('#test-div').text('2017-4-7').click();
-        expect($('.layui-this').text()).to.equal('妹子', '显示自定义的妹子');
+        expect($('.layui-this').text()).to.equal('妹子', '顯示自定義的妹子');
       });
 
       it('yyyy-M-d', function () {
@@ -1083,12 +1083,12 @@ describe('laydate', function () {
           elem: '#test-div'
         });
 
-        expect($('.layui-this').text()).to.equal('妹子', '显示自定义的妹子');
+        expect($('.layui-this').text()).to.equal('妹子', '顯示自定義的妹子');
 
         // 再看下2016年
         $('.laydate-btns-confirm').click();
         $('#test-div').text('2016-3-7').click();
-        expect($('.layui-this').text()).to.equal('7', '显示日期');
+        expect($('.layui-this').text()).to.equal('7', '顯示日期');
       });
 
       it('options.calendar is true', function () {
@@ -1097,16 +1097,16 @@ describe('laydate', function () {
           show: true,
           value: '2017-3-8',
           mark: {
-            '2017-3-8': '快乐'
+            '2017-3-8': '快樂'
           },
           calendar: true
         });
 
-        expect($('.layui-this').text()).to.equal('快乐', '显示被mark覆盖的 快乐');
+        expect($('.layui-this').text()).to.equal('快樂', '顯示被mark覆蓋的 快樂');
       });
     });
 
-    // 基于phantomjs测试内部方法
+    // 基於phantomjs測試內部方法
     if (IS_PHANTOMJS) {
       it('options.dateTime', function (done) {
         laydate.render({
@@ -1120,7 +1120,7 @@ describe('laydate', function () {
             hours: 25
           },
           done: function (value) {
-            expect(value).to.equal(dateFormat('yyyy-MM-dd'), '设置日期超出范围, 初始化为当天');
+            expect(value).to.equal(dateFormat('yyyy-MM-dd'), '設置日期超出範圍, 初始化為當天');
             done();
           }
         });
@@ -1158,7 +1158,7 @@ describe('laydate', function () {
         $('#test-div').click();
       });
 
-      // 如果是div则自动切换成click
+      // 如果是div則自動切換成click
       it('multiple trigger', function (done) {
         var index = 0;
 
@@ -1176,7 +1176,7 @@ describe('laydate', function () {
         });
       });
 
-      // 当show=true时应该直接显示并执行ready事件
+      // 當show=true時應該直接顯示並執行ready事件
       it('options.show is true', function (done) {
         laydate.render({
           elem: '#test-div',
@@ -1197,7 +1197,7 @@ describe('laydate', function () {
           value: '2017-07-07',
           range: false,
           change: function (value, date, endDate) {
-            expect(value).to.equal('2017-08-07', '进入下一月的日期');
+            expect(value).to.equal('2017-08-07', '進入下一月的日期');
             expect(date).to.deep.equal({
               year: 2017,
               month: 8,
@@ -1205,8 +1205,8 @@ describe('laydate', function () {
               hours: 0,
               minutes: 0,
               seconds: 0
-            }, '进入下一月的日期时间对象');
-            expect(endDate).to.deep.equal({}, '没有开启 options.range 时 endDate 为空对象');
+            }, '進入下一月的日期時間對象');
+            expect(endDate).to.deep.equal({}, '沒有開啟 options.range 時 endDate 為空對象');
 
             done();
           }
@@ -1224,17 +1224,17 @@ describe('laydate', function () {
             var start = dateFormat('yyyy-MM-dd');
             var end = dateFormat('yyyy-MM-dd', 1);
 
-            // expect(value).to.equal(start + ' - ' + end, '进入下一月的日期');
+            // expect(value).to.equal(start + ' - ' + end, '進入下一月的日期');
             expect(date).to.be.a('Object');
             expect(date).to.not.deep.equal({});
             expect(endDate).to.be.a('Object');
-            expect(endDate).to.not.deep.equal({}, '开启 options.range 时 endDate 不能为空');
+            expect(endDate).to.not.deep.equal({}, '開啟 options.range 時 endDate 不能為空');
 
             done();
           }
         });
 
-        // 模拟点击当天和下一天
+        // 模擬點擊當天和下一天
         $('[lay-ymd="' + dateFormat('yyyy-M-d') + '"]').click();
         $('[lay-ymd="' + dateFormat('yyyy-M-d', 1) + '"]').click();
       });
@@ -1334,7 +1334,7 @@ describe('laydate', function () {
         show: true
       });
 
-      expect(app.hint).to.be.a('function', '.hint 必须是方法');
+      expect(app.hint).to.be.a('function', '.hint 必須是方法');
       app.hint('layui');
       expect($('.layui-laydate-hint').text()).to.equal('layui');
     });
@@ -1355,19 +1355,19 @@ describe('laydate', function () {
   });
   describe('.getEndDate', function () {
     it('default params and return value', function () {
-      expect(laydate.getEndDate).to.be.a('function', 'laydate.getEndDate 必须是方法');
-      expect(laydate.getEndDate()).to.be.a('number', 'laydate.getEndDate 返回值必须是数字');
-      expect(laydate.getEndDate(10, 2017)).to.be.a('number', 'laydate.getEndDate 返回值必须是数字');
-      expect(laydate.getEndDate(10)).to.be.a('number', 'laydate.getEndDate 返回值必须是数字');
+      expect(laydate.getEndDate).to.be.a('function', 'laydate.getEndDate 必須是方法');
+      expect(laydate.getEndDate()).to.be.a('number', 'laydate.getEndDate 返回值必須是數字');
+      expect(laydate.getEndDate(10, 2017)).to.be.a('number', 'laydate.getEndDate 返回值必須是數字');
+      expect(laydate.getEndDate(10)).to.be.a('number', 'laydate.getEndDate 返回值必須是數字');
     });
 
     it('getEndDate(year)', function () {
-      expect(laydate.getEndDate(10)).to.equal(31, '10月最后一天为31');
-      expect(laydate.getEndDate(11)).to.equal(30, '11月最后一天为30');
-      expect(laydate.getEndDate(11, 2017)).to.equal(30, '2017年11月最后一天为30');
-      expect(laydate.getEndDate(10, 2017)).to.equal(31, '2017年10月最后一天为31');
-      expect(laydate.getEndDate(2, 2017)).to.equal(28, '2017年2月最后一天为28');
-      expect(laydate.getEndDate(2, 2016)).to.equal(29, '2016年2月最后一天为29');
+      expect(laydate.getEndDate(10)).to.equal(31, '10月最後一天為31');
+      expect(laydate.getEndDate(11)).to.equal(30, '11月最後一天為30');
+      expect(laydate.getEndDate(11, 2017)).to.equal(30, '2017年11月最後一天為30');
+      expect(laydate.getEndDate(10, 2017)).to.equal(31, '2017年10月最後一天為31');
+      expect(laydate.getEndDate(2, 2017)).to.equal(28, '2017年2月最後一天為28');
+      expect(laydate.getEndDate(2, 2016)).to.equal(29, '2016年2月最後一天為29');
     });
   });
 
@@ -1388,7 +1388,7 @@ describe('laydate', function () {
         expect(event.cancelBubble).to.be.true;
       });
 
-      // ie中不支持, 只针对phantomjs测试
+      // ie中不支持, 只針對phantomjs測試
       if (IS_PHANTOMJS) {
         it('window.event', function () {
           var old = window.event;
@@ -1402,10 +1402,10 @@ describe('laydate', function () {
 
     describe('lay.extend', function () {
       it('default params and return value', function () {
-        expect(lay.extend).to.be.a('function', '必须是方法');
-        expect(lay.extend()).to.be.a('object', '返回值必须是对象');
-        expect(lay.extend({})).to.be.a('object', '返回值必须是对象');
-        expect(lay.extend({}, {})).to.be.a('object', '返回值必须是对象');
+        expect(lay.extend).to.be.a('function', '必須是方法');
+        expect(lay.extend()).to.be.a('object', '返回值必須是對象');
+        expect(lay.extend({})).to.be.a('object', '返回值必須是對象');
+        expect(lay.extend({}, {})).to.be.a('object', '返回值必須是對象');
       });
 
       it('multiple object', function () {
@@ -1414,11 +1414,11 @@ describe('laydate', function () {
         expect(lay.extend(true, {a: 1}, {b: 2})).to.deep.equal({
           a: 1,
           b: 2
-        }, '合并多个对象');
+        }, '合併多個對象');
         expect(lay.extend({a: 1}, {b: 2})).to.deep.equal({
           a: 1,
           b: 2
-        }, '合并多个对象');
+        }, '合併多個對象');
       });
 
       it('recursion merge', function () {
@@ -1453,15 +1453,15 @@ describe('laydate', function () {
           c: []
         });
 
-        expect(a.b).to.equal(1, '污染了原对象');
-        expect(a.c).to.deep.equal([], '污染了原对象');
+        expect(a.b).to.equal(1, '汙染了原對象');
+        expect(a.c).to.deep.equal([], '汙染了原對象');
       });
     });
 
     describe('lay.each', function () {
       it('check params', function () {
-        expect(lay.each).to.be.a('function', '必须是方法');
-        expect(lay.each()).to.deep.equal(lay, '返回值判断');
+        expect(lay.each).to.be.a('function', '必須是方法');
+        expect(lay.each()).to.deep.equal(lay, '返回值判斷');
         expect(lay.each({})).to.deep.equal(lay);
         expect(lay.each([])).to.deep.equal(lay);
         expect(lay.each({}, function () {})).to.deep.equal(lay);
@@ -1542,7 +1542,7 @@ describe('laydate', function () {
 
     describe('lay.elem', function () {
       it('create div', function () {
-        expect(lay.elem('div')).to.be.an.instanceof(HTMLElement, '必须是 html 节点');
+        expect(lay.elem('div')).to.be.an.instanceof(HTMLElement, '必須是 html 節點');
       });
 
       it('has error', function () {
@@ -1566,8 +1566,8 @@ describe('laydate', function () {
 
     describe('lay.digit', function () {
       it('default params and return value', function () {
-        expect(lay.digit).to.be.a('function', '必须是方法');
-        expect(lay.digit()).to.equal('undefined', '无参数时返回 undefined');
+        expect(lay.digit).to.be.a('function', '必須是方法');
+        expect(lay.digit()).to.equal('undefined', '無參數時返回 undefined');
       });
 
       it('default length', function () {
@@ -1581,9 +1581,9 @@ describe('laydate', function () {
         expect(lay.digit(1, 1)).to.equal('1');
         expect(lay.digit(1, 2)).to.equal('01');
         expect(lay.digit(11, 1)).to.equal('11');
-        expect(lay.digit('11', 10)).to.equal('0000000011', '补10位');
+        expect(lay.digit('11', 10)).to.equal('0000000011', '補10位');
         expect(lay.digit(1, 5)).to.equal('00001');
-        expect(lay.digit(1, 100).length).to.equal(100, '补100位');
+        expect(lay.digit(1, 100).length).to.equal(100, '補100位');
       });
     });
 
@@ -1596,7 +1596,7 @@ describe('laydate', function () {
 
   describe('lay()', function () {
     it('return value', function () {
-      expect(lay).to.be.a('function', '必须是方法');
+      expect(lay).to.be.a('function', '必須是方法');
       expect(lay()).to.be.a('object');
     });
 

@@ -3,51 +3,51 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <title>完整库使用 - layui</title>
+  <title>完整庫使用 - layui</title>
 
   <link rel="stylesheet" href="../src/css/layui.css">
 
   <style>
     body{padding: 10px;}
   </style>
-  
+
 </head>
 <body>
 
 <textarea style="
-  position: fixed; 
-  top: 0; 
-  bottom: 0; 
-  right:0; 
-  width: 100px; 
-  background-color:#666; 
-  z-index:100; 
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right:0;
+  width: 100px;
+  background-color:#666;
+  z-index:100;
 resize: none;">
 
 </textarea>
 
 
 <div id="demo1"></div>
-<button class="layui-btn demo" test-active="test-form">测试弹出式 Form</button>
-<button class="layui-btn demo" test-active="test-use">测试是否重复加载内置组件</button>
+<button class="layui-btn demo" test-active="test-form">測試彈出式 Form</button>
+<button class="layui-btn demo" test-active="test-use">測試是否重複加載內置組件</button>
 
 <div class="layui-tab" lay-filter="tabDemo">
   <ul class="layui-tab-title">
-    <li class="layui-this" lay-id="1">标题1</li>
-    <li lay-id="2">标题2</li>
-    <li lay-id="3">标题3</li>
-    <li lay-id="4">标题4</li>
-    <li lay-id="5">标题5</li>
+    <li class="layui-this" lay-id="1">標題1</li>
+    <li lay-id="2">標題2</li>
+    <li lay-id="3">標題3</li>
+    <li lay-id="4">標題4</li>
+    <li lay-id="5">標題5</li>
   </ul>
   <div class="layui-tab-content">
     <div class="layui-tab-item layui-show">
       <div class="layui-form">
         <select name="city" lay-verify="">
-          <option value="">请选择一个城市</option>
+          <option value="">請選擇一個城市</option>
           <option value="010">北京</option>
           <option value="021">上海</option>
           <option value="0571">杭州</option>
-        </select>  
+        </select>
       </div>
     </div>
     <div class="layui-tab-item">
@@ -73,17 +73,17 @@ layui.use(function(){
   ,element = layui.element
   ,transfer = layui.transfer
   ,util = layui.util;
-  
+
   layer.msg('hello');
-  
+
   laypage.render({
     elem: 'demo1'
-    ,count: 100 //总页数
+    ,count: 100 //總頁數
   });
-  
+
   console.log(lay('#footer').html());
-  
-  //测试加载非内置模块
+
+  //測試加載非內置模塊
   /*
   layui.config({
     base: 'extends/'
@@ -92,28 +92,28 @@ layui.use(function(){
     ,mod2: 'mod2'
   }).use('mod1');
   */
-  
-  
-  //定义标题及数据源
+
+
+  //定義標題及數據源
   transfer.render({
     elem: '#test2'
-    ,title: ['候选文人', '获奖文人']  //自定义标题
+    ,title: ['候選文人', '獲獎文人']  //自定義標題
     ,data: [
       {"value": "1", "title": "李白"}
       ,{"value": "2", "title": "杜甫"}
-      ,{"value": "3", "title": "苏轼"}
+      ,{"value": "3", "title": "蘇軾"}
       ,{"value": "4", "title": "李清照"}
-      ,{"value": "5", "title": "鲁迅", "disabled": true}
+      ,{"value": "5", "title": "魯迅", "disabled": true}
       ,{"value": "6", "title": "巴金"}
       ,{"value": "7", "title": "冰心"}
       ,{"value": "8", "title": "矛盾"}
-      ,{"value": "9", "title": "贤心"}
+      ,{"value": "9", "title": "賢心"}
     ]
-    //,width: 150 //定义宽度
-    ,height: 210 //定义高度
+    //,width: 150 //定義寬度
+    ,height: 210 //定義高度
   });
-  
-  //触发事件
+
+  //觸發事件
   util.event('test-active', {
     'test-form': function(){
       layer.open({
@@ -121,13 +121,13 @@ layui.use(function(){
         ,resize: false
         ,content: ['<ul class="layui-form" style="margin: 10px;">'
           ,'<li class="layui-form-item">'
-            ,'<label class="layui-form-label">输入框</label>'
+            ,'<label class="layui-form-label">輸入框</label>'
             ,'<div class="layui-input-block">'
               ,'<input class="layui-input" name="field1">'
             ,'</div>'
           ,'</li>'
           ,'<li class="layui-form-item">'
-            ,'<label class="layui-form-label">选择框</label>'
+            ,'<label class="layui-form-label">選擇框</label>'
             ,'<div class="layui-input-block">'
               ,'<select name="field2">'
                 ,'<option value="A">A</option>'
@@ -141,7 +141,7 @@ layui.use(function(){
         ,'</ul>'].join('')
         ,success: function(layero){
           layero.find('.layui-layer-content').css('overflow', 'visible');
-          
+
           form.render().on('submit(*)', function(data){
             layer.msg(JSON.stringify(data.field));
           });
@@ -150,13 +150,13 @@ layui.use(function(){
     }
     ,'test-use': function(othis){
       layui.use(['laytpl','laypage','laydate','jquery','layer','util','element','upload','slider','colorpicker','form','tree','transfer','table','carousel','rate','flow','layedit','code'], function(){
-        layer.tips('请观察 Network 是否有重复加载 js 文件。如果没有任何新的请求，则代表正常。', othis, {
+        layer.tips('請觀察 Network 是否有重複加載 js 文件。如果沒有任何新的請求，則代表正常。', othis, {
           time: 10*1000
         });
       });
     }
   });
-  
+
 });
 //})();
 </script>
@@ -164,9 +164,9 @@ layui.use(function(){
 
 
 <span class="layui-breadcrumb" lay-separator="-">
-  <a href="">首页</a>
-  <a href="">国际新闻</a>
-  <a href="">亚太地区</a>
+  <a href="">首頁</a>
+  <a href="">國際新聞</a>
+  <a href="">亞太地區</a>
   <a><cite>正文</cite></a>
 </span>
 

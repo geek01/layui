@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>滑块 - layui</title>
+<title>滑塊 - layui</title>
 
 <link rel="stylesheet" href="../src/css/layui.css">
 
@@ -23,32 +23,32 @@ body{padding:100px 0;}
 
 layui.use('slider', function(){
   var slider = layui.slider;
-  
+
   var sliderInst = slider.render({
     elem: '#slideTest1'
     //,type: 'vertical'
     //,min: -20 //最小值
     //,max: 20 //最大值
     //,value: 10 //[40, 60] //初始值
-    //,step: 10 //间隔值
-    //,showstep: true //间隔点
-    //,tips: false //关闭提示文本
-    ,input: true //输入框
-    //,range: true //范围选择
-    ,change: function(value){ //回调实时显示当前值
+    //,step: 10 //間隔值
+    //,showstep: true //間隔點
+    //,tips: false //關閉提示文本
+    ,input: true //輸入框
+    //,range: true //範圍選擇
+    ,change: function(value){ //回調實時顯示當前值
       console.log(value)
     }
-    ,setTips: function(value){ //自定义提示文本
+    ,setTips: function(value){ //自定義提示文本
       return value + '%';
     }
-    //,setTips: function(value){ //自定义提示文本
-      //return '离世界末日还有 ' + value + ' 天';
+    //,setTips: function(value){ //自定義提示文本
+      //return '離世界末日還有 ' + value + ' 天';
     //}
-    //,height: '300' //配合 type:'vertical' 参数使用，默认200px
-    //,disabled: true //禁用滑块
-    //,theme: '#c00' //主题色
+    //,height: '300' //配合 type:'vertical' 參數使用，默認200px
+    //,disabled: true //禁用滑塊
+    //,theme: '#c00' //主題色
   });
-  
+
   sliderInst.setValue(30);
 });
 </script>

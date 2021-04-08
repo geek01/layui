@@ -1,5 +1,5 @@
 /**
- * @file laytpl - 测试
+ * @file laytpl - 測試
  * @author xuexb <fe.xiaowu@gmail.com>
  */
 
@@ -24,18 +24,18 @@ describe('laytpl', function () {
     expect(laytpl('').render()).to.have.string('Laytpl Error');
 
     laytpl('{{ d.name }}是一位公猿').render({
-      name: '贤心'
+      name: '賢心'
     }, function (result) {
-      expect(result).to.equal('贤心是一位公猿');
+      expect(result).to.equal('賢心是一位公猿');
       done();
     });
   });
 
   it('sync result', function () {
     var result = laytpl('{{ d.name }}是一位公猿').render({
-      name: '贤心'
+      name: '賢心'
     });
-    expect(result).to.equal('贤心是一位公猿');
+    expect(result).to.equal('賢心是一位公猿');
   });
 
   it('cached', function () {
@@ -79,7 +79,7 @@ describe('laytpl', function () {
       ].join('')).render({})).to.be.a('string');
     });
 
-    // 表达式返回boolean
+    // 表達式返回boolean
     it('boolean', function () {
       expect(laytpl([
         '{{# ',

@@ -1,11 +1,11 @@
- 
- 
+
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>layer 弹层 - layui</title>
+<title>layer 彈層 - layui</title>
 
 <link rel="stylesheet" href="../src/css/layui.css">
 
@@ -35,25 +35,25 @@ body{padding: 100px;}
 <script src="../src/layui.js"></script>
 <script>
 layui.use('layer', function(){
-  var $ = layui.jquery, layer = layui.layer; //独立版的layer无需执行这一句
-  
-  
+  var $ = layui.jquery, layer = layui.layer; //獨立版的layer無需執行這一句
+
+
   var index = layer.msg('hello');
   //layer.close(index);
-  
-  //触发事件
+
+  //觸發事件
   var active = {
     test: function(){
-      layer.alert('你好么，体验者');
+      layer.alert('你好麼，體驗者');
     }
     ,test2: function(){
-      layer.confirm('您是如何看待前端开发？', {
-        btn: ['重要','奇葩'] //按钮
+      layer.confirm('您是如何看待前端開發？', {
+        btn: ['重要','奇葩'] //按鈕
       }, function(){
-        layer.msg('的确很重要', {icon: 1});
+        layer.msg('的確很重要', {icon: 1});
       }, function(){
-        layer.msg('也可以这样', {
-          time: 20000, //20s后自动关闭
+        layer.msg('也可以這樣', {
+          time: 20000, //20s後自動關閉
           btn: ['明白了', '知道了']
         });
       });
@@ -62,14 +62,14 @@ layui.use('layer', function(){
       layer.msg('玩命提示中');
     }
     ,test4: function(){
-      layer.tips('Hi，我是一个小提示', this, {tips: 1});
+      layer.tips('Hi，我是一個小提示', this, {tips: 1});
     }
     ,test5: function(){
        layer.open({
-        title:'更新论坛信息',
+        title:'更新論壇信息',
         type: 1,
-        skin: 'layui-layer-rim', 
-        area: ['1000px', '580px'], 
+        skin: 'layui-layer-rim',
+        area: ['1000px', '580px'],
         content: $('#test11111')
       });
     }
@@ -82,11 +82,11 @@ layui.use('layer', function(){
       });
     }
     ,test7: function(){
-      layer.prompt({title: '输入任何口令，并确认', formType: 1}, function(pass, index){
+      layer.prompt({title: '輸入任何口令，並確認', formType: 1}, function(pass, index){
         layer.close(index);
-        layer.prompt({title: '随便写点啥，并确认', formType: 2}, function(text, index){
+        layer.prompt({title: '隨便寫點啥，並確認', formType: 2}, function(text, index){
           layer.close(index);
-          layer.msg('演示完毕！您的口令：'+ pass +'<br>您最后写下了：'+text);
+          layer.msg('演示完畢！您的口令：'+ pass +'<br>您最後寫下了：'+text);
         });
       });
     }
@@ -94,20 +94,20 @@ layui.use('layer', function(){
       layer.tab({
         area: ['600px', '300px'],
         tab: [{
-          title: 'TAB1', 
-          content: '内容1'
+          title: 'TAB1',
+          content: '內容1'
         }, {
-          title: 'TAB2', 
-          content: '内容2'
+          title: 'TAB2',
+          content: '內容2'
         }, {
-          title: 'TAB3', 
-          content: '内容3'
+          title: 'TAB3',
+          content: '內容3'
         }]
       });
     }
-    
+
   };
-  
+
   $('.demo').on('click', function(){
     var type = $(this).data('type');
     active[type] ? active[type].call(this) : '';

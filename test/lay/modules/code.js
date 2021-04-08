@@ -1,5 +1,5 @@
 /**
- * @file code - 测试
+ * @file code - 測試
  * @author xuexb <fe.xiaowu@gmail.com>
  */
 
@@ -10,11 +10,11 @@ var laycode = layui.code;
 var $ = layui.$;
 
 /**
- * 创建dom元素, 并返回 jquery 对象
+ * 創建dom元素, 並返回 jquery 對象
  *
  * @inner
  *
- * @param  {string} html 标签
+ * @param  {string} html 標籤
  *
  * @return {jQuery}
  */
@@ -23,18 +23,18 @@ var createNode = function (html) {
 };
 
 describe('code', function () {
-  // 输出测试节点
+  // 輸出測試節點
   beforeEach(function () {
     createNode('<div id="test-div"></div>');
   });
 
-  // 删除节点
+  // 刪除節點
   afterEach(function () {
     $('.test-node').remove();
   });
 
   it('css loaded', function () {
-    expect($('#layuicss-skincodecss').length).to.equal(1, 'css link 节点必须存在');
+    expect($('#layuicss-skincodecss').length).to.equal(1, 'css link 節點必須存在');
   });
 
   it('default params', function () {
@@ -45,9 +45,9 @@ describe('code', function () {
     createNode('<pre class="layui-code"><div class="layui-code-div">123</div></pre>');
     laycode();
 
-    expect($('.layui-code').hasClass('layui-code-view')).to.equal(true, '元素的样式名必须包含 layui-code-view');
-    expect($('.layui-code').find('.layui-code-div').length).to.equal(1, '默认没有 encode');
-    expect($('.layui-code').find('.layui-code-h3 a').length).to.equal(1, '默认有版权元素');
+    expect($('.layui-code').hasClass('layui-code-view')).to.equal(true, '元素的樣式名必須包含 layui-code-view');
+    expect($('.layui-code').find('.layui-code-div').length).to.equal(1, '默認沒有 encode');
+    expect($('.layui-code').find('.layui-code-h3 a').length).to.equal(1, '默認有版權元素');
   });
 
   it('options.elem', function () {
@@ -68,11 +68,11 @@ describe('code', function () {
     laycode({
       title: 'layui',
 
-      // 主要是版权和标题在一个元素内
+      // 主要是版權和標題在一個元素內
       about: false
     });
 
-    expect($('.layui-code-h3').text()).to.equal('layui', '判断标题元素');
+    expect($('.layui-code-h3').text()).to.equal('layui', '判斷標題元素');
   });
 
   it('options.height', function () {
@@ -82,7 +82,7 @@ describe('code', function () {
       height: 100
     });
 
-    expect($('.layui-code-ol').css('maxHeight')).to.equal('100px', '判断ol元素的最大高');
+    expect($('.layui-code-ol').css('maxHeight')).to.equal('100px', '判斷ol元素的最大高');
   });
 
   it('options.encode', function () {
@@ -92,7 +92,7 @@ describe('code', function () {
       encode: true
     });
 
-    expect($('.layui-code').find('.layui-code-div').length).to.equal(0, 'encode 后元素被转义');
+    expect($('.layui-code').find('.layui-code-div').length).to.equal(0, 'encode 後元素被轉義');
   });
 
   it('options.skin', function () {
@@ -102,7 +102,7 @@ describe('code', function () {
       skin: 'notepad'
     });
 
-    expect($('.layui-code-notepad').length).to.equal(1, '自定义风格存在');
+    expect($('.layui-code-notepad').length).to.equal(1, '自定義風格存在');
   });
 
   it('options.about', function () {
@@ -112,18 +112,18 @@ describe('code', function () {
       about: false
     });
 
-    expect($('.layui-code').find('.layui-code-h3 a').length).to.equal(0, '不输出版权元素');
+    expect($('.layui-code').find('.layui-code-h3 a').length).to.equal(0, '不輸出版權元素');
   });
 
   it('attr lay-title', function () {
     createNode('<pre class="layui-code" lay-title="layui"><div>123</div></pre>');
 
     laycode({
-      // 主要是版权和标题在一个元素内
+      // 主要是版權和標題在一個元素內
       about: false
     });
 
-    expect($('.layui-code-h3').text()).to.equal('layui', '判断标题元素');
+    expect($('.layui-code-h3').text()).to.equal('layui', '判斷標題元素');
   });
 
   it('attr lay-height', function () {
@@ -131,7 +131,7 @@ describe('code', function () {
 
     laycode();
 
-    expect($('.layui-code-ol').css('maxHeight')).to.equal('100px', '判断ol元素的最大高');
+    expect($('.layui-code-ol').css('maxHeight')).to.equal('100px', '判斷ol元素的最大高');
   });
 
   it('attr lay-encode', function () {
@@ -139,7 +139,7 @@ describe('code', function () {
 
     laycode();
 
-    expect($('.layui-code').find('.layui-code-div').length).to.equal(0, 'encode 后元素被转义');
+    expect($('.layui-code').find('.layui-code-div').length).to.equal(0, 'encode 後元素被轉義');
   });
 
   it('attr lay-skin', function () {
@@ -147,7 +147,7 @@ describe('code', function () {
 
     laycode();
 
-    expect($('.layui-code-notepad').length).to.equal(1, '自定义风格存在');
+    expect($('.layui-code-notepad').length).to.equal(1, '自定義風格存在');
   });
 
   it('multiple nested', function () {
@@ -160,8 +160,8 @@ describe('code', function () {
 
     laycode();
 
-    expect($('.layui-code-view').length).to.equal(2, '必须输出2个代码块');
-    expect($('.layui-code-h3').length).to.equal(2, '必须输出2个标题元素');
+    expect($('.layui-code-view').length).to.equal(2, '必須輸出2個代碼塊');
+    expect($('.layui-code-h3').length).to.equal(2, '必須輸出2個標題元素');
   });
 
   it('multiple init', function () {
@@ -172,8 +172,8 @@ describe('code', function () {
     expect($('.layui-code-h3').length).to.equal(1);
 
     laycode();
-    expect($('.layui-code-view').length).to.equal(1, '同标签多次调用时 view 层只有一个');
-    expect($('.layui-code-h3').length).to.equal(2, '多次调用输出多个标题元素');
+    expect($('.layui-code-view').length).to.equal(1, '同標籤多次調用時 view 層只有一個');
+    expect($('.layui-code-h3').length).to.equal(2, '多次調用輸出多個標題元素');
   });
 
   it('multiple line', function () {
