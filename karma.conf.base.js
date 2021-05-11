@@ -1,23 +1,23 @@
 /**
- * @file karma自动化测试配置
+ * @file karma自動化測試配置
  * @author fe.xiaowu@gmail.com
  */
 
 var url = require('url');
 
 /**
- * mock一个server供测试使用
+ * mock一個server供測試使用
  *
  * @param  {Object}   req  request
  * @param  {Object}   res  response
  * @param  {Function} next 下一路由
  *
  * @example
- * 请求 /api/mock 参数如:
- *     timeout - 超时时间, 默认 0
- *     statusCode - 状态码, 默认 200
- *     response - 响应内容, 默认 {}
- *     dataType - 响应格式, 默认 json
+ * 請求 /api/mock 參數如:
+ *     timeout - 超時時間, 默認 0
+ *     statusCode - 狀態碼, 默認 200
+ *     response - 響應內容, 默認 {}
+ *     dataType - 響應格式, 默認 json
  */
 var httpServer = function (req, res, next) {
     if (req.url.indexOf('/api/mock') === -1) {
@@ -61,7 +61,7 @@ var sourceFileMap = [
 ];
 
 /**
- * 测试覆盖率文件, 要忽略 jquery.js、zepto.js
+ * 測試覆蓋率文件, 要忽略 jquery.js、zepto.js
  *
  * @type {Object}
  */
@@ -79,7 +79,7 @@ module.exports = function (config) {
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        // Important: 下列数组中文件将『逆序载入』
+        // Important: 下列數組中文件將『逆序載入』
         frameworks: ['mocha', 'chai', 'chai-sinon'],
 
 
@@ -101,7 +101,7 @@ module.exports = function (config) {
 
         client: {
             mocha: {
-                // mocha测试超时6秒
+                // mocha測試超時6秒
                 timeout: 1000 * 6
             }
         },
@@ -146,7 +146,7 @@ module.exports = function (config) {
 
         // level of logging
         // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-        // Note: 如果要调试Karma，请设置为DEBUG
+        // Note: 如果要調試Karma，請設置為DEBUG
         logLevel: config.LOG_INFO,
 
         // start these browsers
@@ -157,12 +157,12 @@ module.exports = function (config) {
 
 
         // enable / disable watching file and executing tests whenever any file changes
-        // Note: 代码改动自动运行测试，需要singleRun为false
+        // Note: 代碼改動自動運行測試，需要singleRun為false
         autoWatch: false,
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
-        // 脚本调用请设为 true
+        // 腳本調用請設為 true
         singleRun: true,
 
         middleware: ['httpServer'],

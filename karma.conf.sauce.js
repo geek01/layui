@@ -12,7 +12,7 @@ var customLaunchers = {
         browserName: 'Safari'
     },
 
-    // 安卓浏览器
+    // 安卓瀏覽器
     // sl_android_4_4: {
     //     base: 'SauceLabs',
     //     browserName: 'android',
@@ -68,13 +68,13 @@ var customLaunchers = {
     // }
 };
 
-// 不支持本地运行
+// 不支持本地運行
 if (!process.env.TRAVIS) {
-    console.error('不支持本地运行, 请使用 npm run test!');
+    console.error('不支持本地運行, 請使用 npm run test!');
     process.exit(1);
 }
 
-// 变量检查
+// 變量檢查
 if (!process.env.SAUCE_USERNAME || !process.env.SAUCE_ACCESS_KEY) {
     console.error('---------------');
     console.error('Make sure the SAUCE_USERNAME and SAUCE_ACCESS_KEY environment variables are set.');

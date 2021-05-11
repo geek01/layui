@@ -1,18 +1,18 @@
 /**
- 
- @Name：transfer 穿梭框组件
+
+ @Name：transfer 穿梭框組件
  @License：MIT
 
  */
 
 layui.define(['laytpl', 'form'], function(exports){
   "use strict";
-  
+
   var $ = layui.$
   ,laytpl = layui.laytpl
   ,form = layui.form
-  
-  //模块名
+
+  //模塊名
   ,MOD_NAME = 'transfer'
 
   //外部接口
@@ -20,42 +20,42 @@ layui.define(['laytpl', 'form'], function(exports){
     config: {}
     ,index: layui[MOD_NAME] ? (layui[MOD_NAME].index + 10000) : 0
 
-    //设置全局项
+    //設置全局項
     ,set: function(options){
       var that = this;
       that.config = $.extend({}, that.config, options);
       return that;
     }
-    
+
     //事件
     ,on: function(events, callback){
       return layui.onevent.call(this, MOD_NAME, events, callback);
     }
   }
 
-  //操作当前实例
+  //操作當前實例
   ,thisModule = function(){
     var that = this
     ,options = that.config
     ,id = options.id || that.index;
-    
-    thisModule.that[id] = that; //记录当前实例对象
-    thisModule.config[id] = options; //记录当前实例配置项
-    
+
+    thisModule.that[id] = that; //記錄當前實例對象
+    thisModule.config[id] = options; //記錄當前實例配置項
+
     return {
       config: options
-      //重置实例
+      //重置實例
       ,reload: function(options){
         that.reload.call(that, options);
       }
-      //获取右侧数据
+      //獲取右側數據
       ,getData: function(){
         return that.getData.call(that);
       }
     }
   }
-  
-  //获取当前实例配置项
+
+  //獲取當前實例配置項
   ,getThisModuleConfig = function(id){
     var config = thisModule.config[id];
     if(!config) hint.error('The ID option was not found in the '+ MOD_NAME +' instance');
@@ -65,7 +65,7 @@ layui.define(['laytpl', 'form'], function(exports){
   //字符常量
   ,ELEM = 'layui-transfer', HIDE = 'layui-hide', DISABLED = 'layui-btn-disabled', NONE = 'layui-none'
   ,ELEM_BOX = 'layui-transfer-box', ELEM_HEADER = 'layui-transfer-header', ELEM_SEARCH = 'layui-transfer-search', ELEM_ACTIVE = 'layui-transfer-active', ELEM_DATA = 'layui-transfer-data'
-  
+
   //穿梭框模板
   ,TPL_BOX = function(obj){
     obj = obj || {};
@@ -76,13 +76,13 @@ layui.define(['laytpl', 'form'], function(exports){
       ,'{{# if(d.data.showSearch){ }}'
       ,'<div class="layui-transfer-search">'
         ,'<i class="layui-icon layui-icon-search"></i>'
-        ,'<input type="input" class="layui-input" placeholder="关键词搜索">'
+        ,'<input type="input" class="layui-input" placeholder="關鍵詞搜索">'
       ,'</div>'
       ,'{{# } }}'
       ,'<ul class="layui-transfer-data"></ul>'
     ,'</div>'].join('');
   }
-  
+
   //主模板
   ,TPL_MAIN = ['<div class="layui-transfer layui-form layui-border-box" lay-filter="LAY-transfer-{{ d.index }}">'
     ,TPL_BOX({
@@ -103,7 +103,7 @@ layui.define(['laytpl', 'form'], function(exports){
     })
   ,'</div>'].join('')
 
-  //构造器
+  //構造器
   ,Class = function(options){
     var that = this;
     that.index = ++transfer.index;
@@ -111,22 +111,22 @@ layui.define(['laytpl', 'form'], function(exports){
     that.render();
   };
 
-  //默认配置
+  //默認配置
   Class.prototype.config = {
     title: ['列表一', '列表二']
     ,width: 200
     ,height: 360
-    ,data: [] //数据源
-    ,value: [] //选中的数据
-    ,showSearch: false //是否开启搜索
-    ,id: '' //唯一索引，默认自增 index
+    ,data: [] //數據源
+    ,value: [] //選中的數據
+    ,showSearch: false //是否開啟搜索
+    ,id: '' //唯一索引，默認自增 index
     ,text: {
-      none: '无数据'
-      ,searchNone: '无匹配数据'
+      none: '無數據'
+      ,searchNone: '無匹配數據'
     }
   };
-  
-  //重载实例
+
+  //重載實例
   Class.prototype.reload = function(options){
     var that = this;
     that.config = $.extend({}, that.config, options);
@@ -137,33 +137,33 @@ layui.define(['laytpl', 'form'], function(exports){
   Class.prototype.render = function(){
     var that = this
     ,options = that.config;
-    
+
     //解析模板
     var thisElem = that.elem = $(laytpl(TPL_MAIN).render({
       data: options
       ,index: that.index //索引
     }));
-    
+
     var othis = options.elem = $(options.elem);
     if(!othis[0]) return;
-    
-    //初始化属性
+
+    //初始化屬性
     options.data = options.data || [];
     options.value = options.value || [];
-    
+
     //索引
     that.key = options.id || that.index;
-    
-    //插入组件结构
+
+    //插入組件結構
     othis.html(that.elem);
-    
-    //各级容器
+
+    //各級容器
     that.layBox = that.elem.find('.'+ ELEM_BOX)
     that.layHeader = that.elem.find('.'+ ELEM_HEADER)
     that.laySearch = that.elem.find('.'+ ELEM_SEARCH)
     that.layData = thisElem.find('.'+ ELEM_DATA);
     that.layBtn = thisElem.find('.'+ ELEM_ACTIVE + ' .layui-btn');
-    
+
     //初始化尺寸
     that.layBox.css({
       width: options.width
@@ -174,17 +174,17 @@ layui.define(['laytpl', 'form'], function(exports){
         return options.height - that.layHeader.outerHeight() - that.laySearch.outerHeight() - 2
       }()
     });
-    
-    that.renderData(); //渲染数据
+
+    that.renderData(); //渲染數據
     that.events(); //事件
   };
-  
-  //渲染数据
+
+  //渲染數據
   Class.prototype.renderData = function(){
     var that = this
     ,options = that.config;
-    
-    //左右穿梭框差异数据
+
+    //左右穿梭框差異數據
     var arr = [{
       checkName: 'layTransferLeftCheck'
       ,views: []
@@ -192,10 +192,10 @@ layui.define(['laytpl', 'form'], function(exports){
       checkName: 'layTransferRightCheck'
       ,views: []
     }];
-    
+
     //解析格式
-    that.parseData(function(item){      
-      //标注为 selected 的为右边的数据
+    that.parseData(function(item){
+      //標註為 selected 的為右邊的數據
       var _index = item.selected ? 1 : 0
       ,listElem = ['<li>'
         ,'<input type="checkbox" name="'+ arr[_index].checkName +'" lay-skin="primary" lay-filter="layTransferCheckbox" title="'+ item.title +'"'+ (item.disabled ? ' disabled' : '') + (item.checked ? ' checked' : '') +' value="'+ item.value +'">'
@@ -203,32 +203,32 @@ layui.define(['laytpl', 'form'], function(exports){
       arr[_index].views.push(listElem);
       delete item.selected;
     });
-    
+
     that.layData.eq(0).html(arr[0].views.join(''));
     that.layData.eq(1).html(arr[1].views.join(''));
-    
+
     that.renderCheckBtn();
   }
-  
-  //渲染表单
+
+  //渲染表單
   Class.prototype.renderForm = function(type){
     form.render(type, 'LAY-transfer-'+ this.index);
   };
-  
-  //同步复选框和按钮状态
+
+  //同步複選框和按鈕狀態
   Class.prototype.renderCheckBtn = function(obj){
     var that = this
     ,options = that.config;
-    
+
     obj = obj || {};
-    
+
     that.layBox.each(function(_index){
       var othis = $(this)
       ,thisDataElem = othis.find('.'+ ELEM_DATA)
       ,allElemCheckbox = othis.find('.'+ ELEM_HEADER).find('input[type="checkbox"]')
       ,listElemCheckbox =  thisDataElem.find('input[type="checkbox"]');
-      
-      //同步复选框和按钮状态
+
+      //同步複選框和按鈕狀態
       var nums = 0
       ,haveChecked = false;
       listElemCheckbox.each(function(){
@@ -240,21 +240,21 @@ layui.define(['laytpl', 'form'], function(exports){
           haveChecked = true;
         }
       });
-      
-      allElemCheckbox.prop('checked', haveChecked && nums === listElemCheckbox.length); //全选复选框状态
-      that.layBtn.eq(_index)[haveChecked ? 'removeClass' : 'addClass'](DISABLED); //对应的按钮状态
-      
-      //无数据视图
+
+      allElemCheckbox.prop('checked', haveChecked && nums === listElemCheckbox.length); //全選複選框狀態
+      that.layBtn.eq(_index)[haveChecked ? 'removeClass' : 'addClass'](DISABLED); //對應的按鈕狀態
+
+      //無數據視圖
       if(!obj.stopNone){
         var isNone = thisDataElem.children('li:not(.'+ HIDE +')').length
         that.noneView(thisDataElem, isNone ? '' : options.text.none);
       }
     });
-    
+
     that.renderForm('checkbox');
   };
-  
-  //无数据视图
+
+  //無數據視圖
   Class.prototype.noneView = function(thisDataElem, text){
     var createNoneElem = $('<p class="layui-none">'+ (text || '') +'</p>');
     if(thisDataElem.find('.'+ NONE)[0]){
@@ -262,8 +262,8 @@ layui.define(['laytpl', 'form'], function(exports){
     }
     text.replace(/\s/g, '') && thisDataElem.append(createNoneElem);
   };
-  
-  //同步 value 属性值
+
+  //同步 value 屬性值
   Class.prototype.setValue = function(){
     var that = this
     ,options = that.config
@@ -273,24 +273,24 @@ layui.define(['laytpl', 'form'], function(exports){
       isHide || arr.push(this.value);
     });
     options.value = arr;
-    
+
     return that;
   };
 
-  //解析数据
+  //解析數據
   Class.prototype.parseData = function(callback){
     var that = this
     ,options = that.config
     ,newData = [];
-    
+
     layui.each(options.data, function(index, item){
       //解析格式
-      item = (typeof options.parseData === 'function' 
-        ? options.parseData(item) 
+      item = (typeof options.parseData === 'function'
+        ? options.parseData(item)
       : item) || item;
-      
+
       newData.push(item = $.extend({}, item))
-      
+
       layui.each(options.value, function(index2, item2){
         if(item2 == item.value){
           item.selected = true;
@@ -298,19 +298,19 @@ layui.define(['laytpl', 'form'], function(exports){
       });
       callback && callback(item);
     });
-   
+
     options.data = newData;
     return that;
   };
-  
-  //获得右侧面板数据
+
+  //獲得右側面板數據
   Class.prototype.getData = function(value){
     var that = this
     ,options = that.config
     ,selectedData = [];
-    
+
     that.setValue();
-    
+
     layui.each(value || options.value, function(index, item){
       layui.each(options.data, function(index2, item2){
         delete item2.selected;
@@ -321,71 +321,71 @@ layui.define(['laytpl', 'form'], function(exports){
     });
     return selectedData;
   };
-  
+
   //事件
   Class.prototype.events = function(){
     var that = this
     ,options = that.config;
-    
-    //左右复选框
-    that.elem.on('click', 'input[lay-filter="layTransferCheckbox"]+', function(){ 
+
+    //左右複選框
+    that.elem.on('click', 'input[lay-filter="layTransferCheckbox"]+', function(){
       var thisElemCheckbox = $(this).prev()
       ,checked = thisElemCheckbox[0].checked
       ,thisDataElem = thisElemCheckbox.parents('.'+ ELEM_BOX).eq(0).find('.'+ ELEM_DATA);
-      
+
       if(thisElemCheckbox[0].disabled) return;
-      
-      //判断是否全选
+
+      //判斷是否全選
       if(thisElemCheckbox.attr('lay-type') === 'all'){
         thisDataElem.find('input[type="checkbox"]').each(function(){
           if(this.disabled) return;
           this.checked = checked;
         });
       }
-      
+
       that.renderCheckBtn({stopNone: true});
     });
-    
-    //按钮事件
+
+    //按鈕事件
     that.layBtn.on('click', function(){
       var othis = $(this)
       ,_index = othis.data('index')
       ,thisBoxElem = that.layBox.eq(_index)
       ,arr = [];
       if(othis.hasClass(DISABLED)) return;
-      
+
       that.layBox.eq(_index).each(function(_index){
         var othis = $(this)
         ,thisDataElem = othis.find('.'+ ELEM_DATA);
-        
+
         thisDataElem.children('li').each(function(){
           var thisList = $(this)
           ,thisElemCheckbox = thisList.find('input[type="checkbox"]')
           ,isHide = thisElemCheckbox.data('hide');
-          
+
           if(thisElemCheckbox[0].checked && !isHide){
             thisElemCheckbox[0].checked = false;
             thisBoxElem.siblings('.'+ ELEM_BOX).find('.'+ ELEM_DATA).append(thisList.clone());
             thisList.remove();
-            
-            //记录当前穿梭的数据
+
+            //記錄當前穿梭的數據
             arr.push(thisElemCheckbox[0].value);
           }
-          
+
           that.setValue();
         });
       });
-      
+
       that.renderCheckBtn();
-      
-      //穿梭时，如果另外一个框正在搜索，则触发匹配
+
+      //穿梭時，如果另外一個框正在搜索，則觸發匹配
       var siblingInput = thisBoxElem.siblings('.'+ ELEM_BOX).find('.'+ ELEM_SEARCH +' input')
       siblingInput.val() === '' ||  siblingInput.trigger('keyup');
-      
-      //穿梭时的回调
+
+      //穿梭時的回調
       options.onchange && options.onchange(that.getData(arr), _index);
     });
-    
+
     //搜索
     that.laySearch.find('input').on('keyup', function(){
       var value = this.value
@@ -402,26 +402,26 @@ layui.define(['laytpl', 'form'], function(exports){
       });
 
       that.renderCheckBtn();
-      
-      //无匹配数据视图
+
+      //無匹配數據視圖
       var isNone = thisListElem.length === thisDataElem.children('li.'+ HIDE).length;
       that.noneView(thisDataElem, isNone ? options.text.searchNone : '');
     });
   };
-  
-  //记录所有实例
-  thisModule.that = {}; //记录所有实例对象
-  thisModule.config = {}; //记录所有实例配置项
-  
-  //重载实例
+
+  //記錄所有實例
+  thisModule.that = {}; //記錄所有實例對象
+  thisModule.config = {}; //記錄所有實例配置項
+
+  //重載實例
   transfer.reload = function(id, options){
     var that = thisModule.that[id];
     that.reload(options);
-    
+
     return thisModule.call(that);
   };
-  
-  //获得选中的数据（右侧面板）
+
+  //獲得選中的數據（右側面板）
   transfer.getData = function(id){
     var that = thisModule.that[id];
     return that.getData();

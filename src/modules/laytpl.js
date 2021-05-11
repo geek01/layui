@@ -1,8 +1,8 @@
 ﻿/**
- 
+
  @Name : laytpl 模板引擎
  @License：MIT
- 
+
  */
 
 layui.define(function(exports){
@@ -18,14 +18,14 @@ layui.define(function(exports){
     exp: function(str){
       return new RegExp(str, 'g');
     },
-    //匹配满足规则内容
+    //匹配滿足規則內容
     query: function(type, _, __){
       var types = [
-        '#([\\s\\S])+?',   //js语句
+        '#([\\s\\S])+?',   //js語句
         '([^{#}])*?' //普通字段
       ][type || 0];
       return exp((_||'') + config.open + types + config.close + (__||''));
-    },   
+    },
     escape: function(html){
       return String(html||'').replace(/&(?!#?[a-zA-Z0-9]+;)/g, '&amp;')
       .replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
@@ -45,16 +45,16 @@ layui.define(function(exports){
 
   window.errors = 0;
 
-  //编译模版
+  //編譯模版
   Tpl.pt.parse = function(tpl, data){
     var that = this, tplog = tpl;
     var jss = exp('^'+config.open+'#', ''), jsse = exp(config.close+'$', '');
-    
+
     tpl = tpl.replace(/\s+|\r|\t|\n/g, ' ')
     .replace(exp(config.open+'#'), config.open+'# ')
     .replace(exp(config.close+'}'), '} '+config.close).replace(/\\/g, '\\\\')
-    
-    //不匹配指定区域的内容
+
+    //不匹配指定區域的內容
     .replace(exp(config.open + '!(.+?)!' + config.close), function(str){
       str = str.replace(exp('^'+ config.open + '!'), '')
       .replace(exp('!'+ config.close), '')
@@ -63,13 +63,13 @@ layui.define(function(exports){
       });
       return str
     })
-    
-    //匹配JS规则内容
+
+    //匹配JS規則內容
     .replace(/(?="|')/g, '\\').replace(tool.query(), function(str){
       str = str.replace(jss, '').replace(jsse, '');
       return '";' + str.replace(/\\(.)/g, '$1') + ';view+="';
     })
-    
+
     //匹配普通字段
     .replace(tool.query(1), function(str){
       var start = '"+(';
@@ -83,7 +83,7 @@ layui.define(function(exports){
       }
       return start + str.replace(/\\(.)/g, '$1') + ')+"';
     });
-    
+
     tpl = '"use strict";var view = "' + tpl + '";return view;';
 
     try{
@@ -116,7 +116,7 @@ layui.define(function(exports){
   };
 
   laytpl.v = '1.2.0';
-  
+
   exports('laytpl', laytpl);
 
 });

@@ -1,11 +1,11 @@
 ﻿
 /*!
- * 用于加载所有内置模块
- * MIT Licensed  
+ * 用於加載所有內置模塊
+ * MIT Licensed
  */
- 
+
 layui.define(function(){
-  var mods = [] 
+  var mods = []
   ,builtin = layui.cache.builtin;
   layui.each(builtin, function(modName){
     (modName === 'all' || modName === 'layui.all') || mods.push(modName);
@@ -15,9 +15,9 @@ layui.define(function(){
   return mods;
 }(), function(exports){
   "use strict";
-  
+
   var MOD_NAME = 'all'
-  
+
   //外部接口
   ,all = {
     config: {}

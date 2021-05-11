@@ -3,16 +3,16 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>树组件 - layui</title>
+  <title>樹組件 - layui</title>
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black"> 
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
 
   <link rel="stylesheet" href="../src/css/layui.css" media="all">
-  
+
   <style>
     body{padding: 100px;}
     #test1,#test2{margin-bottom: 100px; width: 400px;}
@@ -21,18 +21,18 @@
 <body>
 
 <div class="layui-btn-container">
-  <button type="button" class="layui-btn" lay-demo="getChecked">获取选中数据</button>
-  <button type="button" class="layui-btn" lay-demo="setChecked">设置节点勾选</button>
-  <button type="button" class="layui-btn" lay-demo="reload">重载实例</button>
+  <button type="button" class="layui-btn" lay-demo="getChecked">獲取選中數據</button>
+  <button type="button" class="layui-btn" lay-demo="setChecked">設置節點勾選</button>
+  <button type="button" class="layui-btn" lay-demo="reload">重載實例</button>
 </div>
 
 <div class="layui-form">
   <div class="layui-form-item">
-    <label class="layui-form-label">表单内</label>
+    <label class="layui-form-label">表單內</label>
     <div class="layui-input-block">
-     
+
   </div>
-</div>  
+</div>
 
 <div id="test1"></div>
 <div id="test2"></div>
@@ -45,134 +45,134 @@
     ,layer = layui.layer
     ,util = layui.util
     ,index = 100;
-    
-    //数据源
+
+    //數據源
     var data1 = [{
-      title: '一级1'
+      title: '一級1'
       ,id: 1
       ,children: [{
-        title: '二级1-1'
+        title: '二級1-1'
         ,id: 3
         ,href: 'https://www.layui.com/doc/'
         ,children: [{
-          title: '三级1-1-3'
+          title: '三級1-1-3'
           ,id: 23
           ,children: [{
-            title: '四级1-1-3-1'
+            title: '四級1-1-3-1'
             ,id: 24
             ,children: [{
-              title: '五级1-1-3-1-1'
+              title: '五級1-1-3-1-1'
               ,id: 30
             },{
-              title: '五级1-1-3-1-2'
+              title: '五級1-1-3-1-2'
               ,id: 31
             }]
           }]
         },{
-          title: '三级1-1-1'
+          title: '三級1-1-1'
           ,id: 7
           ,checked: true
           ,children: [{
-            title: '四级1-1-1-1'
+            title: '四級1-1-1-1'
             ,id: 15
             //,checked: true
             ,href: 'https://www.layui.com/doc/base/infrastructure.html'
           }]
         },{
-          title: '三级1-1-2'
+          title: '三級1-1-2'
           ,id: 8
           ,children: [{
-            title: '四级1-1-2-1'
+            title: '四級1-1-2-1'
             ,id: 32
           }]
         }]
       },{
-        title: '二级1-2'
+        title: '二級1-2'
         ,id: 4
         ,spread: true
         ,children: [{
-          title: '三级1-2-1'
+          title: '三級1-2-1'
           ,id: 9
           ,checked: true
           ,disabled: true
         },{
-          title: '三级1-2-2'
+          title: '三級1-2-2'
           ,id: 10
         }]
       },{
-        title: '二级1-3'
+        title: '二級1-3'
         ,id: 20
         ,children: [{
-          title: '三级1-3-1'
+          title: '三級1-3-1'
           ,id: 21
         },{
-          title: '三级1-3-2'
+          title: '三級1-3-2'
           ,id: 22
         }]
       }]
     },{
-      title: '一级2'
+      title: '一級2'
       ,id: 2
       ,spread: true
       ,children: [{
-        title: '二级2-1'
+        title: '二級2-1'
         ,id: 5
         ,spread: true
         ,children: [{
-          title: '三级2-1-1'
+          title: '三級2-1-1'
           ,id: 11
         },{
-          title: '三级2-1-2'
+          title: '三級2-1-2'
           ,id: 12
         }]
       },{
-        title: '二级2-2'
+        title: '二級2-2'
         ,id: 6
         ,checked: true
         ,children: [{
-          title: '三级2-2-1'
+          title: '三級2-2-1'
           ,id: 13
         },{
-          title: '三级2-2-2'
+          title: '三級2-2-2'
           ,id: 14
           ,disabled: true
         }]
       }]
     },{
-      title: '一级3'
+      title: '一級3'
       ,id: 16
       ,children: [{
-        title: '二级3-1'
+        title: '二級3-1'
         ,id: 17
         ,fixed: true
         ,children: [{
-          title: '三级3-1-1'
+          title: '三級3-1-1'
           ,id: 18
         },{
-          title: '三级3-1-2'
+          title: '三級3-1-2'
           ,id: 19
         }]
       },{
-        title: '二级3-2'
+        title: '二級3-2'
         ,id: 27
         ,children: [{
-          title: '三级3-2-1'
+          title: '三級3-2-1'
           ,id: 28
         },{
-          title: '三级3-2-2'
+          title: '三級3-2-2'
           ,id: 29
         }]
       }]
     }];
-    
-    //数据源
+
+    //數據源
     var data2 = [{
-      title: '控制台'
+      title: '控制檯'
       ,id: '1000'
       ,spread: true
       ,checked: true
       ,children: [{
-        title: '概览'
+        title: '概覽'
         ,id: '1001'
         ,spread: true
         ,checked: true
@@ -206,15 +206,15 @@
           console.log(obj);
         };
       }
-      ,showCheckbox: true  //是否显示复选框
-      ,accordion: 0  //是否开启手风琴模式
-      
-      ,onlyIconControl: true //是否仅允许节点左侧图标控制展开收缩
-      ,isJump: 0  //点击文案跳转地址
-      ,edit: true  //操作节点图标
+      ,showCheckbox: true  //是否顯示覆選框
+      ,accordion: 0  //是否開啟手風琴模式
+
+      ,onlyIconControl: true //是否僅允許節點左側圖標控制展開收縮
+      ,isJump: 0  //點擊文案跳轉地址
+      ,edit: true  //操作節點圖標
     });
 
-    //按钮事件
+    //按鈕事件
     util.event('lay-demo', {
       getChecked: function(othis){
         var checkedData = tree.getChecked('demoId1');
@@ -226,7 +226,7 @@
       }
       ,reload: function(){
         tree.reload('demoId1', {
-          
+
         });
       }
     });
@@ -235,7 +235,7 @@
       elem: '#test2'
       ,data: data1
       //,expandClick: false
-      ,showLine: false //关闭连接线
+      ,showLine: false //關閉連接線
       ,click: function(obj, state){
         console.log(obj);
       }
@@ -254,7 +254,7 @@
         console.log(state, obj, target);
       }
     });
-     
+
   });
 </script>
 

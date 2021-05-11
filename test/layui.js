@@ -1,5 +1,5 @@
 /**
- * @file layui - 测试
+ * @file layui - 測試
  * @author xuexb <fe.xiaowu@gmail.com>
  */
 
@@ -9,7 +9,7 @@
 var $ = layui.$;
 
 /**
- * 是否基于`phantomjs`测试, 因为有些特殊的case在ie中是不可用的, 比如: `window.event = {}`
+ * 是否基於`phantomjs`測試, 因為有些特殊的case在ie中是不可用的, 比如: `window.event = {}`
  *
  * @type {boolean}
  */
@@ -63,8 +63,8 @@ describe('layui', function () {
         }
       }));
 
-      expect(layui.router('#/a=测试/b=2').search).to.deep.equal({
-        a: '测试',
+      expect(layui.router('#/a=測試/b=2').search).to.deep.equal({
+        a: '測試',
         b: '2'
       });
 
@@ -186,10 +186,10 @@ describe('layui', function () {
     it('success callback', function (done) {
       layui.img(base64, function (img) {
         expect(img).to.not.undefined;
-        expect(typeof(img)).to.equal('object', '是img对象');
-        expect(img.nodeType).to.equal(1, 'img标签节点');
+        expect(typeof(img)).to.equal('object', '是img對象');
+        expect(img.nodeType).to.equal(1, 'img標籤節點');
 
-        // 在ie11中不通过, 原因目前不明
+        // 在ie11中不通過, 原因目前不明
         // expect(img.width).to.equal(1);
         // expect(img.height).to.equal(1);
         done();
@@ -203,7 +203,7 @@ describe('layui', function () {
       });
     });
 
-    // 先删除, 因为没有哪个图片是决定不变的
+    // 先刪除, 因為沒有哪個圖片是決定不變的
     // it('http 200', function (done) {
     //   layui.img('https://www.baidu.com/img/bd_logo1.png', function (img) {
     //     expect(img).to.not.undefined;
@@ -211,7 +211,7 @@ describe('layui', function () {
     //   });
     // });
 
-    // 由于没有超时配置, 在部分设备中, dns解析可能超时
+    // 由於沒有超時配置, 在部分設備中, dns解析可能超時
     // it('http 404', function (done) {
     //   layui.img('http://www.404.xx/logo.404.gif', function () {}, function (e) {
     //     expect(e).to.not.undefined;
@@ -251,7 +251,7 @@ describe('layui', function () {
       expect(event.cancelBubble).to.be.true;
     });
 
-    // ie中不支持, 只针对phantomjs测试
+    // ie中不支持, 只針對phantomjs測試
     if (IS_PHANTOMJS) {
       it('window.event', function () {
         var old = window.event;
@@ -323,7 +323,7 @@ describe('layui', function () {
     it('return value', function () {
       expect(layui.event('id', 'event')).to.be.null;
 
-      // 只有在返回 false 时, 结果才是 false
+      // 只有在返回 false 時, 結果才是 false
       layui.onevent('test-return-value-1', 'click', function (data) {
         return data;
       });
@@ -347,14 +347,14 @@ describe('layui', function () {
     ];
 
     it('check params and return value', function () {
-      expect(layui.sort()).to.deep.equal([], '空参数时默认为空数组');
+      expect(layui.sort()).to.deep.equal([], '空參數時默認為空數組');
 
-      expect(layui.sort({})).to.deep.equal({}, '只传空对象默认返回');
+      expect(layui.sort({})).to.deep.equal({}, '只傳空對象默認返回');
       expect(layui.sort({
         name: 'layui'
       })).to.deep.equal({
         name: 'layui'
-      }, '只传一个对象参数时返回');
+      }, '只傳一個對象參數時返回');
 
       expect(layui.sort([{
         name: 'layui'
@@ -369,11 +369,11 @@ describe('layui', function () {
       }]);
     });
 
-    // 测试是否污染原数据
+    // 測試是否汙染原數據
     it('clone object', function () {
       var clone = layui.sort(numberData, 'name');
 
-      // 往clone对象添加
+      // 往clone對象添加
       clone.push('layui');
 
       expect(clone).to.have.lengthOf(4);
@@ -534,7 +534,7 @@ describe('layui', function () {
       });
     }
 
-    // 在支持情况下才测试
+    // 在支持情況下才測試
     if (window.localStorage) {
       it('delete table data', function() {
         var id = 'test-delete-data';
@@ -556,17 +556,17 @@ describe('layui', function () {
           name: 'layui'
         });
 
-        // 删除数据
+        // 刪除數據
         layui.data(table, null);
       });
 
       it('get data', function () {
         var id = 'test-get-data';
 
-        // 直接获取肯定为空
+        // 直接獲取肯定為空
         expect(layui.data(null, id)).to.be.undefined;
 
-        // 写入数据
+        // 寫入數據
         expect(layui.data(null, {
           key: id,
           value: true
@@ -574,7 +574,7 @@ describe('layui', function () {
 
         expect(layui.data(null, id)).to.be.true;
 
-        // 清除数据
+        // 清除數據
         layui.data(null, {
           key: id,
           remove: true

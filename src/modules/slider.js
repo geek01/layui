@@ -1,6 +1,6 @@
 /**
 
- @Title: slider 滑块组件
+ @Title: slider 滑塊組件
  @License：MIT
 
  */
@@ -14,26 +14,26 @@ layui.define('jquery', function(exports){
     config: {}
     ,index: layui.slider ? (layui.slider.index + 10000) : 0
 
-    //设置全局项
+    //設置全局項
     ,set: function(options){
       var that = this;
       that.config = $.extend({}, that.config, options);
       return that;
     }
-    
+
     //事件
     ,on: function(events, callback){
       return layui.onevent.call(this, MOD_NAME, events, callback);
     }
   }
-  
-  //操作当前实例
+
+  //操作當前實例
   ,thisSlider = function(){
     var that = this
     ,options = that.config;
 
     return {
-      setValue: function(value, index){ //设置值
+      setValue: function(value, index){ //設置值
         options.value = value;
         return that.slide('set', value, index || 0);
       }
@@ -44,7 +44,7 @@ layui.define('jquery', function(exports){
   //字符常量
   ,MOD_NAME = 'slider', DISABLED = 'layui-disabled', ELEM_VIEW = 'layui-slider', SLIDER_BAR = 'layui-slider-bar', SLIDER_WRAP = 'layui-slider-wrap', SLIDER_WRAP_BTN = 'layui-slider-wrap-btn', SLIDER_TIPS = 'layui-slider-tips', SLIDER_INPUT = 'layui-slider-input', SLIDER_INPUT_TXT = 'layui-slider-input-txt', SLIDER_INPUT_BTN = 'layui-slider-input-btn', ELEM_HOVER = 'layui-slider-hover'
 
-  //构造器
+  //構造器
   ,Class = function(options){
     var that = this;
     that.index = ++slider.index;
@@ -52,36 +52,36 @@ layui.define('jquery', function(exports){
     that.render();
   };
 
-  //默认配置
+  //默認配置
   Class.prototype.config = {
-    type: 'default' //滑块类型，垂直：vertical
+    type: 'default' //滑塊類型，垂直：vertical
     ,min: 0 //最小值
-    ,max: 100 //最大值，默认100
-    ,value: 0 //初始值，默认为0
-    ,step: 1 //间隔值
-    ,showstep: false //间隔点开启
-    ,tips: true //文字提示，开启
-    ,input: false //输入框，关闭
-    ,range: false //范围选择，与输入框不能同时开启，默认关闭
-    ,height: 200 //配合 type:"vertical" 使用，默认200px
-    ,disabled: false //滑块禁用，默认关闭
-    ,theme: '#009688' //主题颜色
+    ,max: 100 //最大值，默認100
+    ,value: 0 //初始值，默認為0
+    ,step: 1 //間隔值
+    ,showstep: false //間隔點開啟
+    ,tips: true //文字提示，開啟
+    ,input: false //輸入框，關閉
+    ,range: false //範圍選擇，與輸入框不能同時開啟，默認關閉
+    ,height: 200 //配合 type:"vertical" 使用，默認200px
+    ,disabled: false //滑塊禁用，默認關閉
+    ,theme: '#009688' //主題顏色
   };
 
-  //滑块渲染
+  //滑塊渲染
   Class.prototype.render = function(){
     var that = this
     ,options = that.config;
-    
-    //间隔值不能小于 1
-    if(options.step < 1) options.step = 1;
-    
-    //最大值不能小于最小值
-    if(options.max < options.min) options.max = options.min + options.step;
-    
-    
 
-    //判断是否开启双滑块
+    //間隔值不能小於 1
+    if(options.step < 1) options.step = 1;
+
+    //最大值不能小於最小值
+    if(options.max < options.min) options.max = options.min + options.step;
+
+
+
+    //判斷是否開啟雙滑塊
     if(options.range){
       options.value = typeof(options.value) == 'object' ? options.value : [options.min, options.value];
       var minValue = Math.min(options.value[0], options.value[1])
@@ -90,57 +90,57 @@ layui.define('jquery', function(exports){
       options.value[1] = maxValue > options.min ? maxValue : options.min;
       options.value[0] = options.value[0] > options.max ? options.max : options.value[0];
       options.value[1] = options.value[1] > options.max ? options.max : options.value[1];
-      
+
       var scaleFir = Math.floor((options.value[0] - options.min) / (options.max - options.min) * 100)
       ,scaleSec = Math.floor((options.value[1] - options.min) / (options.max - options.min) * 100)
       ,scale = scaleSec - scaleFir + '%';
       scaleFir = scaleFir + '%';
       scaleSec = scaleSec + '%';
     } else {
-      //如果初始值是一个数组，则获取数组的最小值
+      //如果初始值是一個數組，則獲取數組的最小值
       if(typeof options.value == 'object'){
         options.value = Math.min.apply(null, options.value);
       }
-      
-      //初始值不能小于最小值且不能大于最大值
+
+      //初始值不能小於最小值且不能大於最大值
       if(options.value < options.min) options.value = options.min;
       if(options.value > options.max) options.value = options.max;
 
       var scale = Math.floor((options.value - options.min) / (options.max - options.min) * 100) + '%';
     };
-    
 
-    //如果禁用，颜色为统一的灰色
+
+    //如果禁用，顏色為統一的灰色
     var theme = options.disabled ? '#c2c2c2' : options.theme;
 
-    //滑块
-    var temp = '<div class="layui-slider '+ (options.type === 'vertical' ? 'layui-slider-vertical' : '') +'">'+ (options.tips ? '<div class="layui-slider-tips"></div>' : '') + 
+    //滑塊
+    var temp = '<div class="layui-slider '+ (options.type === 'vertical' ? 'layui-slider-vertical' : '') +'">'+ (options.tips ? '<div class="layui-slider-tips"></div>' : '') +
     '<div class="layui-slider-bar" style="background:'+ theme +'; '+ (options.type === 'vertical' ? 'height' : 'width') +':'+ scale +';'+ (options.type === 'vertical' ? 'bottom' : 'left') +':'+ (scaleFir || 0) +';"></div><div class="layui-slider-wrap" style="'+ (options.type === 'vertical' ? 'bottom' : 'left') +':'+ (scaleFir || scale) +';">' +
     '<div class="layui-slider-wrap-btn" style="border: 2px solid '+ theme +';"></div></div>'+ (options.range ? '<div class="layui-slider-wrap" style="'+ (options.type === 'vertical' ? 'bottom' : 'left') +':'+ scaleSec +';"><div class="layui-slider-wrap-btn" style="border: 2px solid '+ theme +';"></div></div>' : '') +'</div>';
 
     var othis = $(options.elem)
     ,hasRender = othis.next('.' + ELEM_VIEW);
     //生成替代元素
-    hasRender[0] && hasRender.remove(); //如果已经渲染，则Rerender  
+    hasRender[0] && hasRender.remove(); //如果已經渲染，則Rerender
     that.elemTemp = $(temp);
 
-    //把数据缓存到滑块上
+    //把數據緩存到滑塊上
     if(options.range){
       that.elemTemp.find('.' + SLIDER_WRAP).eq(0).data('value', options.value[0]);
-      that.elemTemp.find('.' + SLIDER_WRAP).eq(1).data('value', options.value[1]); 
+      that.elemTemp.find('.' + SLIDER_WRAP).eq(1).data('value', options.value[1]);
     }else{
       that.elemTemp.find('.' + SLIDER_WRAP).data('value', options.value);
     };
-    
-    //插入替代元素
-    othis.html(that.elemTemp); 
 
-    //垂直滑块
+    //插入替代元素
+    othis.html(that.elemTemp);
+
+    //垂直滑塊
     if(options.type === 'vertical'){
       that.elemTemp.height(options.height + 'px');
     };
 
-    //显示间断点
+    //顯示間斷點
     if(options.showstep){
       var number = (options.max - options.min) / options.step, item = '';
       for(var i = 1; i < number + 1; i++) {
@@ -152,7 +152,7 @@ layui.define('jquery', function(exports){
       that.elemTemp.append(item);
     };
 
-    //插入输入框
+    //插入輸入框
     if(options.input && !options.range){
       var elemInput = $('<div class="layui-slider-input layui-input"><div class="layui-slider-input-txt"><input type="text" class="layui-input"></div><div class="layui-slider-input-btn"><i class="layui-icon layui-icon-up"></i><i class="layui-icon layui-icon-down"></i></div></div>');
       othis.css("position","relative");
@@ -166,9 +166,9 @@ layui.define('jquery', function(exports){
       } else {
         that.elemTemp.css("margin-right", elemInput.outerWidth() + 15);
       }
-    };  
+    };
 
-    //给未禁止的滑块滑动事件
+    //給未禁止的滑塊滑動事件
     if(!options.disabled){
       that.slide();
     }else{
@@ -176,7 +176,7 @@ layui.define('jquery', function(exports){
       that.elemTemp.find('.' + SLIDER_WRAP_BTN).addClass(DISABLED);
     };
 
-    //划过滑块显示数值
+    //劃過滑塊顯示數值
     that.elemTemp.find('.' + SLIDER_WRAP_BTN).on('mouseover', function(){
       var sliderWidth = options.type === 'vertical' ? options.height : that.elemTemp[0].offsetWidth
       ,sliderWrap = that.elemTemp.find('.' + SLIDER_WRAP)
@@ -192,10 +192,10 @@ layui.define('jquery', function(exports){
       };
     }).on('mouseout', function(){
       that.elemTemp.find('.' + SLIDER_TIPS).css("display", "none");
-    }); 
+    });
   };
 
-  //滑块滑动
+  //滑塊滑動
   Class.prototype.slide = function(setValue, value, i){
     var that = this
     ,options = that.config
@@ -238,17 +238,17 @@ layui.define('jquery', function(exports){
       sliderTxt.children('.' + SLIDER_INPUT_TXT).children('input').val(inputValue);
       sliderWrap.eq(index).data('value', selfValue);
       sliderAct.find('.' + SLIDER_TIPS).html(options.setTips ? options.setTips(selfValue) : selfValue);
-      
-      //如果开启范围选择，则返回数组值
+
+      //如果開啟範圍選擇，則返回數組值
       if(options.range){
         var arrValue = [
           sliderWrap.eq(0).data('value')
           ,sliderWrap.eq(1).data('value')
         ];
-        if(arrValue[0] > arrValue[1]) arrValue.reverse(); //如果前面的圆点超过了后面的圆点值，则调换顺序
+        if(arrValue[0] > arrValue[1]) arrValue.reverse(); //如果前面的圓點超過了後面的圓點值，則調換順序
       }
-      
-       //回调
+
+       //回調
       options.change && options.change(options.range ? arrValue : selfValue);
     }
     ,valueTo = function(value){
@@ -259,7 +259,7 @@ layui.define('jquery', function(exports){
       };
       return left;
     }
-    
+
     //拖拽元素
     ,elemMove = $(['<div class="layui-auxiliar-moving" id="LAY-slider-moving"></div'].join(''))
     ,createMoveElem = function(move, up){
@@ -271,23 +271,23 @@ layui.define('jquery', function(exports){
       elemMove.on('mousemove', move);
       elemMove.on('mouseup', upCall).on('mouseleave', upCall);
     };
-    
-    //动态赋值
+
+    //動態賦值
     if(setValue === 'set') return change(value, i);
 
-    //滑块滑动
+    //滑塊滑動
     sliderAct.find('.' + SLIDER_WRAP_BTN).each(function(index){
       var othis = $(this);
       othis.on('mousedown', function(e){
         e = e || window.event;
-        
+
         var oldleft = othis.parent()[0].offsetLeft
         ,oldx = e.clientX;
         if(options.type === 'vertical'){
           oldleft = sliderWidth() - othis.parent()[0].offsetTop - sliderWrap.height()
           oldx = e.clientY;
         };
-        
+
         var move = function(e){
           e = e || window.event;
           var left = oldleft + (options.type === 'vertical' ? (oldx - e.clientY) : (e.clientX - oldx));
@@ -299,17 +299,17 @@ layui.define('jquery', function(exports){
           sliderAct.find('.' + SLIDER_TIPS).show();
           e.preventDefault();
         };
-        
+
         var up = function(){
           othis.removeClass(ELEM_HOVER);
           sliderAct.find('.' + SLIDER_TIPS).hide();
         };
-        
+
         createMoveElem(move, up)
       });
     });
-    
-    //点击滑块
+
+    //點擊滑塊
     sliderAct.on('click', function(e){
       var main = $('.' + SLIDER_WRAP_BTN);
       if(!main.is(event.target) && main.has(event.target).length === 0 && main.length){
@@ -330,26 +330,26 @@ layui.define('jquery', function(exports){
         e.preventDefault();
       }
     });
-    
-    //点击加减输入框
+
+    //點擊加減輸入框
     sliderTxt.children('.' + SLIDER_INPUT_BTN).children('i').each(function(index){
       $(this).on('click', function(){
         inputValue = sliderTxt.children('.' + SLIDER_INPUT_TXT).children('input').val();
-        if(index == 1){ //减
-          inputValue = inputValue - options.step < options.min 
-            ? options.min 
+        if(index == 1){ //減
+          inputValue = inputValue - options.step < options.min
+            ? options.min
           : Number(inputValue) - options.step;
         }else{
-          inputValue = Number(inputValue) + options.step > options.max 
-            ? options.max 
+          inputValue = Number(inputValue) + options.step > options.max
+            ? options.max
           : Number(inputValue) + options.step;
         };
         var inputScale =  (inputValue - options.min) / (options.max - options.min) * 100 / step;
         change(inputScale, 0);
       });
     });
-    
-    //获取输入框值
+
+    //獲取輸入框值
     var getInputValue = function(){
       var realValue = this.value;
       realValue = isNaN(realValue) ? 0 : realValue;
@@ -364,10 +364,10 @@ layui.define('jquery', function(exports){
         e.preventDefault();
         getInputValue.call(this);
       }
-    }).on('change', getInputValue);     
+    }).on('change', getInputValue);
   };
 
-  //事件处理
+  //事件處理
   Class.prototype.events = function(){
      var that = this
     ,options = that.config;
@@ -375,9 +375,9 @@ layui.define('jquery', function(exports){
 
   //核心入口
   slider.render = function(options){
-    var inst = new Class(options); 
+    var inst = new Class(options);
     return thisSlider.call(inst);
   };
-  
+
   exports(MOD_NAME, slider);
 })

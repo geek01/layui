@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>评分 - layui</title>
+<title>評分 - layui</title>
 
 <link rel="stylesheet" href="../src/css/layui.css">
 
@@ -15,31 +15,31 @@ body{padding:20px;}
 
 <div class="layui-container">
   <div class="layui-row">
-    <!-- 基础评分用法 -->
+    <!-- 基礎評分用法 -->
     <div class="layui-rate-div layui-col-xm4 layui-col-xm-offset4 ">
-      <h3>基础用法</h3>
+      <h3>基礎用法</h3>
       <hr>
       <div id="test1"></div>
     </div>
 
-    <!-- 半星评分用法 -->
+    <!-- 半星評分用法 -->
     <div class="layui-rate-div layui-col-xm4 layui-col-xm-offset4 ">
-      <h3>选中半星</h3>
+      <h3>選中半星</h3>
       <hr>
       <div id="test2"></div>
     </div>
 
-    <!-- 显示提示文字 -->
+    <!-- 顯示提示文字 -->
     <div class="layui-rate-div layui-col-xm4 layui-col-xm-offset4 ">
-      <h3>显示提示文字</h3>
+      <h3>顯示提示文字</h3>
       <hr>
       <div id="test3"></div>
       <span></span>
     </div>
 
-    <!-- 只读 -->
+    <!-- 只讀 -->
     <div class="layui-rate-div layui-col-xm4 layui-col-xm-offset4 ">
-      <h3>只读</h3>
+      <h3>只讀</h3>
       <hr>
       <div id="test4"></div>
     </div>
@@ -55,7 +55,7 @@ layui.use(['rate'], function(){
   var rate = layui.rate;
 
   //渲染
-  
+
   // rate.set({
   //   elem: '#test1'
   //   ,length: 7
@@ -65,7 +65,7 @@ layui.use(['rate'], function(){
   //   ,text: true
   //   ,reader: true
   // })
-  
+
   rate.render({
     elem: '#test1'
     ,length: 5
@@ -75,10 +75,10 @@ layui.use(['rate'], function(){
     ,setText1: function(value){
 
       var arrs = {
-        '0.5': '极差'
+        '0.5': '極差'
         , '1' : '一般'
-        ,'1.5': '满意'
-        ,'2': '极满意'
+        ,'1.5': '滿意'
+        ,'2': '極滿意'
       };
 
       this.span.text(arrs[value] || ( value + "星"));
@@ -104,8 +104,8 @@ layui.use(['rate'], function(){
     ,half: true
     ,theme: '#FF5722'
   })
-  
-  //只读
+
+  //只讀
   rate.render({
     elem: '#test4'
     ,value: 3.5

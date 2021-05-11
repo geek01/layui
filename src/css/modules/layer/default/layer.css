@@ -1,7 +1,7 @@
 /**
- 
+
  @Name: layer
- 
+
  **/
 
 /* *html{background-image: url(about:blank); background-attachment: fixed;} */
@@ -24,16 +24,16 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 .layui-layer-move{display: none; position: fixed; *position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; cursor: move; opacity: 0; filter:alpha(opacity=0); background-color: #fff; z-index: 2147483647;}
 .layui-layer-resize{position: absolute; width: 15px; height: 15px; right: 0; bottom: 0; cursor: se-resize;}
 
-/* 动画 */
+/* 動畫 */
 .layer-anim{-webkit-animation-fill-mode: both; animation-fill-mode: both; -webkit-animation-duration:.3s; animation-duration:.3s;}
 
-@-webkit-keyframes layer-bounceIn { /* 默认 */
-	0% {opacity: 0; -webkit-transform: scale(.5); transform: scale(.5)}
-	100% {opacity: 1; -webkit-transform: scale(1); transform: scale(1)}
+@-webkit-keyframes layer-bounceIn { /* 默認 */
+  0% {opacity: 0; -webkit-transform: scale(.5); transform: scale(.5)}
+  100% {opacity: 1; -webkit-transform: scale(1); transform: scale(1)}
 }
 @keyframes layer-bounceIn {
-	0% {opacity: 0; -webkit-transform: scale(.5); -ms-transform: scale(.5); transform: scale(.5)}
-	100% {opacity: 1; -webkit-transform: scale(1); -ms-transform: scale(1); transform: scale(1)}
+  0% {opacity: 0; -webkit-transform: scale(.5); -ms-transform: scale(.5); transform: scale(.5)}
+  100% {opacity: 1; -webkit-transform: scale(1); -ms-transform: scale(1); transform: scale(1)}
 }
 .layer-anim-00{-webkit-animation-name: layer-bounceIn;animation-name: layer-bounceIn}
 
@@ -49,7 +49,7 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 
 @-webkit-keyframes layer-shake{0%,100%{-webkit-transform:translateX(0);transform:translateX(0)}10%,30%,50%,70%,90%{-webkit-transform:translateX(-10px);transform:translateX(-10px)}20%,40%,60%,80%{-webkit-transform:translateX(10px);transform:translateX(10px)}}@keyframes layer-shake{0%,100%{-webkit-transform:translateX(0);-ms-transform:translateX(0);transform:translateX(0)}10%,30%,50%,70%,90%{-webkit-transform:translateX(-10px);-ms-transform:translateX(-10px);transform:translateX(-10px)}20%,40%,60%,80%{-webkit-transform:translateX(10px);-ms-transform:translateX(10px);transform:translateX(10px)}}.layer-anim-06{-webkit-animation-name:layer-shake;animation-name:layer-shake}@-webkit-keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
 
-/* 标题栏 */
+/* 標題欄 */
 .layui-layer-title{padding:0 80px 0 20px; height: 50px; line-height: 50px; border-bottom:1px solid #F0F0F0; font-size: 14px; color:#333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-radius: 2px 2px 0 0;}
 .layui-layer-setwin{position:absolute; right: 15px; *right:0; top: 17px; font-size:0; line-height: initial;}
 .layui-layer-setwin a{position:relative; width: 16px; height:16px; margin-left:10px; font-size:12px; _overflow:hidden;}
@@ -64,7 +64,7 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 .layui-layer-setwin .layui-layer-close2{position:absolute; right:-28px; top:-28px; width:30px; height:30px;  margin-left:0; background-position:-149px -31px; *right:-18px; _display:none;}
 .layui-layer-setwin .layui-layer-close2:hover{ background-position:-180px -31px;}
 
-/* 按钮栏 */
+/* 按鈕欄 */
 .layui-layer-btn{text-align: right; padding: 0 15px 12px; pointer-events: auto; user-select: none; -webkit-user-select: none;}
 .layui-layer-btn a{height: 28px; line-height: 28px; margin: 5px 5px 0; padding: 0 15px; border: 1px solid #dedede; background-color:#fff; color: #333; border-radius: 2px; font-weight:400; cursor:pointer; text-decoration: none;}
 .layui-layer-btn a:hover{opacity: 0.9; text-decoration: none;}
@@ -73,7 +73,7 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 .layui-layer-btn-l{text-align: left;}
 .layui-layer-btn-c{text-align: center;}
 
-/* 定制化 */
+/* 定製化 */
 .layui-layer-dialog{min-width: 300px;}
 .layui-layer-dialog .layui-layer-content{position: relative; padding:20px; line-height:24px; word-break: break-all; overflow:hidden; font-size:14px; overflow-x: hidden; overflow-y:auto;}
 .layui-layer-dialog .layui-layer-content .layui-layer-ico{position:absolute; top:16px; left:15px; _left:-40px; width:30px; height:30px;}
@@ -120,9 +120,9 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 
 
 /**
- 
- @Name: layer拓展样式
- 
+
+ @Name: layer拓展樣式
+
  */
 
 .layui-layer-iconext{background:url(icon-ext.png) no-repeat;}
@@ -159,7 +159,7 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 .layui-layer-imgtit a:hover{color:#fff; text-decoration:underline;}
 .layui-layer-imgtit em{padding-left:10px; font-style: normal;}
 
-/* 关闭动画 */
+/* 關閉動畫 */
 @-webkit-keyframes layer-bounceOut {
   100% {opacity: 0; -webkit-transform: scale(.7); transform: scale(.7)}
   30% {-webkit-transform: scale(1.05); transform: scale(1.05)}

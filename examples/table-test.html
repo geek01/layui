@@ -1,5 +1,5 @@
- 
- 
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,22 +17,22 @@
 
 <script type="text/html" id="toolbarDemo">
   <div class="layui-btn-container">
-    <button class="layui-btn layui-btn-sm" lay-event="getCheckData">获取选中行数据</button>
-    <button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>
-    <button class="layui-btn layui-btn-sm" lay-event="getData">获取当前页所有数据</button>
-    <button class="layui-btn layui-btn-sm" lay-event="isAll">验证是否全选</button>
-    <button class="layui-btn layui-btn-sm" lay-event="reload">重载（保留初始参数）</button>
-    <button class="layui-btn layui-btn-sm" lay-event="reload2">重载（不保留初始参数）</button>
+    <button class="layui-btn layui-btn-sm" lay-event="getCheckData">獲取選中行數據</button>
+    <button class="layui-btn layui-btn-sm" lay-event="getCheckLength">獲取選中數目</button>
+    <button class="layui-btn layui-btn-sm" lay-event="getData">獲取當前頁所有數據</button>
+    <button class="layui-btn layui-btn-sm" lay-event="isAll">驗證是否全選</button>
+    <button class="layui-btn layui-btn-sm" lay-event="reload">重載（保留初始參數）</button>
+    <button class="layui-btn layui-btn-sm" lay-event="reload2">重載（不保留初始參數）</button>
     <button class="layui-btn layui-btn-sm" id="dropdown">
-      更多菜单 
+      更多菜單
       <i class="layui-icon layui-icon-down layui-font-12"></i>
   </button>
   </div>
 </script>
 
 <script type="text/html" id="barDemo">
-  <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+  <a class="layui-btn layui-btn-xs" lay-event="edit">編輯</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">刪除</a>
 </script>
 
 <script type="text/html" id="usernameTpl">
@@ -47,12 +47,12 @@
   <select lay-ignore>
     <option value="浙江杭州">浙江杭州</option>
     <option value="江西南昌">江西南昌</option>
-    <option value="湖北武汉">湖北武汉</option>
+    <option value="湖北武漢">湖北武漢</option>
   </select>
 </script>
 
 <script type="text/html" id="checkboxTpl">
-  <input type="checkbox" name="" title="锁定" checked>
+  <input type="checkbox" name="" title="鎖定" checked>
 </script>
 
 <script type="text/html" id="LAY_table_tpl_email">
@@ -67,75 +67,75 @@ layui.use(['table'], function(){
   var table = layui.table
   ,$ = layui.$
   ,laytpl = layui.laytpl;
-  
-  //全局设定某参数
+
+  //全局設定某參數
   table.set({
     where: {
-      token: '默认 token 参数'
+      token: '默認 token 參數'
     }
     //,defaultToolbar: ['filter']
     ,limit: 30
     //,url: 'list'
     //,height: 300
   });
-  
+
   $('#appendtest').append($('#TPL_appendtest').html())
   table.init('appendtest');
-  
+
   //渲染
   window.ins1 = table.render({
     elem: '#test'
     ,height: 400
     //,width: 600
-    ,title: '用户数据表'
+    ,title: '用戶數據表'
     ,url: 'json/table/demo1.json'
     //,size: 'lg'
-    
-    //,autoSort: false //是否自动排序。如果否，则由服务端排序
+
+    //,autoSort: false //是否自動排序。如果否，則由服務端排序
     //,loading: false
     ,totalRow: true
     ,limit: 30
     ,toolbar: '#toolbarDemo'
     ,defaultToolbar: ['filter', 'exports', 'print', {
-      title: '帮助'
+      title: '幫助'
       ,layEvent: 'LAYTABLE_TIPS'
       ,icon: 'layui-icon-tips'
     }]
     ,cols: [[
       {type: 'checkbox', fixed: 'left'}
-      ,{field:'id', title:'ID', width:80, fixed: 'left', unresize: true, sort: true, totalRowText: '合计：'}
-      ,{field:'username', title:'用户名', width:120, edit: 'text', templet: '#usernameTpl'}
-      ,{field:'email', title:'邮箱', hide: 0, width:150, edit: 'text', templet: function(d){
+      ,{field:'id', title:'ID', width:80, fixed: 'left', unresize: true, sort: true, totalRowText: '合計：'}
+      ,{field:'username', title:'用戶名', width:120, edit: 'text', templet: '#usernameTpl'}
+      ,{field:'email', title:'郵箱', hide: 0, width:150, edit: 'text', templet: function(d){
         console.log(d);
         return '<em>'+ d.email +'</em>'
       }}
-      ,{field:'sex', title:'性别', width:80, edit: 'text', sort: true}
+      ,{field:'sex', title:'性別', width:80, edit: 'text', sort: true}
       ,{field:'city', title:'城市', width:120, templet: '#cityTpl'}
-      ,{field:'sign', title:'签名'}
-      ,{field:'experience', title:'积分', width:80, sort: true, totalRow: '{{ d.TOTAL_NUMS }}🍉', templet: '<div>{{ d.experience }} 分</div>'}
+      ,{field:'sign', title:'簽名'}
+      ,{field:'experience', title:'積分', width:80, sort: true, totalRow: '{{ d.TOTAL_NUMS }}🍉', templet: '<div>{{ d.experience }} 分</div>'}
       ,{field:'ip', title:'IP', width:120}
-      ,{field:'logins', title:'登入次数', width:100, sort: true, totalRow: '{{ parseInt(d.TOTAL_NUMS) }} 次'}
-      ,{field:'joinTime', title:'加入时间', width:120}
+      ,{field:'logins', title:'登入次數', width:100, sort: true, totalRow: '{{ parseInt(d.TOTAL_NUMS) }} 次'}
+      ,{field:'joinTime', title:'加入時間', width:120}
       ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:150}
     ]]
-    
+
     ,initSort1: {
-      field: 'experience' //排序字段，对应 cols 设定的各字段名
-      ,type: 'desc' //排序方式  asc: 升序、desc: 降序、null: 默认排序
+      field: 'experience' //排序字段，對應 cols 設定的各字段名
+      ,type: 'desc' //排序方式  asc: 升序、desc: 降序、null: 默認排序
     }
-    
+
     ,headers: {headers_token: 'sasasas'}
     ,where: {
-      test: '初始 test 参数'
+      test: '初始 test 參數'
       ,token: '初始 token'
       ,key: 'experience'
       ,order: 'asc'
     }
-    
+
     ,done: function(){
-      
+
     }
-    
+
     ,error: function(res, msg){
       console.log(res, msg)
     }
@@ -155,25 +155,25 @@ layui.use(['table'], function(){
     }
     */
   });
-  
+
   //排序事件
   table.on('sort(test)', function(obj){
     console.log(obj);
 
     return;
-    layer.msg('服务端排序。order by '+ obj.field + ' ' + obj.type);
-    //服务端排序
+    layer.msg('服務端排序。order by '+ obj.field + ' ' + obj.type);
+    //服務端排序
     table.reload('test', {
       initSort: obj
-      //,page: {curr: 1} //重新从第一页开始
-      ,where: { //重新请求服务端
+      //,page: {curr: 1} //重新從第一頁開始
+      ,where: { //重新請求服務端
         key: obj.field //排序字段
         ,order: obj.type //排序方式
       }
     }, true);
   });
-  
-  //工具栏事件
+
+  //工具欄事件
   table.on('toolbar(test)', function(obj){
     var checkStatus = table.checkStatus(obj.config.id);
     switch(obj.event){
@@ -181,10 +181,10 @@ layui.use(['table'], function(){
         layer.msg('添加');
       break;
       case 'update':
-        layer.msg('编辑');
+        layer.msg('編輯');
       break;
       case 'delete':
-        layer.msg('删除');
+        layer.msg('刪除');
       break;
       case 'getCheckData':
         var data = checkStatus.data;
@@ -192,7 +192,7 @@ layui.use(['table'], function(){
       break;
       case 'getCheckLength':
         var data = checkStatus.data;
-        layer.msg('选中了：'+ data.length + ' 个');
+        layer.msg('選中了：'+ data.length + ' 個');
       break;
       case 'getData':
         var getData = table.getData(obj.config.id);
@@ -200,15 +200,15 @@ layui.use(['table'], function(){
         layer.alert(JSON.stringify(getData));
       break;
       case 'isAll':
-        layer.msg(checkStatus.isAll ? '全选': '未全选')
+        layer.msg(checkStatus.isAll ? '全選': '未全選')
       break;
       case 'LAYTABLE_TIPS':
         layer.alert('Table for layui-v'+ layui.v);
       break;
       case 'reload':
-        //深度重载
+        //深度重載
         var instReload = table.reload('test', {
-          
+
           where: {
             abc: 123
             ,test: '新的 test1'
@@ -220,7 +220,7 @@ layui.use(['table'], function(){
         }, true);
       break;
       case 'reload2':
-        //浅重载
+        //淺重載
         table.reload('test', {
           where: {
             efg: 'sasasas'
@@ -229,11 +229,11 @@ layui.use(['table'], function(){
           }
           ,cols: [[
             {type: 'checkbox', fixed: 'left'}
-            ,{field:'id', title:'ID', width:80, fixed: 'left', unresize: true, sort: true, totalRowText: '合计：'}
-            ,{field:'sex', title:'性别', width:80, edit: 'text', sort: true}
-            ,{field:'experience', title:'积分', width:80, sort: true, totalRow: true, templet: '<div>{{ d.experience }} 分</div>'}
-            ,{field:'logins', title:'登入次数', width:100, sort: true, totalRow: true}
-            ,{field:'joinTime', title:'加入时间', width:120}
+            ,{field:'id', title:'ID', width:80, fixed: 'left', unresize: true, sort: true, totalRowText: '合計：'}
+            ,{field:'sex', title:'性別', width:80, edit: 'text', sort: true}
+            ,{field:'experience', title:'積分', width:80, sort: true, totalRow: true, templet: '<div>{{ d.experience }} 分</div>'}
+            ,{field:'logins', title:'登入次數', width:100, sort: true, totalRow: true}
+            ,{field:'joinTime', title:'加入時間', width:120}
           ]]
           //,height: 500
         });
@@ -245,8 +245,8 @@ layui.use(['table'], function(){
     console.log(obj);
     //layer.closeAll('tips');
   });
-  
-  
+
+
 });
 </script>
 </body>
