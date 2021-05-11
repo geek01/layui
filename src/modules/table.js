@@ -1,8 +1,7 @@
-/**
 
- @Name：table 表格操作组件
- @License：MIT
-    
+/*!
+ * layui.table 
+ * 数据表格组件
  */
 
 layui.define(['laytpl', 'laypage', 'layer', 'form', 'util'], function(exports){
@@ -145,7 +144,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util'], function(exports){
   ,'</table>'].join('')
   
   //主模板
-  ,TPL_MAIN = ['<div class="layui-form layui-border-box {{d.VIEW_CLASS}}" lay-filter="LAY-table-{{d.index}}" lay-id="{{ d.data.id }}" style="{{# if(d.data.width){ }}width:{{d.data.width}}px;{{# } }} {{# if(d.data.height){ }}height:{{d.data.height}}px;{{# } }}">'
+  ,TPL_MAIN = ['<div class="layui-form layui-border-box {{d.VIEW_CLASS}}{{# if(d.data.className){ }} {{ d.data.className }}{{# } }}" lay-filter="LAY-table-{{d.index}}" lay-id="{{ d.data.id }}" style="{{# if(d.data.width){ }}width:{{d.data.width}}px;{{# } }} {{# if(d.data.height){ }}height:{{d.data.height}}px;{{# } }}">'
 
     ,'{{# if(d.data.toolbar){ }}'
     ,'<div class="layui-table-tool">'
@@ -228,14 +227,14 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util'], function(exports){
   ,Class = function(options){
     var that = this;
     that.index = ++table.index;
-    that.config = $.extend({}, that.config, table.config, options);;
+    that.config = $.extend({}, that.config, table.config, options);
     that.render();
   };
   
   //初始默认配置
   Class.prototype.config = {
     limit: 10 //每页显示的数量
-    ,loading: true //请求数据时，是否显示loading
+    ,loading: true //请求数据时，是否显示 loading
     ,cellMinWidth: 60 //所有单元格默认最小宽度
     ,defaultToolbar: ['filter', 'exports', 'print'] //工具栏右侧图标
     ,autoSort: true //是否前端自动排序。如果否，则需自主排序（通常为服务端处理好排序）
@@ -777,7 +776,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util'], function(exports){
       var thisCheckedRowIndex;
       if(!sort && that.sortKey){
         return that.sort(that.sortKey.field, that.sortKey.sort, true);
-      }      
+      }
       layui.each(data, function(i1, item1){
         var tds = [], tds_fixed = [], tds_fixed_r = []
         ,numbers = i1 + options.limit*(curr - 1) + 1; //序号
@@ -795,7 +794,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util'], function(exports){
           
           if(content === undefined || content === null) content = '';
           if(item3.colGroup) return;
-          
+
           //td内容
           var td = ['<td data-field="'+ field +'" data-key="'+ key +'" '+ function(){ //追加各种属性
             var attr = [];
@@ -967,17 +966,16 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util'], function(exports){
       var content = function(){
         var text = item3.totalRowText || ''
         ,thisTotalNum = parseFloat(totalNums[field]).toFixed(2)
-        ,tplData = {};
+        ,tplData = {}
+        ,getContent;
         
         tplData[field] = thisTotalNum;
-        thisTotalNum = parseTempData(item3, thisTotalNum, tplData);
+        
+        //获取自动计算的合并内容
+        getContent = item3.totalRow ? (parseTempData(item3, thisTotalNum, tplData) || text) : text;
         
         //如果直接传入了合计行数据，则不输出自动计算的结果
-        if(totalRowData){
-          return totalRowData[item3.field] || text;
-        } else {
-          return item3.totalRow ? (thisTotalNum || text) : text;
-        }
+        return totalRowData ? (totalRowData[item3.field] || getContent) : getContent;
       }()
       ,td = ['<td data-field="'+ field +'" data-key="'+ options.index + '-'+ item3.key +'" '+ function(){
         var attr = [];
@@ -2017,7 +2015,9 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util'], function(exports){
   };
   
   //自动完成渲染
-  table.init();
+  $(function(){
+    table.init();
+  });
   
   exports(MOD_NAME, table);
 });

@@ -1,8 +1,7 @@
-/**
 
- @Name：code 代码修饰器
- @License：MIT
-    
+/**
+ * code 代码修饰器
+ * MIT Licensed 
  */
  
 layui.define('jquery', function(exports){
@@ -56,5 +55,5 @@ layui.define('jquery', function(exports){
     });
     
   });
-}).addcss('modules/code.css?v=1', 'skincodecss');
+}).addcss('modules/code.css?v=2', 'skincodecss');
 

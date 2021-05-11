@@ -1,9 +1,8 @@
+
 /*!
-
- @Name: layui
- @Description：Classic modular front-end UI framework
- @License：MIT
-
+ * layui
+ * Classic modular front-end ui framework
+ * MIT Licensed
  */
  
 ;!function(win){
@@ -17,10 +16,13 @@
   }
 
   ,Layui = function(){
-    this.v = '2.6.4'; //版本号
+    this.v = '2.6.6'; //版本号
   }
+  
+  //识别预先可能定义的指定全局对象
+  ,GLOBAL = window.LAYUI_GLOBAL || {}
 
-  //获取layui所在目录
+  //获取 layui 所在目录
   ,getPath = function(){
     var jsPath = doc.currentScript ? doc.currentScript.src : function(){
       var js = doc.scripts
@@ -34,7 +36,8 @@
       }
       return src || js[last].src;
     }();
-    return jsPath.substring(0, jsPath.lastIndexOf('/') + 1);
+    
+    return config.dir = GLOBAL.dir || jsPath.substring(0, jsPath.lastIndexOf('/') + 1);
   }()
 
   //异常提示
@@ -239,13 +242,14 @@
   //css外部加载器
   Layui.prototype.link = function(href, fn, cssname){
     var that = this
-    ,link = doc.createElement('link')
-    ,head = doc.getElementsByTagName('head')[0];
+    ,head = doc.getElementsByTagName('head')[0]
+    ,link = doc.createElement('link');
     
     if(typeof fn === 'string') cssname = fn;
     
     var app = (cssname || href).replace(/\.|\//g, '')
     ,id = link.id = 'layuicss-'+ app
+    ,STAUTS_NAME = 'creating'
     ,timeout = 0;
     
     link.rel = 'stylesheet';
@@ -255,10 +259,35 @@
     if(!doc.getElementById(id)){
       head.appendChild(link);
     }
-
+    
     if(typeof fn !== 'function') return that;
     
+    //轮询 css 是否加载完毕
+    (function poll(status) {
+      var delay = 100
+      ,getLinkElem = doc.getElementById(id); //获取动态插入的 link 元素
+      
+      //如果轮询超过指定秒数，则视为请求文件失败或 css 文件不符合规范
+      if(++timeout > config.timeout * 1000 / delay){
+        return error(href + ' timeout');
+      };
+      
+      //css 加载就绪
+      if(parseInt(that.getStyle(getLinkElem, 'width')) === 1989){
+        //如果参数来自于初始轮询（即未加载就绪时的），则移除 link 标签状态
+        if(status === STAUTS_NAME) getLinkElem.removeAttribute('lay-status');
+        //如果 link 标签的状态仍为「创建中」，则继续进入轮询，直到状态改变，则执行回调
+        getLinkElem.getAttribute('lay-status') === STAUTS_NAME ? setTimeout(poll, delay) : fn();
+      } else {
+        getLinkElem.setAttribute('lay-status', STAUTS_NAME);
+        setTimeout(function(){
+          poll(STAUTS_NAME);
+        }, delay);
+      }
+    }());
+    
     //轮询css是否加载完毕
+    /*
     (function poll() {
       if(++timeout > config.timeout * 1000 / 100){
         return error(href + ' timeout');
@@ -267,8 +296,14 @@
         fn();
       }() : setTimeout(poll, 100);
     }());
+    */
     
     return that;
+  };
+  
+  //css 内部加载器
+  Layui.prototype.addcss = function(firename, fn, cssname){
+    return layui.link(config.dir + 'css/' + firename, fn, cssname);
   };
   
   //存储模块的回调
@@ -281,11 +316,6 @@
         ? config.callback[modName]
       : null;
     }
-  };
-
-  //css内部加载器
-  Layui.prototype.addcss = function(firename, fn, cssname){
-    return layui.link(config.dir + 'css/' + firename, fn, cssname);
   };
 
   //图片预加载
@@ -416,7 +446,7 @@
       //提取 Hash
       ,hash: that.router(function(){
         return href 
-          ? ((href.match(/#.+/) || [])[0] || '')
+          ? ((href.match(/#.+/) || [])[0] || '/')
         : location.hash;
       }())
     };
@@ -513,16 +543,21 @@
   //遍历
   Layui.prototype.each = function(obj, fn){
     var key
-    ,that = this;
+    ,that = this
+    ,callFn = function(key, obj){
+      return fn.call(obj[key], key, obj[key])
+    };
+    
     if(typeof fn !== 'function') return that;
     obj = obj || [];
+    
     if(obj.constructor === Object){
       for(key in obj){
-        if(fn.call(obj[key], key, obj[key])) break;
+        if(callFn(key, obj)) break;
       }
     } else {
       for(key = 0; key < obj.length; key++){
-        if(fn.call(obj[key], key, obj[key])) break;
+        if(callFn(key, obj)) break;
       }
     }
     return that;
