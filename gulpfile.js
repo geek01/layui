@@ -124,18 +124,18 @@ gulp.task('mv', task.mv);
 gulp.task('release', task.release);
 
 //完整任务 gulp
-gulp.task('default', ['clear'], function(){ //rc 版：gulp --rc
+gulp.task('default', gulp.series('clear', function(){ //rc 版：gulp --rc
   for(var key in task){
     task[key]();
   }
-});
+}));
 
 //发行版 gulp rls
-gulp.task('rls', ['clearRelease'], function(){ // gulp rls
+gulp.task('rls', gulp.series('clearRelease', function(){ // gulp rls
   for(var key in task){
     task[key]('release');
   }
-});
+}));
 
 //打包 layer 单独版
 gulp.task('layer', function(){

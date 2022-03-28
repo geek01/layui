@@ -1,5 +1,5 @@
 /**
-  扩展模块，且依赖 mod2
+  擴充套件模組，且依賴 mod2
 **/
 layui.define('mod2', function(exports){
   var $ = layui.jquery;
