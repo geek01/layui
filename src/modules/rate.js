@@ -1,8 +1,5 @@
 /**
-
- @Title: rate 評分評星組件
- @License：MIT
-
+ * rate 評分評星組件
  */
 
 layui.define('jquery',function(exports){
@@ -20,7 +17,7 @@ layui.define('jquery',function(exports){
       that.config = $.extend({}, that.config, options);
       return that;
     }
-
+    
     //事件
     ,on: function(events, callback){
       return layui.onevent.call(this, MOD_NAME, events, callback);
@@ -31,7 +28,7 @@ layui.define('jquery',function(exports){
   ,thisRate = function(){
     var that = this
     ,options = that.config;
-
+    
     return {
       setvalue: function(value){
         that.setvalue.call(that, value);
@@ -42,7 +39,7 @@ layui.define('jquery',function(exports){
 
   //字符常量
   ,MOD_NAME = 'rate',ELEM_VIEW = 'layui-rate', ICON_RATE = 'layui-icon-rate', ICON_RATE_SOLID = 'layui-icon-rate-solid', ICON_RATE_HALF = 'layui-icon-rate-half'
-
+  
   ,ICON_SOLID_HALF = 'layui-icon-rate-solid layui-icon-rate-half',  ICON_SOLID_RATE = 'layui-icon-rate-solid layui-icon-rate',  ICON_HALF_RATE = 'layui-icon-rate layui-icon-rate-half'
 
   //構造器
@@ -70,7 +67,7 @@ layui.define('jquery',function(exports){
     ,style = options.theme ? ('style="color: '+ options.theme + ';"') : '';
 
     options.elem = $(options.elem);
-
+    
     //最大值不能大於總長度
     if(options.value > options.length){
       options.value = options.length;
@@ -180,7 +177,7 @@ layui.define('jquery',function(exports){
           if(x <= wide / 2){
             othis.children("i").addClass(ICON_RATE_HALF).removeClass(ICON_RATE_SOLID)
           }
-        }
+        }         
       })
 
       //移出
@@ -194,14 +191,14 @@ layui.define('jquery',function(exports){
         //如果設置可選半星，根據分數判斷是否有半星
         if(options.half){
           if(parseInt(options.value) !== options.value){
-            _ul.children("li:eq(" + Math.floor(options.value) + ")").children("i").addClass(ICON_RATE_HALF).removeClass(ICON_SOLID_RATE)
+            _ul.children("li:eq(" + Math.floor(options.value) + ")").children("i").addClass(ICON_RATE_HALF).removeClass(ICON_SOLID_RATE)             
           }
-        }
+        } 
       })
 
     })
   };
-
+  
   //事件處理
   Class.prototype.events = function(){
      var that = this

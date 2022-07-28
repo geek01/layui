@@ -1,17 +1,14 @@
 /**
- 
- @Name：tree 樹組件
- @License：MIT
-
+ * tree 樹組件
  */
 
 layui.define('form', function(exports){
   "use strict";
-
+  
   var $ = layui.$
   ,form = layui.form
   ,layer = layui.layer
-
+  
   //模塊名
   ,MOD_NAME = 'tree'
 
@@ -26,7 +23,7 @@ layui.define('form', function(exports){
       that.config = $.extend({}, that.config, options);
       return that;
     }
-
+    
     //事件
     ,on: function(events, callback){
       return layui.onevent.call(this, MOD_NAME, events, callback);
@@ -38,10 +35,10 @@ layui.define('form', function(exports){
     var that = this
     ,options = that.config
     ,id = options.id || that.index;
-
+    
     thisModule.that[id] = that; //記錄當前實例對象
     thisModule.config[id] = options; //記錄當前實例配置項
-
+    
     return {
       config: options
       //重置實例
@@ -56,7 +53,7 @@ layui.define('form', function(exports){
       }
     }
   }
-
+  
   //獲取當前實例配置項
   ,getThisModuleConfig = function(id){
     var config = thisModule.config[id];
@@ -66,11 +63,11 @@ layui.define('form', function(exports){
 
   //字符常量
   ,SHOW = 'layui-show', HIDE = 'layui-hide', NONE = 'layui-none', DISABLED = 'layui-disabled'
-
+  
   ,ELEM_VIEW = 'layui-tree', ELEM_SET = 'layui-tree-set', ICON_CLICK = 'layui-tree-iconClick'
   ,ICON_ADD = 'layui-icon-addition', ICON_SUB = 'layui-icon-subtraction', ELEM_ENTRY = 'layui-tree-entry', ELEM_MAIN = 'layui-tree-main', ELEM_TEXT = 'layui-tree-txt', ELEM_PACK = 'layui-tree-pack', ELEM_SPREAD = 'layui-tree-spread'
   ,ELEM_LINE_SHORT = 'layui-tree-setLineShort', ELEM_SHOW = 'layui-tree-showLine', ELEM_EXTEND = 'layui-tree-lineExtend'
-
+ 
   //構造器
   ,Class = function(options){
     var that = this;
@@ -82,28 +79,28 @@ layui.define('form', function(exports){
   //默認配置
   Class.prototype.config = {
     data: []  //數據
-
-    ,showCheckbox: false  //是否顯示覆選框
+    
+    ,showCheckbox: false  //是否顯示復選框
     ,showLine: true  //是否開啟連接線
     ,accordion: false  //是否開啟手風琴模式
     ,onlyIconControl: false  //是否僅允許節點左側圖標控制展開收縮
     ,isJump: false  //是否允許點擊節點時彈出新窗口跳轉
     ,edit: false  //是否開啟節點的操作圖標
-
+    
     ,text: {
       defaultNodeName: '未命名' //節點默認名稱
       ,none: '無數據'  //數據為空時的文本提示
     }
   };
-
+  
   //重載實例
   Class.prototype.reload = function(options){
     var that = this;
-
+    
     layui.each(options, function(key, item){
-      if(layui._typeof(item) === 'array') delete that.config[key];
+      if(layui.type(item) === 'array') delete that.config[key];
     });
-
+    
     that.config = $.extend(true, {}, that.config, options);
     that.render();
   };
@@ -112,7 +109,7 @@ layui.define('form', function(exports){
   Class.prototype.render = function(){
     var that = this
     ,options = that.config;
-
+    
     that.checkids = [];
 
     var temp = $('<div class="layui-tree'+ (options.showCheckbox ? " layui-form" : "") + (options.showLine ? " layui-tree-line" : "") +'" lay-filter="LAY-tree-'+ that.index +'"></div>');
@@ -123,7 +120,7 @@ layui.define('form', function(exports){
 
     //索引
     that.key = options.id || that.index;
-
+    
     //插入組件結構
     that.elem = temp;
     that.elemNone = $('<div class="layui-tree-emptyText">'+ options.text.none +'</div>');
@@ -132,8 +129,8 @@ layui.define('form', function(exports){
     if(that.elem.find('.layui-tree-set').length == 0){
       return that.elem.append(that.elemNone);
     };
-
-    //複選框渲染
+    
+    //復選框渲染
     if(options.showCheckbox){
       that.renderForm('checkbox');
     };
@@ -149,7 +146,7 @@ layui.define('form', function(exports){
       if(!othis.next()[0] && othis.parents('.layui-tree-pack').eq(1).hasClass('layui-tree-lineExtend')){
         othis.addClass(ELEM_LINE_SHORT);
       };
-
+      
       //沒有下一個節點 外層最後一個
       if(!othis.next()[0] && !othis.parents('.layui-tree-set').eq(0).next()[0]){
         othis.addClass(ELEM_LINE_SHORT);
@@ -190,7 +187,7 @@ layui.define('form', function(exports){
               };
             }()
 
-            //複選框
+            //復選框
             ,function(){
               return options.showCheckbox ? '<input type="checkbox" name="'+ (item.field || ('layuiTreeCheck_'+ item.id)) +'" same="layuiTreeCheck" lay-skin="primary" '+ (item.disabled ? "disabled" : "") +' value="'+ item.id +'">' : '';
             }()
@@ -324,7 +321,7 @@ layui.define('form', function(exports){
     });
   };
 
-  //計算複選框選中狀態
+  //計算復選框選中狀態
   Class.prototype.setCheckbox = function(elem, item, elemCheckbox){
     var that = this
     ,options = that.config
@@ -374,7 +371,7 @@ layui.define('form', function(exports){
     that.renderForm('checkbox');
   };
 
-  //複選框選擇
+  //復選框選擇
   Class.prototype.checkClick = function(elem, item){
     var that = this
     ,options = that.config
@@ -383,7 +380,7 @@ layui.define('form', function(exports){
 
 
 
-    //點擊複選框
+    //點擊復選框
     elemMain.on('click', 'input[same="layuiTreeCheck"]+', function(e){
       layui.stope(e); //阻止點擊節點事件
 
@@ -394,7 +391,7 @@ layui.define('form', function(exports){
 
       that.setCheckbox(elem, item, elemCheckbox);
 
-      //複選框點擊產生的回調
+      //復選框點擊產生的回調
       options.oncheck && options.oncheck({
         elem: elem
         ,checked: checked
@@ -492,7 +489,7 @@ layui.define('form', function(exports){
           };
         };
         if(!options.showCheckbox) return;
-        //若開啟複選框，同步新增節點狀態
+        //若開啟復選框，同步新增節點狀態
         if(elemMain.find('input[same="layuiTreeCheck"]')[0].checked){
           var packLast = elem.children('.'+ELEM_PACK).children('.'+ELEM_SET).last();
           packLast.find('input[same="layuiTreeCheck"]')[0].checked = true;
@@ -536,7 +533,7 @@ layui.define('form', function(exports){
       } else {
         layer.confirm('確認刪除該節點 "<span style="color: #999;">'+ (item.title || '') +'</span>" 嗎？', function(index){
           options.operate && options.operate(returnObj); //節點刪除的回調
-          returnObj.status = 'remove'; //標註節點刪除
+          returnObj.status = 'remove'; //標注節點刪除
 
           layer.close(index);
 
@@ -548,9 +545,9 @@ layui.define('form', function(exports){
           };
           //若有兄弟節點
           if(elem.siblings('.'+ELEM_SET).children('.'+ELEM_ENTRY)[0]){
-            //若開啟複選框
+            //若開啟復選框
             if(options.showCheckbox){
-              //若開啟複選框，進行下步操作
+              //若開啟復選框，進行下步操作
               var elemDel = function(elem){
                 //若無父結點，則不執行
                 if(!elem.parents('.'+ELEM_SET)[0]) return;
@@ -647,7 +644,7 @@ layui.define('form', function(exports){
 
           elem.remove();
         });
-
+        
       };
     });
   };
@@ -657,10 +654,10 @@ layui.define('form', function(exports){
     var that = this
     ,options = that.config
     ,checkWarp = that.elem.find('.layui-tree-checkedFirst');
-
+    
     //初始選中
     that.setChecked(that.checkids);
-
+    
     //搜索
     that.elem.find('.layui-tree-search').on('keyup', function(){
       var input = $(this)
@@ -674,7 +671,7 @@ layui.define('form', function(exports){
         //若值匹配，加一個類以作標識
         if($(this).html().indexOf(val) != -1){
           arr.push($(this).parent());
-
+          
           var select = function(div){
             div.addClass('layui-tree-searchShow');
             //向上父節點渲染
@@ -686,7 +683,7 @@ layui.define('form', function(exports){
         };
       });
 
-      //根據標誌剔除
+      //根據標志剔除
       pack.find('.'+ELEM_ENTRY).each(function(){
         var parent = $(this).parent('.'+ELEM_SET);
         if(!parent.hasClass('layui-tree-searchShow')){
@@ -719,12 +716,12 @@ layui.define('form', function(exports){
     ,options = that.config
     ,checkId = []
     ,checkData = [];
-
+    
     //遍歷節點找到選中索引
     that.elem.find('.layui-form-checked').each(function(){
       checkId.push($(this).prev()[0].value);
     });
-
+    
     //遍歷節點
     var eachNodes = function(data, checkNode){
       layui.each(data, function(index, item){
@@ -732,9 +729,9 @@ layui.define('form', function(exports){
           if(item.id == item2){
             var cloneItem = $.extend({}, item);
             delete cloneItem.children;
-
+            
             checkNode.push(cloneItem);
-
+            
             if(item.children){
               cloneItem.children = [];
               eachNodes(item.children, cloneItem.children);
@@ -746,7 +743,7 @@ layui.define('form', function(exports){
     };
 
     eachNodes($.extend({}, options.data), checkData);
-
+    
     return checkData;
   };
 
@@ -760,7 +757,7 @@ layui.define('form', function(exports){
       var thisId = $(this).data('id')
       ,input = $(item).children('.'+ELEM_ENTRY).find('input[same="layuiTreeCheck"]')
       ,reInput = input.next();
-
+      
       //若返回數字
       if(typeof checkedId === 'number'){
         if(thisId == checkedId){
@@ -769,7 +766,7 @@ layui.define('form', function(exports){
           };
           return false;
         };
-      }
+      } 
       //若返回數組
       else if(typeof checkedId === 'object'){
         layui.each(checkedId, function(index, value){
@@ -785,21 +782,21 @@ layui.define('form', function(exports){
   //記錄所有實例
   thisModule.that = {}; //記錄所有實例對象
   thisModule.config = {}; //記錄所有實例配置項
-
+  
   //重載實例
   tree.reload = function(id, options){
     var that = thisModule.that[id];
     that.reload(options);
-
+    
     return thisModule.call(that);
   };
-
+  
   //獲得選中的節點數據
   tree.getChecked = function(id){
     var that = thisModule.that[id];
     return that.getChecked();
   };
-
+  
   //設置選中節點
   tree.setChecked = function(id, checkedId){
     var that = thisModule.that[id];

@@ -1,20 +1,17 @@
 /**
- 
- @Name : laypage 分頁組件
- @License：MIT
-
+ * laypage 分頁組件
  */
 
 layui.define(function(exports){
   "use strict";
-
+  
   var doc = document
   ,id = 'getElementById'
   ,tag = 'getElementsByTagName'
-
+  
   //字符常量
   ,MOD_NAME = 'laypage', DISABLED = 'layui-disabled'
-
+  
   //構造器
   ,Class = function(options){
     var that = this;
@@ -31,35 +28,43 @@ layui.define(function(exports){
     }
   };
 
-  //分頁視圖
+  // 分頁視圖
   Class.prototype.view = function(){
-    var that = this
-    ,config = that.config
-    ,groups = config.groups = 'groups' in config ? (config.groups|0) : 5; //連續頁碼個數
+    var that = this;
+    var config = that.config;
 
-    //排版
-    config.layout = typeof config.layout === 'object'
-      ? config.layout
+    // 連續頁碼個數
+    var groups = config.groups = 'groups' in config 
+      ? (Number(config.groups) || 0)
+    : 5; 
+    
+    // 排版
+    config.layout = typeof config.layout === 'object' 
+      ? config.layout 
     : ['prev', 'page', 'next'];
+    
+    config.count = Number(config.count) || 0; // 數據總數
+    config.curr = Number(config.curr) || 1; // 當前頁
 
-    config.count = config.count|0; //數據總數
-    config.curr = (config.curr|0) || 1; //當前頁
-
-    //每頁條數的選擇項
+    // 每頁條數的選擇項
     config.limits = typeof config.limits === 'object'
       ? config.limits
     : [10, 20, 30, 40, 50];
-    config.limit = (config.limit|0) || 10; //默認條數
 
+     // 默認條數
+    config.limit = Number(config.limit) || 10;
+    
     //總頁數
     config.pages = Math.ceil(config.count/config.limit) || 1;
-
-    //當前頁不能超過總頁數
+    
+    // 當前頁不能超過總頁數
     if(config.curr > config.pages){
       config.curr = config.pages;
+    } else if(config.curr < 1) { // 當前分頁不能小於 1
+      config.curr = 1;
     }
 
-    //連續分頁個數不能低於0且不能大於總頁數
+    //連續分頁個數不能低於 0 且不能大於總頁數
     if(groups < 0){
       groups = 1;
     } else if (groups > config.pages){
@@ -200,27 +205,27 @@ layui.define(function(exports){
     ,input = elem[tag]('input')[0]
     ,select = elem[tag]('select')[0]
     ,skip = function(){
-      var curr = input.value.replace(/\s|\D/g, '')|0;
+      var curr = Number(input.value.replace(/\s|\D/g, ''));
       if(curr){
         config.curr = curr;
         that.render();
       }
     };
-
+    
     if(isskip) return skip();
-
+    
     //頁碼
     for(var i = 0, len = childs.length; i < len; i++){
       if(childs[i].nodeName.toLowerCase() === 'a'){
         laypage.on(childs[i], 'click', function(){
-          var curr = this.getAttribute('data-page')|0;
+          var curr = Number(this.getAttribute('data-page'));
           if(curr < 1 || curr > config.pages) return;
           config.curr = curr;
           that.render();
         });
       }
     }
-
+    
     //條數
     if(select){
       laypage.on(select, 'change', function(){
@@ -232,7 +237,7 @@ layui.define(function(exports){
         that.render();
       });
     }
-
+    
     //確定
     if(btn){
       laypage.on(btn, 'click', function(){
@@ -240,7 +245,7 @@ layui.define(function(exports){
       });
     }
   };
-
+  
   //輸入頁數字控制
   Class.prototype.skip = function(elem){
     if(!elem) return;
@@ -265,7 +270,7 @@ layui.define(function(exports){
     ,config = that.config
     ,type = that.type()
     ,view = that.view();
-
+    
     if(type === 2){
       config.elem && (config.elem.innerHTML = view);
     } else if(type === 3){
@@ -277,17 +282,17 @@ layui.define(function(exports){
     }
 
     config.jump && config.jump(config, load);
-
+    
     var elem = doc[id]('layui-laypage-' + config.index);
     that.jump(elem);
-
+    
     if(config.hash && !load){
       location.hash = '!'+ config.hash +'='+ config.curr;
     }
-
+    
     that.skip(elem);
   };
-
+  
   //外部接口
   var laypage = {
     //分頁渲染

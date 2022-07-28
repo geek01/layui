@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>檢視模板引擎 - layui</title>
+
+<link rel="stylesheet" href="../src/css/layui.css">
+<style>
+.laytpl-demo{border: 1px solid #EBEBEB;}
+.laytpl-demo>textarea{position: relative; display: block; width:100%; height: 300px; padding: 11px; border: 0; box-sizing: border-box; resize: none; background-color: #fff; font-family: Courier New; font-size: 13px;}
+.laytpl-demo>div:first-child{height: 32px; line-height: 32px; padding: 6px 11px; border-bottom: 1px solid #EBEBEB; background-color: #F8F9FA;}
+</style>
+</head>
+<body>
+
+<div>
+  
+  <div class="layui-row">
+    <div class="layui-col-xs6 laytpl-demo">
+      <div>模板</div>
+      <textarea id="demoTPL1"><h1>{{ d.title }}</h1>
+
+<p>轉義輸出(HTML)：{{ d.desc }}</p>
+<p>轉義輸出(HTML)：{{= d.desc }}</p>
+<p>原始輸出(HTML)：{{- d.desc }}</p>
+{{#}}
+
+<div class="layui-section">
+  <hr>
+  <ul>
+  {{# var str = "a  b		c";
+  layui.each(d.items, function(index, item){ }}
+    <li class="{{ index > 0 ? 'list' : '' }}">
+      <strong>{{ item.title }}</strong>
+      {{# if(item.content){ }}
+        <span>{{ item.content }}</span>
+      {{# } }}
+      <span>{{ item.time || '' }}</span>
+      {{ str }}
+      
+      
+    </li>
+  {{# });  if(d.items.length === 0){ }}
+    無數據
+  {{# } }} 
+  </ul>
+  <hr>
+</div>
+
+<div>
+  {{ d.content || '' }}
+  {{ }} {{}}
+  {{ }}
+  
+  \a
+  '12'"""""
+  "哈''哈"
+</div>
+
+<p>渲染時間：{{ layui.util.toDateString(new Date()) }}</p></textarea>
+    </div>
+    
+    <div class="layui-col-xs6 laytpl-demo">
+      <div class="layui-row">
+        <div class="layui-col-xs3">數據</div>
+        <div class="layui-col-xs9" style="text-align: right">
+          <button class="layui-btn layui-btn-sm layui-btn-primary" lay-on="createData">產生數據</button>
+        </div>
+      </div>
+      <textarea id="demoData1">
+{
+  "title": "標題",
+  "desc": "<a href=\"\" style=\"color:blue;\">一段描述</a>",
+  "items": [
+    {
+      "title": "list 1",
+      "child": [{
+        "title": "list 1-1",
+        "child": [{
+          "title": "list 1-1-1"
+        }]
+      }]
+    },
+    {
+      "title": "list 2",
+      "child": [{
+        "title": "list 2-1"
+      }]
+    },
+    {"title": "list 3"}
+  ]
+}</textarea>
+    </div>
+    <div class="layui-col-xs12 laytpl-demo">
+      <div class="layui-row">
+        <div class="layui-col-xs4">檢視</div>
+        <div class="layui-col-xs4" style="text-align: center">
+            <button class="layui-btn layui-btn-sm layui-btn-primary" lay-on="test1">效能測試</button>
+        </div>
+        <div class="layui-col-xs4" style="text-align: right">
+          <span id="demoViewTime"></span>
+        </div>
+       </div>
+      <div class="layui-padding-sm" id="demoView1"></div>
+    </div>
+  </div>
+  
+  
+  <script type="type/html" template id="demoTplCommon">
+    公共模板 - {{ d.title }}
+  </script>
+  
+  <script type="type/html" template id="demoTplList">
+    {{# if(d.items && d.items.length > 0){ }}
+      <ul>
+        {{# layui.each(d.items, function(index, item){ }}
+          <li><strong>{{ item.title }}</strong>{{ laytpl.include('demoTplList', {items: item.child}) }}</li>
+        {{# }); }}
+      </ul>
+    {{# } }}
+  </script>
+
+  <script type="type/html" template id="laytplTestTpl">
+    {{# for(var i = 0; i < d.items.length; i++){ }}
+      第{{= d.items[i].index }}個，Name: {{- d.items[i].name }}   Number: {{= d.items[i].number }} 
+    {{# } }}
+  </script>
+  
+</div>
+
+<script src="../src/layui.js"></script>
+<script>
+layui.use(['laytpl', 'util'], function(){
+  var laytpl = layui.laytpl
+  ,util = layui.util
+  ,$ = layui.$;
+  
+  //獲取模板和數據
+  var get = function(type){
+    return {
+      template: $('#demoTPL1').val() //獲取模板
+      ,data: function(){  //獲取數據
+        try {
+          return JSON.parse($('#demoData1').val());
+        } catch(e){
+          $('#demoView1').html(e);
+        }
+      }()
+    };
+  };
+  
+  var data = get();
+  
+  //耗時計算
+  var startTime = new Date().getTime(), timer = function(startTime, title){
+    var endTime = new Date().getTime();
+    $('#demoViewTime').html((title || '模板解析耗時：')+ (endTime - startTime) + 'ms');
+  };
+
+  //渲染模板
+  var thisTpl = laytpl(data.template);
+
+  //執行渲染
+  thisTpl.render(data.data, function(view){
+    timer(startTime);
+    $('#demoView1').html(view);
+  });
+  
+  //編輯
+  $('.laytpl-demo textarea').on('input', function(){
+    var data = get();
+    if(!data.data) return;
+    
+    //計算模板渲染耗時
+    var startTime = new Date().getTime();
+    
+    //若模板有變化，則重新解析模板；若模板沒變，數據有變化，則從模板快取中直接渲染（效率大增）
+    if(this.id === 'demoTPL1'){ 
+      thisTpl.parse(data.template, data.data); //解析模板
+    }
+    
+    //執行渲染
+    thisTpl.render(data.data, function(view){
+      timer(startTime);
+      $('#demoView1').html(view);
+    });
+  });
+  
+  //事件
+  util.event('lay-on', {
+    //效能測試
+    test1: function(){
+      var dataLen = 1000 //數據量
+      ,renderTimes = 1000; //渲染次數
+      
+      //初始化數據
+      var data = {
+        title: '效能測試'
+        ,items: function(items){
+          for(var i = 0; i < dataLen; i++){
+            items.push({
+              index: i
+              ,name: '<strong style="color: red;">張三</strong>'
+              ,number: 100+i
+            });
+          }
+          return items;
+        }([])
+      };
+      
+      //模板
+      var startTime = new Date();
+      for(var j = 0; j < renderTimes; j++){
+        var template = document.getElementById('laytplTestTpl').innerHTML;
+        var html = laytpl(template).render(data);
+      }
+      timer(startTime, '本次測試耗時：');
+      $('#demoView1').html(html);
+      
+    }
+  });
+});
+</script>
+</body>
+</html>

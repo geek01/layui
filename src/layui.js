@@ -1,7 +1,6 @@
-
-/*!
+/**
  * Layui
- * Classic modular Front-End UI library
+ * Classic modular front-end UI library
  * MIT Licensed
  */
  
@@ -9,14 +8,14 @@
   "use strict";
 
   var doc = win.document, config = {
-    modules: {} //記錄模塊物理路徑
-    ,status: {} //記錄模塊加載狀態
-    ,timeout: 10 //符合規範的模塊請求最長等待秒數
-    ,event: {} //記錄模塊自定義事件
+    modules: {} // 模塊物理路徑
+    ,status: {} // 模塊加載狀態
+    ,timeout: 10 // 符合規範的模塊請求最長等待秒數
+    ,event: {} // 模塊自定義事件
   }
 
   ,Layui = function(){
-    this.v = '2.6.8'; // layui 版本號
+    this.v = '2.7.5'; // layui 版本號
   }
 
   //識別預先可能定義的指定全局對象
@@ -233,6 +232,23 @@
     return that;
   };
 
+  // 棄用原有的指定模塊，以便重新擴展新的同名模塊
+  Layui.prototype.disuse = function(apps){
+    var that = this;
+    apps = that.isArray(apps) ? apps : [apps];
+    that.each(apps, function (index, item) {
+      if (!config.status[item]) {
+        //return error('module ' + item + ' is not exist');
+      }
+      delete that[item];
+      delete modules[item];
+      delete that.modules[item];
+      delete config.status[item];
+      delete config.modules[item];
+    });
+    return that;
+  };
+
   //獲取節點的 style 屬性值
   Layui.prototype.getStyle = function(node, name){
     var style = node.currentStyle ? node.currentStyle : win.getComputedStyle(node, null);
@@ -371,7 +387,7 @@
   };
 
   // location.hash 路由解析
-  Layui.prototype.router = function(hash){
+  Layui.prototype.router = Layui.prototype.hash = function(hash){
     var that = this
     ,hash = hash || location.hash
     ,data = {
@@ -454,14 +470,14 @@
     return data;
   };
 
-  //本地持久性存儲
+  // 本地持久存儲
   Layui.prototype.data = function(table, settings, storage){
     table = table || 'layui';
     storage = storage || localStorage;
 
     if(!win.JSON || !win.JSON.parse) return;
 
-    //如果settings為null，則刪除表
+    // 如果 settings 為 null，則刪除表
     if(settings === null){
       return delete storage[table];
     }
@@ -483,7 +499,7 @@
     return settings.key ? data[settings.key] : data;
   };
 
-  //本地會話性存儲
+  // 本地臨時存儲
   Layui.prototype.sessionData = function(table, settings){
     return this.data(table, settings, sessionStorage);
   }
@@ -541,7 +557,7 @@
   };
 
   //typeof 類型細分 -> string/number/boolean/undefined/null、object/array/function/…
-  Layui.prototype._typeof = function(operand){
+  Layui.prototype._typeof = Layui.prototype.type = function(operand){
     if(operand === null) return String(operand);
 
     //細分引用類型
@@ -559,10 +575,10 @@
   };
 
   //對象是否具備數組結構（此處為兼容 jQuery 對象）
-  Layui.prototype._isArray = function(obj){
+  Layui.prototype._isArray = Layui.prototype.isArray = function(obj){
     var that = this
     ,len
-    ,type = that._typeof(obj);
+    ,type = that.type(obj);
 
     if(!obj || (typeof obj !== 'object') || obj === win) return false;
 
@@ -584,7 +600,7 @@
     obj = obj || [];
 
     //優先處理數組結構
-    if(that._isArray(obj)){
+    if(that.isArray(obj)){
       for(key = 0; key < obj.length; key++){
         if(callFn(key, obj)) break;
       }
@@ -597,25 +613,57 @@
     return that;
   };
 
-  //將數組中的對象按其某個成員排序
-  Layui.prototype.sort = function(obj, key, desc){
-    var clone = JSON.parse(
-      JSON.stringify(obj || [])
+  // 將數組中的成員對象按照某個 key 的 value 值進行排序
+  Layui.prototype.sort = function(arr, key, desc){
+    var that = this
+    ,clone = JSON.parse(
+      JSON.stringify(arr || [])
     );
 
-    if(!key) return clone;
+    // 若未傳入 key，則直接返回原對象
+    if(that.type(arr) === 'object' && !key){
+      return clone;
+    } else if(typeof arr !== 'object'){ //若 arr 非對象
+      return [clone];
+    }
 
-    //如果是數字，按大小排序；如果是非數字，則按字典序排序
+    // 開始排序
     clone.sort(function(o1, o2){
       var v1 = o1[key]
-      ,v2 = o2[key]
-      ,isNum = [
-        !isNaN(v1)
-        ,!isNaN(v2)
-      ];
+      ,v2 = o2[key];
 
+      /*
+       * 特殊數據
+       * 若比較的成員均非對象
+       */
 
-      //若為數字比較
+      // 若比較的成員均為數字
+      if(!isNaN(o1) && !isNaN(o2)) return o1 - o2;
+      // 若比較的成員只存在某一個非對象
+      if(!isNaN(o1) && isNaN(o2)){
+        if(key && typeof o2 === 'object'){
+          v1 = o1;
+        } else {
+          return -1;
+        }
+      } else if (isNaN(o1) && !isNaN(o2)){
+        if(key && typeof o1 === 'object'){
+          v2 = o2;
+        } else {
+          return 1;
+        }
+      }
+
+      /*
+       * 正常數據
+       * 即成員均為對象，也傳入了對比依據： key
+       * 若 value 為數字，按「大小」排序；若 value 非數字，則按「字典序」排序
+       */
+
+      // value 是否為數字
+      var isNum = [!isNaN(v1), !isNaN(v2)];
+
+      // 若為數字比較
       if(isNum[0] && isNum[1]){
         if(v1 && (!v2 && v2 !== 0)){ //數字 vs 空
           return 1;
@@ -630,9 +678,9 @@
        * 字典序排序
        */
 
-      //若為非數字比較
+      // 若為非數字比較
       if(!isNum[0] && !isNum[1]){
-        //字典序比較
+        // 字典序比較
         if(v1 > v2){
           return 1;
         } else if (v1 < v2) {
@@ -642,33 +690,16 @@
         }
       }
 
-      //若為混合比較
+      // 若為混合比較
       if(isNum[0] || !isNum[1]){ //數字 vs 非數字
         return -1;
       } else if(!isNum[0] || isNum[1]) { //非數字 vs 數字
         return 1;
       }
 
-      /*
-      //老版本
-      if(v1 && !v2){
-        return 1;
-      } else if(!v1 && v2){
-        return -1;
-      }
-
-      if(v1 > v2){
-        return 1;
-      } else if (v1 < v2) {
-        return -1;
-      } else {
-        return 0;
-      }
-      */
-
     });
 
-    desc && clone.reverse(); //倒序
+    desc && clone.reverse(); // 倒序
     return clone;
   };
 
