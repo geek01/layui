@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>基礎方法測試用例 - layui</title>
+  <title>基础方法测试用例 - layui</title>
   <link href="../src/css/layui.css" rel="stylesheet">
 </head>
 <body>
@@ -11,7 +11,7 @@
 <div class="layui-container" style="padding: 30px 0;">
   <div class="" style="padding: 30px 0;">
     <blockquote class="layui-elem-quote" style="color: #666;">
-      點選按鈕開始測試，測試結果打開瀏覽器控制檯檢視
+      点击按钮开始测试，测试结果打开浏览器控制台查看
     </blockquote>
     <div class="layui-btn-container">
       <button class="layui-btn" lay-on="sort">layui.sort</button>
@@ -35,15 +35,15 @@ layui.use(['lay', 'util'], function(){
       //sort
       console.log('%c> layui.sort: ', style);
       console.log(
-        '數字-整數型',
+        '数字-整数型',
         layui.sort([{a: 3},{a: 0},{a: 0},{a: -1},{a: -5},{a: 6},{a: 9},{a: -333333}], 'a')
       );
       console.log(
-        '數字-浮點型',
+        '数字-浮点型',
         layui.sort([{a: 3.5},{a: 0.5},{a: 0.5},{a: -1.5},{a: -5.5},{a: 6.5},{a: 9.5},{a: -333333.5}], 'a')
       );
       console.log(
-        '數字-混合型',
+        '数字-混合型',
         layui.sort([{a: 1},{a: 20.5},{a: 20.3},{a: 3},{a: 52},{a: 4.3}], 'a')
       );
       console.log(
@@ -78,12 +78,12 @@ layui.use(['lay', 'util'], function(){
         ], 'a')
       );
       console.log(
-        '陣列成員全為數字', 
+        '数组成员全为数字', 
         layui.sort([1, 20.5, 19.5, 52, 4.5])
       );
       console.log(
-        '陣列成員為混合型', 
-        layui.sort([1, {a: 32}, 20.5, {a: 6}, 52, 5.5], 'a') //按成員對象的 key 為 a 進行比較
+        '数组成员为混合型', 
+        layui.sort([1, {a: 32}, 20.5, {a: 6}, 52, 5.5], 'a') //按成员对象的 key 为 a 进行比较
       );
     }
 

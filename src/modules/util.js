@@ -1,13 +1,13 @@
 /**
- * util 工具組件  
+ * util 工具組件
  */
 
 layui.define('jquery', function(exports){
   "use strict";
-  
+
   var $ = layui.$
   ,hint = layui.hint()
-  
+
   //外部接口
   ,util = {
     //固定塊
@@ -19,11 +19,11 @@ layui.define('jquery', function(exports){
       options = $.extend({
         showHeight: 200 //出現TOP的滾動條高度臨界值
       }, options);
-      
+
       options.bar1 = options.bar1 === true ? '&#xe606;' : options.bar1;
       options.bar2 = options.bar2 === true ? '&#xe607;' : options.bar2;
       options.bgcolor = options.bgcolor ? ('background-color:' + options.bgcolor) : '';
-      
+
       var icon = [options.bar1, options.bar2, '&#xe604;'] //圖標：信息、問號、TOP
       ,elem = $(['<ul class="'+ ELEM +'">'
         ,options.bar1 ? '<li class="layui-icon" lay-type="bar1" style="'+ options.bgcolor +'">'+ icon[0] +'</li>' : ''
@@ -40,10 +40,10 @@ layui.define('jquery', function(exports){
         }
       };
       if($('.'+ ELEM)[0]) return;
-      
+
       typeof options.css === 'object' && elem.css(options.css);
       body.append(elem), scroll();
-      
+
       //bar點擊事件
       elem.find('li').on('click', function(){
         var othis = $(this), type = othis.attr('lay-type');
@@ -54,16 +54,16 @@ layui.define('jquery', function(exports){
         }
         options.click && options.click.call(this, type);
       });
-      
+
       //Top顯示控制
       dom.on('scroll', function(){
         clearTimeout(timer);
         timer = setTimeout(function(){
           scroll();
         }, 100);
-      }); 
+      });
     }
-    
+
     //倒計時
     ,countdown: function(endTime, serverTime, callback){
       var that = this
@@ -77,32 +77,32 @@ layui.define('jquery', function(exports){
         ,Math.floor(count/(1000*60)) % 60 //分
         ,Math.floor(count/1000) % 60 //秒
       ];
-      
+
       if(type) callback = serverTime;
-       
+
       var timer = setTimeout(function(){
         that.countdown(endTime, now + 1000, callback);
       }, 1000);
-      
+
       callback && callback(count > 0 ? time : [0,0,0,0], serverTime, timer);
-      
+
       if(count <= 0) clearTimeout(timer);
       return timer;
     }
-    
+
     //某個時間在當前時間的多久前
     ,timeAgo: function(time, onlyDate){
       var that = this
       ,arr = [[], []]
       ,stamp = new Date().getTime() - new Date(time).getTime();
-      
+
       //返回具體日期
       if(stamp > 1000*60*60*24*31){
         stamp =  new Date(time);
         arr[0][0] = that.digit(stamp.getFullYear(), 4);
         arr[0][1] = that.digit(stamp.getMonth() + 1);
         arr[0][2] = that.digit(stamp.getDate());
-        
+
         //是否輸出時間
         if(!onlyDate){
           arr[1][0] = that.digit(stamp.getHours());
@@ -111,7 +111,7 @@ layui.define('jquery', function(exports){
         }
         return arr[0].join('-') + ' ' + arr[1].join(':');
       }
-      
+
       //30天以內，返回“多久前”
       if(stamp >= 1000*60*60*24){
         return ((stamp/1000/60/60/24)|0) + '天前';
@@ -125,7 +125,7 @@ layui.define('jquery', function(exports){
         return '剛剛';
       }
     }
-    
+
     //數字前置補零
     ,digit: function(num, length){
       var str = '';
@@ -136,12 +136,12 @@ layui.define('jquery', function(exports){
       }
       return num < Math.pow(10, length) ? str + (num|0) : num;
     }
-    
+
     //轉化為日期格式字符
     ,toDateString: function(time, format){
       //若 null 或空字符，則返回空字符
       if(time === null || time === '') return '';
-      
+
       var that = this
       ,date = new Date(function(){
         if(!time) return;
@@ -157,9 +157,9 @@ layui.define('jquery', function(exports){
         ,that.digit(date.getMinutes())
         ,that.digit(date.getSeconds())
       ];
-      
+
       if(!date.getDate()) return hint.error('Invalid Msec for "util.toDateString(Msec)"'), '';
-      
+
       format = format || 'yyyy-MM-dd HH:mm:ss';
       return format.replace(/yyyy/g, ymd[0])
       .replace(/MM/g, ymd[1])
@@ -168,7 +168,7 @@ layui.define('jquery', function(exports){
       .replace(/mm/g, hms[1])
       .replace(/ss/g, hms[2]);
     }
-    
+
     //轉義 html
     ,escape: function(html){
       var exp = /[<"'>]|&(?=#[a-zA-Z0-9]+)/g;
@@ -181,7 +181,7 @@ layui.define('jquery', function(exports){
       .replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/'/g, '&#39;').replace(/"/g, '&quot;');
     }
-    
+
     //還原轉義的 html
     ,unescape: function(html){
       if(html === undefined || html === null) html = '';
@@ -191,7 +191,7 @@ layui.define('jquery', function(exports){
       .replace(/\&lt;/g, '<').replace(/\&gt;/g, '>')
       .replace(/\&#39;/g, '\'').replace(/\&quot;/g, '"');
     }
-    
+
     //讓指定的元素保持在可視區域
     ,toVisibleArea: function(options){
       options = $.extend({
@@ -199,35 +199,35 @@ layui.define('jquery', function(exports){
         ,duration: 200 //動畫持續毫秒數
         ,type: 'y' //觸發方向，x 水平、y 垂直
       }, options);
-      
+
       if(!options.scrollElem[0] || !options.thisElem[0]) return;
-      
+
       var scrollElem = options.scrollElem //滾動元素
       ,thisElem = options.thisElem //目標元素
       ,vertical = options.type === 'y' //是否垂直方向
       ,SCROLL_NAME = vertical ? 'scrollTop' : 'scrollLeft' //滾動方法
-      ,OFFSET_NAME = vertical ? 'top' : 'left' //坐標方式
+      ,OFFSET_NAME = vertical ? 'top' : 'left' //座標方式
       ,scrollValue = scrollElem[SCROLL_NAME]() //當前滾動距離
       ,size = scrollElem[vertical ? 'height' : 'width']() //滾動元素的尺寸
       ,scrollOffet = scrollElem.offset()[OFFSET_NAME] //滾動元素所處位置
       ,thisOffset = thisElem.offset()[OFFSET_NAME] - scrollOffet //目標元素當前的所在位置
       ,obj = {};
-      
+
       //邊界滿足條件
       if(thisOffset > size - options.margin || thisOffset < options.margin){
         obj[SCROLL_NAME] = thisOffset - size/2 + scrollValue
         scrollElem.animate(obj, options.duration);
       }
     }
-    
+
     //批量事件
     ,event: function(attr, obj, eventType){
       var _body = $('body');
       eventType = eventType || 'click';
-      
+
       //記錄事件回調集合
       obj = util.event[attr] = $.extend(true, util.event[attr], obj) || {};
-      
+
       //清除委託事件
       util.event.UTIL_EVENT_CALLBACK = util.event.UTIL_EVENT_CALLBACK || {};
       _body.off(eventType, '*['+ attr +']', util.event.UTIL_EVENT_CALLBACK[attr])
@@ -241,18 +241,18 @@ layui.define('jquery', function(exports){
 
       //清除舊事件，綁定新事件
       _body.on(eventType, '*['+ attr +']', util.event.UTIL_EVENT_CALLBACK[attr]);
-      
+
       return obj;
     }
   };
 
   util.on = util.event;
-  
+
   // DOM 尺寸變化，該創意來自：http://benalman.com/projects/jquery-resize-plugin/
   /*
   !function(a,b,c){"$:nomunge";function l(){f=b[g](function(){d.each(function(){var b=a(this),c=b.width(),d=b.height(),e=a.data(this,i);(c!==e.w||d!==e.h)&&b.trigger(h,[e.w=c,e.h=d])}),l()},e[j])}var f,d=a([]),e=a.resize=a.extend(a.resize,{}),g="setTimeout",h="resize",i=h+"-special-event",j="delay",k="throttleWindow";e[j]=250,e[k]=!0,a.event.special[h]={setup:function(){if(!e[k]&&this[g])return!1;var b=a(this);d=d.add(b),a.data(this,i,{w:b.width(),h:b.height()}),1===d.length&&l()},teardown:function(){if(!e[k]&&this[g])return!1;var b=a(this);d=d.not(b),b.removeData(i),d.length||clearTimeout(f)},add:function(b){function f(b,e,f){var g=a(this),h=a.data(this,i)||{};h.w=e!==c?e:g.width(),h.h=f!==c?f:g.height(),d.apply(this,arguments)}if(!e[k]&&this[g])return!1;var d;return a.isFunction(b)?(d=b,f):(d=b.handler,b.handler=f,void 0)}}}($,window);
   */
-  
+
   // 輸出接口
   exports('util', util);
 });

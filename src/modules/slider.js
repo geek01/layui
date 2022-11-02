@@ -17,13 +17,13 @@ layui.define('jquery', function(exports){
       that.config = $.extend({}, that.config, options);
       return that;
     }
-    
+
     //事件
     ,on: function(events, callback){
       return layui.onevent.call(this, MOD_NAME, events, callback);
     }
   }
-  
+
   //操作當前實例
   ,thisSlider = function(){
     var that = this
@@ -257,7 +257,7 @@ layui.define('jquery', function(exports){
         ];
         if(arrValue[0] > arrValue[1]) arrValue.reverse(); //如果前面的圓點超過了後面的圓點值，則調換順序
       }
-      
+
        //回調
       options.change && options.change(options.range ? arrValue : selfValue);
     }
@@ -269,7 +269,7 @@ layui.define('jquery', function(exports){
       };
       return left;
     }
-    
+
     //拖拽元素
     ,elemMove = $(['<div class="layui-auxiliar-moving" id="LAY-slider-moving"></div'].join(''))
     ,createMoveElem = function(move, up){
@@ -281,7 +281,7 @@ layui.define('jquery', function(exports){
       elemMove.on('mousemove', move);
       elemMove.on('mouseup', upCall).on('mouseleave', upCall);
     };
-    
+
     //動態賦值
     if(setValue === 'set') return change(value, i);
 
@@ -290,14 +290,14 @@ layui.define('jquery', function(exports){
       var othis = $(this);
       othis.on('mousedown', function(e){
         e = e || window.event;
-        
+
         var oldleft = othis.parent()[0].offsetLeft
         ,oldx = e.clientX;
         if(options.type === 'vertical'){
           oldleft = sliderWidth() - othis.parent()[0].offsetTop - sliderWrap.height()
           oldx = e.clientY;
         };
-        
+
         var move = function(e){
           e = e || window.event;
           var left = oldleft + (options.type === 'vertical' ? (oldx - e.clientY) : (e.clientX - oldx));
@@ -309,23 +309,23 @@ layui.define('jquery', function(exports){
           sliderAct.find('.' + SLIDER_TIPS).show();
           e.preventDefault();
         };
-        
+
         var up = function(){
           othis.removeClass(ELEM_HOVER);
           sliderAct.find('.' + SLIDER_TIPS).hide();
         };
-        
+
         createMoveElem(move, up)
       });
     });
-    
+
     // 點擊滑塊
     sliderAct.on('click', function(e){
       var main = $('.' + SLIDER_WRAP_BTN);
       var othis = $(this);
       if(!main.is(event.target) && main.has(event.target).length === 0 && main.length){
         var index;
-        var offset = options.type === 'vertical' 
+        var offset = options.type === 'vertical'
           ? (sliderWidth() - e.clientY + othis.offset().top - $(window).scrollTop())
         :(e.clientX - othis.offset().left - $(window).scrollLeft());
 
@@ -345,25 +345,25 @@ layui.define('jquery', function(exports){
         e.preventDefault();
       }
     });
-    
+
     //點擊加減輸入框
     sliderTxt.children('.' + SLIDER_INPUT_BTN).children('i').each(function(index){
       $(this).on('click', function(){
         inputValue = sliderTxt.children('.' + SLIDER_INPUT_TXT).children('input').val();
         if(index == 1){ //減
-          inputValue = inputValue - options.step < options.min 
-            ? options.min 
+          inputValue = inputValue - options.step < options.min
+            ? options.min
           : Number(inputValue) - options.step;
         }else{
-          inputValue = Number(inputValue) + options.step > options.max 
-            ? options.max 
+          inputValue = Number(inputValue) + options.step > options.max
+            ? options.max
           : Number(inputValue) + options.step;
         };
         var inputScale =  (inputValue - options.min) / (options.max - options.min) * 100 / step;
         change(inputScale, 0);
       });
     });
-    
+
     //獲取輸入框值
     var getInputValue = function(){
       var realValue = this.value;
@@ -379,7 +379,7 @@ layui.define('jquery', function(exports){
         e.preventDefault();
         getInputValue.call(this);
       }
-    }).on('change', getInputValue);     
+    }).on('change', getInputValue);
   };
 
   //事件處理

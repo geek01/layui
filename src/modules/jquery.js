@@ -10971,7 +10971,7 @@ jQuery.fn.andSelf = jQuery.fn.addBack;
 
 
 
-//將jQuery對象局部暴露給layui
+//将jQuery对象局部暴露给layui
 layui.define(function(exports){
   layui.$ = jQuery;
   exports('jquery', jQuery);

@@ -2,10 +2,10 @@
  * upload
  * 上傳組件
  */
- 
+
 layui.define('layer' , function(exports){
   "use strict";
-  
+
   var $ = layui.$
   ,layer = layui.layer
   ,hint = layui.hint()
@@ -21,13 +21,13 @@ layui.define('layer' , function(exports){
       that.config = $.extend({}, that.config, options);
       return that;
     }
-    
+
     //事件
     ,on: function(events, callback){
       return layui.onevent.call(this, MOD_NAME, events, callback);
     }
   }
-  
+
   //操作當前實例
   ,thisUpload = function(){
     var that = this;
@@ -41,20 +41,20 @@ layui.define('layer' , function(exports){
       ,config: that.config
     }
   }
-  
+
   //字符常量
   ,MOD_NAME = 'upload', ELEM = 'layui-upload', THIS = 'layui-this', SHOW = 'layui-show', HIDE = 'layui-hide', DISABLED = 'layui-disabled'
-  
+
   ,ELEM_FILE = 'layui-upload-file', ELEM_FORM = 'layui-upload-form', ELEM_IFRAME = 'layui-upload-iframe', ELEM_CHOOSE = 'layui-upload-choose', ELEM_DRAG = 'layui-upload-drag'
-  
-  
+
+
   //構造器
   ,Class = function(options){
     var that = this;
     that.config = $.extend({}, that.config, upload.config, options);
     that.render();
   };
-  
+
   //默認配置
   Class.prototype.config = {
     accept: 'images' //允許上傳的文件類型：images/file/video/audio
@@ -426,11 +426,11 @@ layui.define('layer' , function(exports){
         +'<br>您當前已經選擇了: '+ that.fileLength +' 個文件'
       );
     }
-    
+
     //檢驗文件大小
     if(options.size > 0 && !(device.ie && device.ie < 10)){
       var limitSize;
-      
+
       layui.each(that.chooseFiles, function(index, file){
         if(file.size > 1024*options.size){
           var size = options.size/1024;
@@ -444,17 +444,17 @@ layui.define('layer' , function(exports){
 
     send();
   };
-  
+
   //重置方法
   Class.prototype.reload = function(options){
     options = options || {};
     delete options.elem;
     delete options.bindAction;
-    
+
     var that = this
     ,options = that.config = $.extend({}, that.config, upload.config, options)
     ,next = options.elem.next();
-    
+
     //更新文件域相關屬性
     next.attr({
       name: options.name
@@ -462,12 +462,12 @@ layui.define('layer' , function(exports){
       ,multiple: options.multiple
     });
   };
-  
+
   //事件處理
   Class.prototype.events = function(){
     var that = this
     ,options = that.config
-    
+
     //設置當前選擇的文件隊列
     ,setChooseFile = function(files){
       that.chooseFiles = {};
@@ -476,15 +476,15 @@ layui.define('layer' , function(exports){
         that.chooseFiles[time + '-' + i] = item;
       });
     }
-    
+
     //設置選擇的文本
     ,setChooseText = function(files, filename){
       var elemFile = that.elemFile
       ,item = options.item ? options.item : options.elem
-      ,value = files.length > 1 
-        ? files.length + '個文件' 
+      ,value = files.length > 1
+        ? files.length + '個文件'
       : ((files[0] || {}).name || (elemFile[0].value.match(/[^\/\\]+\..+/g)||[]) || '');
-      
+
       if(elemFile.next().hasClass(ELEM_CHOOSE)){
         elemFile.next().remove();
       }
@@ -496,7 +496,7 @@ layui.define('layer' , function(exports){
     //點擊上傳容器
     options.elem.off('upload.start').on('upload.start', function(){
       var othis = $(this), data = othis.attr('lay-data');
-      
+
       if(data){
         try{
           data = new Function('return '+ data)();
@@ -505,11 +505,11 @@ layui.define('layer' , function(exports){
           hint.error('Upload element property lay-data configuration item has a syntax error: ' + data)
         }
       }
-      
+
       that.config.item = othis;
       that.elemFile[0].click();
     });
-    
+
     //拖拽上傳
     if(!(device.ie && device.ie < 10)){
       options.elem.off('upload.over').on('upload.over', function(){
@@ -522,27 +522,27 @@ layui.define('layer' , function(exports){
       })
       .off('upload.drop').on('upload.drop', function(e, param){
         var othis = $(this), files = param.originalEvent.dataTransfer.files || [];
-        
+
         othis.removeAttr('lay-over');
         setChooseFile(files);
 
         options.auto ? that.upload() : setChooseText(files); //是否自動觸發上傳
       });
     }
-    
+
     //文件選擇
     that.elemFile.off('upload.change').on('upload.change', function(){
       var files = this.files || [];
       setChooseFile(files);
       options.auto ? that.upload() : setChooseText(files); //是否自動觸發上傳
     });
-    
+
     //手動觸發上傳
     options.bindAction.off('upload.action').on('upload.action', function(){
       that.upload();
     });
-    
-    //防止事件重復綁定
+
+    //防止事件重複綁定
     if(options.elem.data('haveEvents')) return;
     
     that.elemFile.on('change', function(){

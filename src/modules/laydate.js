@@ -5,23 +5,23 @@
 
   var isLayui = window.layui && layui.define, ready = {
     getPath: (window.lay && lay.getPath) ? lay.getPath : ''
-    
+
     //載入 CSS 依賴
     ,link: function(href, fn, cssname){
-      
+
       //未設置路徑，則不主動加載 css
       if(!laydate.path) return;
-      
+
       //加載 css
       if(window.lay && lay.layui){
         lay.layui.link(laydate.path + href, fn, cssname);
       }
     }
   }
-  
+
   //識別預先可能定義的指定全局對象
   ,GLOBAL = window.LAYUI_GLOBAL || {}
-  
+
   //外部調用
   ,laydate = {
     v: '5.3.1' //layDate 版本號
@@ -130,9 +130,9 @@
     ,lang: 'cn' //語言，只支持cn/en，即中文和英文
     ,theme: 'default' //主題
     ,position: null //控件定位方式定位, 默認absolute，支持：fixed/absolute/static
-    ,calendar: false //是否開啟公歷重要節日，僅支持中文版
-    ,mark: {} //日期備注，如重要事件或活動標記
-    ,holidays: null // 標注法定節假日或補假上班
+    ,calendar: false //是否開啟公曆重要節日，僅支持中文版
+    ,mark: {} //日期備註，如重要事件或活動標記
+    ,holidays: null // 標註法定節假日或補假上班
     ,zIndex: null //控件層疊順序
     ,done: null //控件選擇完畢後的回調，點擊清空/現在/確定也均會觸發
     ,change: null //日期時間改變後的回調
@@ -302,9 +302,9 @@
           year: tDate.getFullYear()
           ,month: tDate.getMonth()
           ,date: tDate.getDate()
-          ,hours: '23'
-          ,minutes: '59'
-          ,seconds: '59'
+          ,hours: i ? 23 : 0
+          ,minutes: i ? 59 : 0
+          ,seconds: i ? 59 : 0
         }).getTime()
         ,STAMP = 86400000 //代表一天的毫秒數
         ,thisDate = new Date(
@@ -374,7 +374,7 @@
 
     if(options.zIndex) elem.style.zIndex = options.zIndex;
 
-    //單雙日歷區域
+    //單雙日曆區域
     lay.each(new Array(2), function(i){
       if(!options.range && i > 0){
         return true;
@@ -419,7 +419,7 @@
         return elem;
       }()]
 
-      //日歷內容區域
+      //日曆內容區域
       ,divContent = lay.elem('div', {
         "class": 'layui-laydate-content'
       })
@@ -774,16 +774,20 @@
 
     //如果當前日期不在設定的最大小日期區間，則自動糾正在可選區域
     //校驗主面板是否在可選日期區間
+    var minMaxError;
     if(that.getDateTime(dateTime) > that.getDateTime(options.max)){ //若超出最大日期
       dateTime = options.dateTime = lay.extend({}, options.max);
+      minMaxError = true;
     } else if(that.getDateTime(dateTime) < that.getDateTime(options.min)){ //若少於最小日期
       dateTime = options.dateTime = lay.extend({}, options.min);
+      minMaxError = true;
     }
 
     //校驗右側面板是否在可選日期區間
     if(options.range){
       if(that.getDateTime(that.endDate) < that.getDateTime(options.min) || that.getDateTime(that.endDate) > that.getDateTime(options.max)){
         that.endDate = lay.extend({}, options.max);
+        minMaxError = true;
       }
       // 有時間範圍的情況下初始化startTime和endTime
       that.startTime = {
@@ -798,11 +802,14 @@
       }
     }
 
+    //初始值不在最大最小範圍內
+    minMaxError && that.setValue(that.parse()).hint('初始值' + lang.invalidDate + lang.formatError[1]);
+
     fn && fn();
     return that;
   };
 
-  // 公歷重要日期與自定義備注
+  // 公曆重要日期與自定義備註
   Class.prototype.mark = function(td, YMD){
     var that = this
     ,mark, options = that.config;
@@ -819,7 +826,7 @@
     return that;
   };
 
-  // 標注法定節假日或補假上班
+  // 標註法定節假日或補假上班
   Class.prototype.holidays = function(td, YMD) {
     var that = this;
     var options = that.config;
@@ -877,7 +884,7 @@
     return index ? that.endDate: options.dateTime;
   };
 
-  //日歷表
+  //日曆表
   Class.prototype.calendar = function(value, index, type){
     var that = this
     ,options = that.config
@@ -966,9 +973,9 @@
       }
     }
 
-    //初始賦值雙日歷
+    //初始賦值雙日曆
     if(options.range && type === 'init' && !value){
-      //執行渲染第二個日歷
+      //執行渲染第二個日曆
       that.calendar(that.endDate, 1);
     }
 
@@ -1788,7 +1795,7 @@
     if(!that) return;
     return that.remove();
   };
-  
+
   //加載方式
   isLayui ? (
     laydate.ready()
@@ -1801,7 +1808,7 @@
     (typeof define === 'function' && define.amd) ? define(function(){ //requirejs 加載
       ready.run(lay);
       return laydate;
-    }) : function(){ //普通 script 標簽加載
+    }) : function(){ //普通 script 標籤加載
       laydate.ready();
       ready.run(window.lay);
       window.laydate = laydate;

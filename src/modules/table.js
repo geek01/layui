@@ -5,7 +5,7 @@
 
 layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
   "use strict";
-  
+
   var $ = layui.$;
   var laytpl = layui.laytpl;
   var laypage = layui.laypage;
@@ -165,7 +165,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
                 ,'{{# } }}'
               ,'{{# } }}'
             ,'" {{#if(item2.align){}}align="{{=item2.align}}"{{#}}}>'
-              ,'{{# if(item2.type === "checkbox"){ }}' //復選框
+              ,'{{# if(item2.type === "checkbox"){ }}' //複選框
                 ,'<input type="checkbox" name="layTableCheckbox" lay-skin="primary" lay-filter="layTableAllChoose" {{# if(item2[d.data.checkName]){ }}checked{{# }; }}>'
               ,'{{# } else { }}'
                 ,'<span>{{-item2.title||""}}</span>'
@@ -504,7 +504,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
         item2.colGroup = true;
         var childIndex = 0;
         layui.each(options.cols[indexChild], function (i22, item22) {
-          //如果子列已經被標注為{HAS_PARENT}，或者子列累計 colspan 數等於父列定義的 colspan，則跳出當前子列循環
+          //如果子列已經被標註為{HAS_PARENT}，或者子列累計 colspan 數等於父列定義的 colspan，則跳出當前子列循環
           if (item22.HAS_PARENT || (childIndex >= 1 && childIndex == (item2.colspan || 1))) return;
 
           item22.HAS_PARENT = true;
@@ -1014,7 +1014,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
 
               //渲染不同風格的列
               switch(item3.type){
-                case 'checkbox': // 復選
+                case 'checkbox': // 複選
                   return '<input type="checkbox" name="layTableCheckbox" lay-skin="primary" '+ function(){
                     // 其他屬性
                     var arr = [];
@@ -1693,7 +1693,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
       if(dict.allowResize){
         var key = othis.data('key');
         e.preventDefault();
-        dict.offset = [e.clientX, e.clientY]; //記錄初始坐標
+        dict.offset = [e.clientX, e.clientY]; //記錄初始座標
 
         that.getCssRule(key, function(item){
           var width = item.style.width || othis.outerWidth();
@@ -1737,7 +1737,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
       });
     }
 
-    // 已給 document 執行全局事件，避免重復綁定
+    // 已給 document 執行全局事件，避免重複綁定
     thisTable.docEvent = true;
 
 
@@ -1830,7 +1830,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
       }, sets);
     };
 
-    // 復選框選擇（替代元素的 click 事件）
+    // 複選框選擇（替代元素的 click 事件）
     that.elem.on('click', 'input[name="layTableCheckbox"]+', function(){
       var checkbox = $(this).prev()
       ,children = that.layBody.find('input[name="layTableCheckbox"]')
@@ -2057,12 +2057,12 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
     };
 
      // 行工具條單擊事件
-    that.layBody.on('click', '*[lay-event]', function(){
+    that.layBody.on('click', '*[lay-event]', function(e){
       toolFn.call(this);
-      return false;
-    }).on('dblclick', '*[lay-event]', function(){ //行工具條雙擊事件
+      layui.stope(e);
+    }).on('dblclick', '*[lay-event]', function(e){ //行工具條雙擊事件
       toolFn.call(this, 'toolDouble');
-      return false;
+      layui.stope(e);
     });
 
     //同步滾動條
@@ -2196,7 +2196,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
           }
         } else {
           // 沒有key信息以colspan數量所謂判斷標準
-          //如果子列已經被標注為{PARENT_COL_INDEX}，或者子列累計 colspan 數等於父列定義的 colspan，則跳出當前子列循環
+          //如果子列已經被標註為{PARENT_COL_INDEX}，或者子列累計 colspan 數等於父列定義的 colspan，則跳出當前子列循環
           if (item22.PARENT_COL_INDEX || (childIndex >= 1 && childIndex == (item2.colspan || 1))) return;
           item22.PARENT_COL_INDEX = index;
           item2.CHILD_COLS.push(item22);
@@ -2211,7 +2211,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
   table.eachCols = function(id, callback, cols){
     var config = thisTable.config[id] || {}
     ,arrs = [], index = 0;
-    
+
     cols = $.extend(true, [], cols || config.cols);
 
     //重新整理表頭結構
@@ -2231,10 +2231,10 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
         typeof callback === 'function' && callback(i, item);
       });
     };
-    
+
     eachArrs();
   };
-  
+
   // 表格選中狀態
   table.checkStatus = function(id){
     var nums = 0
@@ -2260,7 +2260,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
       ,isAll: data.length ? (nums === (data.length - invalidNum)) : false //是否全選
     };
   };
-  
+
   // 獲取表格當前頁的所有行數據
   table.getData = function(id){
     var arr = []
@@ -2273,7 +2273,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
     });
     return arr;
   };
-  
+
   // 表格導出
   table.exportFile = function(id, data, options){
     data = data || table.clearCacheKey(table.cache[id]);
@@ -2291,15 +2291,15 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
       ,xls: 'application/vnd.ms-excel'
     })[type];
     var alink = document.createElement("a");
-    
+
     if(device.ie) return hint.error('IE_NOT_SUPPORT_EXPORTS');
-    
+
     alink.href = 'data:'+ textType +';charset=utf-8,\ufeff'+ encodeURIComponent(function(){
       var dataTitle = []
       ,dataMain = []
       ,dataTotal = []
       ,fieldsIsHide = {};
-      
+
       //表頭和表體
       layui.each(data, function(i1, item1){
         var vals = [];
@@ -2323,7 +2323,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
               ,td = thatTable.layBody.find('tr[data-index="'+ i1 +'"]>td');
 
               if(content === undefined || content === null) content = '';
-              
+
               i1 == 0 && dataTitle.push(item3.title || '');
               vals.push('"'+ parseTempData.call(thatTable, {
                 item3: item3
@@ -2341,45 +2341,45 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
         }
         dataMain.push(vals.join(','));
       });
-      
+
       //表合計
       thatTable && layui.each(thatTable.dataTotal, function(key, value){
         fieldsIsHide[key] || dataTotal.push(value);
       });
-      
+
       return dataTitle.join(',') + '\r\n' + dataMain.join('\r\n') + '\r\n' + dataTotal.join(',');
     }());
 
     alink.download = (options.title || config.title || 'table_'+ (config.index || '')) + '.' + type;
     document.body.appendChild(alink);
     alink.click();
-    document.body.removeChild(alink); 
+    document.body.removeChild(alink);
   };
-  
+
   // 重置表格尺寸結構
   table.resize = function(id){
     //如果指定表格唯一 id，則只執行該 id 對應的表格實例
     if(id){
       var config = getThisTableConfig(id); //獲取當前實例配置項
       if(!config) return;
-      
+
       thisTable.that[id].resize();
-      
+
     } else { //否則重置所有表格實例尺寸
       layui.each(thisTable.that, function(){
         this.resize();
       });
     }
   };
-  
+
   // 重載
   table.reload = function(id, options, deep, type){
     var config = getThisTableConfig(id); //獲取當前實例配置項
     if(!config) return;
-    
+
     var that = thisTable.that[id];
     that.reload(options, deep, type);
-    
+
     return thisTable.call(that);
   };
 
@@ -2390,7 +2390,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
 
     // 重載時，與數據相關的參數
     var dataParams = new RegExp('^('+ [
-      'data', 'url', 'method', 'contentType', 
+      'data', 'url', 'method', 'contentType',
       'dataType','jsonpCallback',
       'headers', 'where', 'page', 'limit',
       'request', 'response', 'parseData',
@@ -2403,7 +2403,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
         delete args[1][key];
       }
     });
-    
+
     return table.reload.apply(null, args);
   };
 
@@ -2412,7 +2412,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
     var inst = new Class(options);
     return thisTable.call(inst);
   };
-  
+
   // 清除臨時 Key
   table.clearCacheKey = function(data){
     data = $.extend({}, data);
@@ -2421,7 +2421,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
     delete data[table.config.disabledName];
     return data;
   };
-  
+
   // 自動完成渲染
   $(function(){
     table.init();

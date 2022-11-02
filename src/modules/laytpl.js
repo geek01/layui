@@ -1,4 +1,4 @@
-/**
+﻿/**
  * laytpl 模板引擎
  */
 
@@ -21,11 +21,11 @@ layui.define(function(exports){
         '([^{#}])*?' //普通字段
       ][type || 0];
       return exp((_||'') + config.open + types + config.close + (__||''));
-    },   
+    },
     escape: function(html){
       var exp = /[<"'>]|&(?=#[a-zA-Z0-9]+)/g;
       if(html === undefined || html === null) return '';
-      
+
       html += '';
       if(!exp.test(html)) return html;
 
@@ -52,11 +52,11 @@ layui.define(function(exports){
   Tpl.pt.parse = function(tpl, data){
     var that = this, tplog = tpl;
     var jss = exp('^'+config.open+'#', ''), jsse = exp(config.close+'$', '');
-    
+
     tpl = tpl.replace(/\s+|\r|\t|\n/g, ' ')
     .replace(exp(config.open+'#'), config.open+'# ')
     .replace(exp(config.close+'}'), '} '+config.close).replace(/\\/g, '\\\\')
-    
+
     //不匹配指定區域的內容
     .replace(exp(config.open + '!(.+?)!' + config.close), function(str){
       str = str.replace(exp('^'+ config.open + '!'), '')
@@ -66,13 +66,13 @@ layui.define(function(exports){
       });
       return str
     })
-    
+
     //匹配 JS 語法
     .replace(/(?="|')/g, '\\').replace(tool.query(), function(str){
       str = str.replace(jss, '').replace(jsse, '');
       return '";' + str.replace(/\\(.)/g, '$1') + ';view+="';
     })
-    
+
     //匹配普通輸出語句
     .replace(tool.query(1), function(str){
       var start = '"+laytpl.escape(';

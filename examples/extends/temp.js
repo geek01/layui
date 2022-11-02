@@ -1,7 +1,7 @@
 /**
  
- @Name：layui.modDemo XX元件
- @Author：賢心
+ @Name：layui.modDemo XX组件
+ @Author：贤心
  @License：MIT
 
  */
@@ -12,53 +12,53 @@ layui.define(['laytpl'], function(exports){
   var $ = layui.$
   ,laytpl = layui.laytpl
   
-  //模組名
+  //模块名
   ,MOD_NAME = 'modDemo'
 
-  //外部介面
+  //外部接口
   ,modeDemo = {
     config: {}
     ,index: layui[MOD_NAME] ? (layui[MOD_NAME].index + 10000) : 0
 
-    //設定全域性項
+    //设置全局项
     ,set: function(options){
       var that = this;
       that.config = $.extend({}, that.config, options);
       return that;
     }
     
-    //事件監聽
+    //事件监听
     ,on: function(events, callback){
       return layui.onevent.call(this, MOD_NAME, events, callback);
     }
   }
 
-  //操作目前實例
+  //操作当前实例
   ,thisModule = function(){
     var that = this
     ,options = that.config
     ,id = options.id || that.index;
     
-    thisModule.that[id] = that; //記錄目前實例對像
-    thisModule.config[id] = options; //記錄目前實例配置項
+    thisModule.that[id] = that; //记录当前实例对象
+    thisModule.config[id] = options; //记录当前实例配置项
     
     return {
       config: options
-      //重置實例
+      //重置实例
       ,reload: function(options){
         that.reload.call(that, options);
       }
     }
   }
   
-  //獲取目前實例配置項
+  //获取当前实例配置项
   ,getThisModuleConfig = function(id){
     var config = thisModule.config[id];
     if(!config) hint.error('The ID option was not found in the '+ MOD_NAME +' instance');
     return config || null;
   }
 
-  //字元常量  
+  //字符常量  
   ,ELEM = 'layui-modeDemo'
   
   
@@ -67,7 +67,7 @@ layui.define(['laytpl'], function(exports){
 
   ,'</div>'].join('')
 
-  //構造器
+  //构造器
   ,Class = function(options){
     var that = this;
     that.index = ++transfer.index;
@@ -75,12 +75,12 @@ layui.define(['laytpl'], function(exports){
     that.render();
   };
 
-  //預設配置
+  //默认配置
   Class.prototype.config = {
     
   };
   
-  //過載實例
+  //重载实例
   Class.prototype.reload = function(options){
     var that = this;
     
@@ -106,7 +106,7 @@ layui.define(['laytpl'], function(exports){
     //索引
     that.key = options.id || that.index;
     
-    //插入元件結構
+    //插入组件结构
     othis.html(that.elem);
     
     that.events(); //事件
@@ -121,11 +121,11 @@ layui.define(['laytpl'], function(exports){
   
   
   
-  //記錄所有實例
-  thisModule.that = {}; //記錄所有實例對像
-  thisModule.config = {}; //記錄所有實例配置項
+  //记录所有实例
+  thisModule.that = {}; //记录所有实例对象
+  thisModule.config = {}; //记录所有实例配置项
   
-  //過載實例
+  //重载实例
   modeDemo.reload = function(id, options){
     var that = thisModule.that[id];
     that.reload(options);

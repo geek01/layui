@@ -2,10 +2,10 @@
  * code 
  * 代碼塊簡易修飾
  */
- 
+
 layui.define(['lay', 'util'], function(exports){
   "use strict";
-  
+
   var $ = layui.$;
   var util = layui.util;
 
@@ -22,7 +22,7 @@ layui.define(['lay', 'util'], function(exports){
   var trim = function(str){
     return $.trim(str).replace(/^\n|\n$/, '');
   };
-  
+
   // export api
   exports('code', function(options){
     var opts = options = $.extend({}, config, options);
@@ -43,7 +43,7 @@ layui.define(['lay', 'util'], function(exports){
           var value = othis.attr('lay-'+ attr);
           if(typeof value === 'string'){
             obj[attr] = value;
-          }  
+          }
         })
         return obj;
       }({}));
@@ -62,19 +62,19 @@ layui.define(['lay', 'util'], function(exports){
       if(options.skin){
         if(options.skin === 'notepad') options.skin = 'dark';
         othis.addClass('layui-code-'+ options.skin);
-      } 
+      }
 
-      // 轉義 HTML 標簽
+      // 轉義 HTML 標籤
       if(options.encode) html = util.escape(html);
       html = html.replace(/[\r\t\n]+/g, '</li><li>'); // 轉義換行符
-      
+
       // 生成列表
       othis.html(listElem.html('<li>' + html + '</li>'));
-      
+
       // 創建 header
       if(!othis.children('.'+ ELEM_TITLE)[0]){
         headerElem.html(options.title + (
-          options.about 
+          options.about
             ? '<div class="layui-code-about">' + options.about + '</div>'
           : ''
         ));

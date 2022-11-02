@@ -1,20 +1,20 @@
 /**
  * form 表單組件
- * MIT Licensed
  */
- 
-layui.define('layer', function(exports){
+
+layui.define(['layer', 'util'], function(exports){
   "use strict";
-  
-  var $ = layui.$
-  ,layer = layui.layer
-  ,hint = layui.hint()
-  ,device = layui.device()
-  
-  ,MOD_NAME = 'form', ELEM = '.layui-form', THIS = 'layui-this'
-  ,SHOW = 'layui-show', HIDE = 'layui-hide', DISABLED = 'layui-disabled'
-  
-  ,Form = function(){
+
+  var $ = layui.$;
+  var layer = layui.layer;
+  var util = layui.util;
+  var hint = layui.hint();
+  var device = layui.device();
+
+  var MOD_NAME = 'form', ELEM = '.layui-form', THIS = 'layui-this';
+  var SHOW = 'layui-show', HIDE = 'layui-hide', DISABLED = 'layui-disabled';
+
+  var Form = function(){
     this.config = {
       verify: {
         required: [
@@ -45,64 +45,64 @@ layui.define('layer', function(exports){
           ,'請輸入正確的身份證號'
         ]
       }
-      ,autocomplete: null //全局 autocomplete 狀態。null 表示不幹預
+      ,autocomplete: null // 全局 autocomplete 狀態。null 表示不干預
     };
   };
 
-  //全局設置
+  // 全局設置
   Form.prototype.set = function(options){
     var that = this;
     $.extend(true, that.config, options);
     return that;
   };
 
-  //驗證規則設定
+  // 驗證規則設定
   Form.prototype.verify = function(settings){
     var that = this;
     $.extend(true, that.config.verify, settings);
     return that;
   };
 
-  //獲取指定表單對象
+  // 獲取指定表單對象
   Form.prototype.getFormElem = function(filter){
     return $(ELEM + function(){
       return filter ? ('[lay-filter="' + filter +'"]') : '';
     }());
   };
 
-  //表單事件
+  // 表單事件
   Form.prototype.on = function(events, callback){
     return layui.onevent.call(this, MOD_NAME, events, callback);
   };
 
-  //賦值/取值
+  // 賦值/取值
   Form.prototype.val = function(filter, object){
     var that = this
     ,formElem = that.getFormElem(filter);
 
-    //遍歷
+    // 遍歷
     formElem.each(function(index, item){
       var itemForm = $(this);
 
-      //賦值
+      // 賦值
       layui.each(object, function(key, value){
         var itemElem = itemForm.find('[name="'+ key +'"]')
         ,type;
 
-        //如果對應的表單不存在，則不執行
+        // 如果對應的表單不存在，則不執行
         if(!itemElem[0]) return;
         type = itemElem[0].type;
 
-        //如果為復選框
+        // 如果為複選框
         if(type === 'checkbox'){
           itemElem[0].checked = value;
-        } else if(type === 'radio') { //如果為單選框
+        } else if(type === 'radio') { // 如果為單選框
           itemElem.each(function(){
             if(this.value == value ){
               this.checked = true
             }
           });
-        } else { //其它類型的表單
+        } else { // 其它類型的表單
           itemElem.val(value);
         }
       });
@@ -110,40 +110,40 @@ layui.define('layer', function(exports){
 
     form.render(null, filter);
 
-    //返回值
+    // 返回值
     return that.getValue(filter);
   };
 
-  //取值
+  // 取值
   Form.prototype.getValue = function(filter, itemForm){
     itemForm = itemForm || this.getFormElem(filter);
 
-    var nameIndex = {} //數組 name 索引
+    var nameIndex = {} // 數組 name 索引
     ,field = {}
-    ,fieldElem = itemForm.find('input,select,textarea') //獲取所有表單域
+    ,fieldElem = itemForm.find('input,select,textarea') // 獲取所有表單域
 
     layui.each(fieldElem, function(_, item){
       var othis = $(this)
-      ,init_name; //初始 name
+      ,init_name; // 初始 name
 
       item.name = (item.name || '').replace(/^\s*|\s*&/, '');
       if(!item.name) return;
 
-      //用於支持數組 name
+      // 用於支持數組 name
       if(/^.*\[\]$/.test(item.name)){
         var key = item.name.match(/^(.*)\[\]$/g)[0];
         nameIndex[key] = nameIndex[key] | 0;
         init_name = item.name.replace(/^(.*)\[\]$/, '$1['+ (nameIndex[key]++) +']');
       }
 
-      if(/^checkbox|radio$/.test(item.type) && !item.checked) return;  //復選框和單選框未選中，不記錄字段
+      if(/^checkbox|radio$/.test(item.type) && !item.checked) return;  // 複選框和單選框未選中，不記錄字段
       field[init_name || item.name] = item.value;
     });
 
     return field;
   };
 
-  //表單控件渲染
+  // 表單控件渲染
   Form.prototype.render = function(type, filter){
     var that = this
     ,options = that.config
@@ -151,21 +151,21 @@ layui.define('layer', function(exports){
       return filter ? ('[lay-filter="' + filter +'"]') : '';
     }())
     ,items = {
-      //輸入框
+      // 輸入框
       input: function(elem){
         var inputs = elem || elemForm.find('input,textarea');
 
-        //初始化全局的 autocomplete
+        // 初始化全局的 autocomplete
         options.autocomplete && inputs.attr('autocomplete', options.autocomplete);
       }
 
-      //下拉選擇框
+      // 下拉選擇框
       ,select: function(elem){
         var TIPS = '請選擇', CLASS = 'layui-form-select', TITLE = 'layui-select-title'
         ,NONE = 'layui-select-none', initValue = '', thatInput
         ,selects = elem || elemForm.find('select')
 
-        //隱藏 select
+        // 隱藏 select
         ,hide = function(e, clear){
           if(!$(e.target).parent().hasClass(TITLE) || clear){
             $('.'+CLASS).removeClass(CLASS+'ed ' + CLASS+'up');
@@ -174,7 +174,7 @@ layui.define('layer', function(exports){
           thatInput = null;
         }
 
-        //各種事件
+        // 各種事件
         ,events = function(reElem, disabled, isSearch){
           var select = $(this)
           ,title = reElem.find('.' + TITLE)
@@ -182,29 +182,29 @@ layui.define('layer', function(exports){
           ,dl = reElem.find('dl')
           ,dds = dl.children('dd')
           ,dts = dl.children('dt') // select分組dt元素
-          ,index =  this.selectedIndex //當前選中的索引
-          ,nearElem; //select 組件當前選中的附近元素，用於輔助快捷鍵功能
+          ,index =  this.selectedIndex // 當前選中的索引
+          ,nearElem; // select 組件當前選中的附近元素，用於輔助快捷鍵功能
 
           if(disabled) return;
 
           // 搜索項
           var laySearch = select.attr('lay-search');
 
-          //展開下拉
+          // 展開下拉
           var showDown = function(){
             var top = reElem.offset().top + reElem.outerHeight() + 5 - $win.scrollTop()
             ,dlHeight = dl.outerHeight();
 
-            index = select[0].selectedIndex; //獲取最新的 selectedIndex
+            index = select[0].selectedIndex; // 獲取最新的 selectedIndex
             reElem.addClass(CLASS+'ed');
             dds.removeClass(HIDE);
             dts.removeClass(HIDE);
             nearElem = null;
 
-            //初始選中樣式
+            // 初始選中樣式
             dds.eq(index).addClass(THIS).siblings().removeClass(THIS);
 
-            //上下定位識別
+            // 上下定位識別
             if(top + dlHeight > $win.height() && top >= dlHeight){
               reElem.addClass(CLASS + 'up');
             }
@@ -212,7 +212,7 @@ layui.define('layer', function(exports){
             followScroll();
           }
 
-          //隱藏下拉
+          // 隱藏下拉
           ,hideDown = function(choose){
             reElem.removeClass(CLASS+'ed ' + CLASS+'up');
             input.blur();
@@ -223,22 +223,22 @@ layui.define('layer', function(exports){
             notOption(input.val(), function(none){
               var selectedIndex = select[0].selectedIndex;
 
-              //未查詢到相關值
+              // 未查詢到相關值
               if(none){
-                initValue = $(select[0].options[selectedIndex]).html(); //重新獲得初始選中值
+                initValue = $(select[0].options[selectedIndex]).html(); // 重新獲得初始選中值
 
-                //如果是第一項，且文本值等於 placeholder，則清空初始值
+                // 如果是第一項，且文本值等於 placeholder，則清空初始值
                 if(selectedIndex === 0 && initValue === input.attr('placeholder')){
                   initValue = '';
                 };
 
-                //如果有選中值，則將輸入框糾正為該值。否則清空輸入框
+                // 如果有選中值，則將輸入框糾正為該值。否則清空輸入框
                 input.val(initValue || '');
               }
             });
           }
 
-          //定位下拉滾動條
+          // 定位下拉滾動條
           ,followScroll = function(){
             var thisDd = dl.children('dd.'+ THIS);
 
@@ -248,18 +248,18 @@ layui.define('layer', function(exports){
             ,dlHeight = dl.height()
             ,ddHeight = thisDd.height();
 
-            //若選中元素在滾動條不可見底部
+            // 若選中元素在滾動條不可見底部
             if(posTop > dlHeight){
               dl.scrollTop(posTop + dl.scrollTop() - dlHeight + ddHeight - 5);
             }
 
-            //若選擇玄素在滾動條不可見頂部
+            // 若選擇玄素在滾動條不可見頂部
             if(posTop < 0){
               dl.scrollTop(posTop + dl.scrollTop() - 5);
             }
           };
 
-          //點擊標題區域
+          // 點擊標題區域
           title.on('click', function(e){
             reElem.hasClass(CLASS+'ed') ? (
               hideDown()
@@ -270,38 +270,38 @@ layui.define('layer', function(exports){
             dl.find('.'+NONE).remove();
           });
 
-          //點擊箭頭獲取焦點
+          // 點擊箭頭獲取焦點
           title.find('.layui-edge').on('click', function(){
             input.focus();
           });
 
-          //select 中 input 鍵盤事件
-          input.on('keyup', function(e){ //鍵盤鬆開
+          // select 中 input 鍵盤事件
+          input.on('keyup', function(e){ // 鍵盤松開
             var keyCode = e.keyCode;
 
-            //Tab鍵展開
+            // Tab鍵展開
             if(keyCode === 9){
               showDown();
             }
-          }).on('keydown', function(e){ //鍵盤按下
+          }).on('keydown', function(e){ // 鍵盤按下
             var keyCode = e.keyCode;
 
-            //Tab鍵隱藏
+            // Tab鍵隱藏
             if(keyCode === 9){
               hideDown();
             }
 
-            //標注 dd 的選中狀態
+            // 標註 dd 的選中狀態
             var setThisDd = function(prevNext, thisElem1){
               var nearDd, cacheNearElem
               e.preventDefault();
 
-              //得到當前隊列元素
+              // 得到當前隊列元素
               var thisElem = function(){
                 var thisDd = dl.children('dd.'+ THIS);
 
-                //如果是搜索狀態，且按 Down 鍵，且當前可視 dd 元素在選中元素之前，
-                //則將當前可視 dd 元素的上一個元素作為虛擬的當前選中元素，以保證遞歸不中斷
+                // 如果是搜索狀態，且按 Down 鍵，且當前可視 dd 元素在選中元素之前，
+                // 則將當前可視 dd 元素的上一個元素作為虛擬的當前選中元素，以保證遞歸不中斷
                 if(dl.children('dd.'+  HIDE)[0] && prevNext === 'next'){
                   var showDd = dl.children('dd:not(.'+ HIDE +',.'+ DISABLED +')')
                   ,firstIndex = showDd.eq(0).index();
@@ -318,31 +318,31 @@ layui.define('layer', function(exports){
                 }
 
                 return thisDd;
-                //return dds.eq(index);
+                // return dds.eq(index);
               }();
 
-              cacheNearElem = thisElem[prevNext](); //當前元素的附近元素
-              nearDd =  thisElem[prevNext]('dd:not(.'+ HIDE +')'); //當前可視元素的 dd 元素
+              cacheNearElem = thisElem[prevNext](); // 當前元素的附近元素
+              nearDd =  thisElem[prevNext]('dd:not(.'+ HIDE +')'); // 當前可視元素的 dd 元素
 
-              //如果附近的元素不存在，則停止執行，並清空 nearElem
+              // 如果附近的元素不存在，則停止執行，並清空 nearElem
               if(!cacheNearElem[0]) return nearElem = null;
 
-              //記錄附近的元素，讓其成為下一個當前元素
+              // 記錄附近的元素，讓其成為下一個當前元素
               nearElem = thisElem[prevNext]();
 
-              //如果附近不是 dd ，或者附近的 dd 元素是禁用狀態，則進入遞歸查找
+              // 如果附近不是 dd ，或者附近的 dd 元素是禁用狀態，則進入遞歸查找
               if((!nearDd[0] || nearDd.hasClass(DISABLED)) && nearElem[0]){
                 return setThisDd(prevNext, nearElem);
               }
 
-              nearDd.addClass(THIS).siblings().removeClass(THIS); //標注樣式
-              followScroll(); //定位滾動條
+              nearDd.addClass(THIS).siblings().removeClass(THIS); // 標註樣式
+              followScroll(); // 定位滾動條
             };
 
-            if(keyCode === 38) setThisDd('prev'); //Up 鍵
-            if(keyCode === 40) setThisDd('next'); //Down 鍵
+            if(keyCode === 38) setThisDd('prev'); // Up 鍵
+            if(keyCode === 40) setThisDd('next'); // Down 鍵
 
-            //Enter 鍵
+            // Enter 鍵
             if(keyCode === 13){
               e.preventDefault();
               dl.children('dd.'+THIS).trigger('click');
@@ -357,7 +357,7 @@ layui.define('layer', function(exports){
               var text = othis.text();
 
               // 是否區分大小寫
-              if(laySearch !== 'exact'){
+              if(laySearch !== 'cs'){
                 text = text.toLowerCase();
                 value = value.toLowerCase();
               }
@@ -379,7 +379,7 @@ layui.define('layer', function(exports){
             return callback(none), none;
           };
 
-          //搜索匹配
+          // 搜索匹配
           var search = function(e){
             var value = this.value, keyCode = e.keyCode;
 
@@ -402,33 +402,33 @@ layui.define('layer', function(exports){
               dl.find('.'+NONE).remove();
             }
 
-            followScroll(); //定位滾動條
+            followScroll(); // 定位滾動條
           };
 
           if(isSearch){
             input.on('keyup', search).on('blur', function(e){
               var selectedIndex = select[0].selectedIndex;
 
-              thatInput = input; //當前的 select 中的 input 元素
-              initValue = $(select[0].options[selectedIndex]).html(); //重新獲得初始選中值
+              thatInput = input; // 當前的 select 中的 input 元素
+              initValue = $(select[0].options[selectedIndex]).html(); // 重新獲得初始選中值
 
-              //如果是第一項，且文本值等於 placeholder，則清空初始值
+              // 如果是第一項，且文本值等於 placeholder，則清空初始值
               if(selectedIndex === 0 && initValue === input.attr('placeholder')){
                 initValue = '';
               };
 
               setTimeout(function(){
                 notOption(input.val(), function(none){
-                  initValue || input.val(''); //none && !initValue
+                  initValue || input.val(''); // none && !initValue
                 }, 'blur');
               }, 200);
             });
           }
 
-          //選擇
+          // 選擇
           dds.on('click', function(){
             var othis = $(this), value = othis.attr('lay-value');
-            var filter = select.attr('lay-filter'); //獲取過濾器
+            var filter = select.attr('lay-filter'); // 獲取過濾器
 
             if(othis.hasClass(DISABLED)) return false;
 
@@ -455,7 +455,7 @@ layui.define('layer', function(exports){
             return false;
           });
 
-          $(document).off('click', hide).on('click', hide); //點擊其它元素關閉 select
+          $(document).off('click', hide).on('click', hide); // 點擊其它元素關閉 select
         }
 
         selects.each(function(index, select){
@@ -463,7 +463,7 @@ layui.define('layer', function(exports){
           ,hasRender = othis.next('.'+CLASS)
           ,disabled = this.disabled
           ,value = select.value
-          ,selected = $(select.options[select.selectedIndex]) //獲取當前選中項
+          ,selected = $(select.options[select.selectedIndex]) // 獲取當前選中項
           ,optionsFirst = select.options[0];
 
           if(typeof othis.attr('lay-ignore') === 'string') return othis.show();
@@ -473,16 +473,16 @@ layui.define('layer', function(exports){
             optionsFirst.value ? TIPS : (optionsFirst.innerHTML || TIPS)
           ) : TIPS;
 
-          //替代元素
+          // 替代元素
           var reElem = $(['<div class="'+ (isSearch ? '' : 'layui-unselect ') + CLASS
           ,(disabled ? ' layui-select-disabled' : '') +'">'
             ,'<div class="'+ TITLE +'">'
-              ,('<input type="text" placeholder="'+ $.trim(placeholder) +'" '
-                +('value="'+ $.trim(value ? selected.html() : '') +'"') //默認值
-                +((!disabled && isSearch) ? '' : ' readonly') //是否開啟搜索
+              ,('<input type="text" placeholder="'+ util.escape($.trim(placeholder)) +'" '
+                +('value="'+ util.escape($.trim(value ? selected.html() : '')) +'"') // 默認值
+                +((!disabled && isSearch) ? '' : ' readonly') // 是否開啟搜索
                 +' class="layui-input'
                 +(isSearch ? '' : ' layui-unselect')
-              + (disabled ? (' ' + DISABLED) : '') +'">') //禁用狀態
+              + (disabled ? (' ' + DISABLED) : '') +'">') // 禁用狀態
             ,'<i class="layui-edge"></i></div>'
             ,'<dl class="layui-anim layui-anim-upbit'+ (othis.find('optgroup')[0] ? ' layui-select-group' : '') +'">'
             ,function(options){
@@ -493,7 +493,7 @@ layui.define('layer', function(exports){
                 } else if(item.tagName.toLowerCase() === 'optgroup'){
                   arr.push('<dt>'+ item.label +'</dt>');
                 } else {
-                  arr.push('<dd lay-value="'+ item.value +'" class="'+ (value === item.value ?  THIS : '') + (item.disabled ? (' '+DISABLED) : '') +'">'+ $.trim(item.innerHTML) +'</dd>');
+                  arr.push('<dd lay-value="'+ util.escape(item.value) +'" class="'+ (value === item.value ?  THIS : '') + (item.disabled ? (' '+DISABLED) : '') +'">'+ $.trim(item.innerHTML) +'</dd>');
                 }
               });
               arr.length === 0 && arr.push('<dd lay-value="" class="'+ DISABLED +'">沒有選項</dd>');
@@ -501,13 +501,13 @@ layui.define('layer', function(exports){
             }(othis.find('*')) +'</dl>'
           ,'</div>'].join(''));
 
-          hasRender[0] && hasRender.remove(); //如果已經渲染，則Rerender
+          hasRender[0] && hasRender.remove(); // 如果已經渲染，則Rerender
           othis.after(reElem);
           events.call(this, reElem, disabled, isSearch);
         });
       }
 
-      //復選框/開關
+      // 複選框/開關
       ,checkbox: function(elem){
         var CLASS = {
           checkbox: ['layui-form-checkbox', 'layui-form-checked', 'checkbox']
@@ -518,9 +518,9 @@ layui.define('layer', function(exports){
         ,events = function(reElem, RE_CLASS){
           var check = $(this);
 
-          //勾選
+          // 勾選
           reElem.on('click', function(){
-            var filter = check.attr('lay-filter') //獲取過濾器
+            var filter = check.attr('lay-filter') // 獲取過濾器
             ,text = (check.attr('lay-text')||'').split('|');
 
             if(check[0].disabled) return;
@@ -549,37 +549,37 @@ layui.define('layer', function(exports){
 
           if(typeof othis.attr('lay-ignore') === 'string') return othis.show();
 
-          //替代元素
+          // 替代元素
           var hasRender = othis.next('.' + RE_CLASS[0])
           ,reElem = $(['<div class="layui-unselect '+ RE_CLASS[0]
-            ,(check.checked ? (' '+ RE_CLASS[1]) : '') //選中狀態
-            ,(disabled ? ' layui-checkbox-disabled '+ DISABLED : '') //禁用狀態
+            ,(check.checked ? (' '+ RE_CLASS[1]) : '') // 選中狀態
+            ,(disabled ? ' layui-checkbox-disabled '+ DISABLED : '') // 禁用狀態
             ,'"'
-            ,(skin ? ' lay-skin="'+ skin +'"' : '') //風格
+            ,(skin ? ' lay-skin="'+ skin +'"' : '') // 風格
           ,'>'
-          ,function(){ //不同風格的內容
+          ,function(){ // 不同風格的內容
             var title = check.title.replace(/\s/g, '')
             ,type = {
-              //復選框
+              // 複選框
               checkbox: [
                 (title ? ('<span>'+ check.title +'</span>') : '')
                 ,'<i class="layui-icon layui-icon-ok"></i>'
               ].join('')
 
-              //開關
+              // 開關
               ,_switch: '<em>'+ ((check.checked ? text[0] : text[1]) || '') +'</em><i></i>'
             };
             return type[skin] || type['checkbox'];
           }()
           ,'</div>'].join(''));
 
-          hasRender[0] && hasRender.remove(); //如果已經渲染，則Rerender
+          hasRender[0] && hasRender.remove(); // 如果已經渲染，則Rerender
           othis.after(reElem);
           events.call(this, reElem, RE_CLASS);
         });
       }
 
-      //單選框
+      // 單選框
       ,radio: function(elem){
         var CLASS = 'layui-form-radio', ICON = ['&#xe643;', '&#xe63f;']
         ,radios = elem || elemForm.find('input[type=radio]')
@@ -589,8 +589,8 @@ layui.define('layer', function(exports){
 
           reElem.on('click', function(){
             var name = radio[0].name, forms = radio.parents(ELEM);
-            var filter = radio.attr('lay-filter'); //獲取過濾器
-            var sameRadio = forms.find('input[name='+ name.replace(/(\.|#|\[|\])/g, '\\$1') +']'); //找到相同name的兄弟
+            var filter = radio.attr('lay-filter'); // 獲取過濾器
+            var sameRadio = forms.find('input[name='+ name.replace(/(\.|#|\[|\])/g, '\\$1') +']'); // 找到相同name的兄弟
 
             if(radio[0].disabled) return;
 
@@ -617,18 +617,18 @@ layui.define('layer', function(exports){
           var othis = $(this), hasRender = othis.next('.' + CLASS), disabled = this.disabled;
 
           if(typeof othis.attr('lay-ignore') === 'string') return othis.show();
-          hasRender[0] && hasRender.remove(); //如果已經渲染，則Rerender
+          hasRender[0] && hasRender.remove(); // 如果已經渲染，則Rerender
 
-          //替代元素
+          // 替代元素
           var reElem = $(['<div class="layui-unselect '+ CLASS
-            ,(radio.checked ? (' '+CLASS+'ed') : '') //選中狀態
-          ,(disabled ? ' layui-radio-disabled '+DISABLED : '') +'">' //禁用狀態
+            ,(radio.checked ? (' '+CLASS+'ed') : '') // 選中狀態
+          ,(disabled ? ' layui-radio-disabled '+DISABLED : '') +'">' // 禁用狀態
           ,'<i class="layui-anim layui-icon">'+ ICON[radio.checked ? 0 : 1] +'</i>'
           ,'<div>'+ function(){
             var title = radio.title || '';
             if(typeof othis.next().attr('lay-radio') === 'string'){
               title = othis.next().html();
-              //othis.next().remove();
+              // othis.next().remove();
             }
             return title
           }() +'</div>'
@@ -759,59 +759,59 @@ layui.define('layer', function(exports){
 
   // 提交表單並校驗
   var submit = Form.prototype.submit = function(filter, callback){
-    var field = {};  //字段集合
-    var button = $(this); //當前觸發的按鈕
+    var field = {};  // 字段集合
+    var button = $(this); // 當前觸發的按鈕
 
     // 表單域 lay-filter 屬性值
-    var layFilter = typeof filter === 'string' 
-      ? filter 
+    var layFilter = typeof filter === 'string'
+      ? filter
     : button.attr('lay-filter');
 
     // 當前所在表單域
-    var elem = this.getFormElem 
-      ? this.getFormElem(layFilter) 
+    var elem = this.getFormElem
+      ? this.getFormElem(layFilter)
     : button.parents(ELEM).eq(0);
 
     // 獲取需要校驗的元素
     var verifyElem = elem.find('*[lay-verify]');
 
-    //開始校驗
+    // 開始校驗
     if(!form.validate(verifyElem)) return false;
 
-    //獲取當前表單值
+    // 獲取當前表單值
     field = form.getValue(null, elem);
 
-    //返回的參數
+    // 返回的參數
     var params = {
-      elem: this.getFormElem ? (window.event && window.event.target) : this //觸發事件的對象
-      ,form: this.getFormElem ? elem[0] : button.parents('form')[0] //當前所在的 form 元素，如果存在的話
-      ,field: field //當前表單數據
+      elem: this.getFormElem ? (window.event && window.event.target) : this // 觸發事件的對象
+      ,form: this.getFormElem ? elem[0] : button.parents('form')[0] // 當前所在的 form 元素，如果存在的話
+      ,field: field // 當前表單數據
     };
-    
-    //回調
+
+    // 回調
     typeof callback === 'function' && callback(params);
- 
-    //事件
+
+    // 事件
     return layui.event.call(this, MOD_NAME, 'submit('+ layFilter +')', params);
   };
 
-  //自動完成渲染
+  // 自動完成渲染
   var form = new Form()
   ,$dom = $(document), $win = $(window);
-  
+
   $(function(){
     form.render();
   });
-  
-  //表單reset重置渲染
+
+  // 表單reset重置渲染
   $dom.on('reset', ELEM, function(){
     var filter = $(this).attr('lay-filter');
     setTimeout(function(){
       form.render(null, filter);
     }, 50);
   });
-  
-  //表單提交事件
+
+  // 表單提交事件
   $dom.on('submit', ELEM, submit)
   .on('click', '*[lay-submit]', submit);
   

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>顏色選擇器 - layui</title>
+<title>颜色选择器 - layui</title>
 
 <link rel="stylesheet" href="../src/css/layui.css">
 
@@ -41,6 +41,12 @@ body{padding:20px;}
     <div class="test-box">
       <div id="test6"></div>
     </div>
+
+    <div class="test-box">
+      <div class="test-more" lay-options="{color: '#FF0000'}"></div>
+      <div class="test-more" lay-options="{color: '#008000'}"></div>
+      <div class="test-more" lay-options="{color: '#0000FF'}"></div>
+    </div>
   </div>
 
 <script src="../src/layui.js"></script>
@@ -51,7 +57,7 @@ body{padding:20px;}
 
     colorpicker.render({
       elem: '#test1'
-      //,predefine: true //開啟預定義顏色
+      //,predefine: true //开启预定义颜色
       //,colors: ['#F00','#0F0','#00F','rgb(255, 69, 0)','rgba(255, 69, 0, 0.5)']
       ,change: function(color){
         document.body.style.backgroundColor = color;
@@ -64,9 +70,9 @@ body{padding:20px;}
     
     colorpicker.render({
       elem: '#test2'
-      ,color: 'rgba(218, 121, 157, 1)' //設定預設色
+      ,color: 'rgba(218, 121, 157, 1)' //设置默认色
       ,predefine: true
-      ,alpha: true  //開啟透明度
+      ,alpha: true  //开启透明度
       ,format: 'rgb'
       ,change: function(color){
         console.log(color)
@@ -77,13 +83,13 @@ body{padding:20px;}
       elem: '#test3'
       ,color: 'rgba(0,0,0)'
       //,alpha: true
-      //,format: 'rgb' //設定輸入顯示格式為rgb
+      //,format: 'rgb' //设置输入显示格式为rgb
     });
     
     colorpicker.render({
       elem: '#test4'
       ,color: '#06eeb8'
-      ,predefine: true //開啟預定義色
+      ,predefine: true //开启预定义色
       ,format: 'rgb'
     });
     
@@ -100,6 +106,14 @@ body{padding:20px;}
       ,predefine: true
       ,colors: ['#F00','#0F0','#00F','rgb(255, 69, 0)','rgba(255, 69, 0, 0.5)']
       ,size: 'xs'
+    });
+
+    // 同时绑定多个
+    colorpicker.render({
+      elem: '.test-more',
+      done: function(color){
+        console.log(this.elem, color);
+      }
     });
   })
 </script>

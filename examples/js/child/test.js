@@ -3,6 +3,6 @@
 layui.define(function(exports){
   
   exports('test', {
-    title: '子目錄模組載入'
+    title: '子目录模块加载'
   })
 });

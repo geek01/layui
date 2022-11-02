@@ -3,6 +3,6 @@
 layui.define(function(exports){
   
   exports('index', {
-    title: '模組入口'
+    title: '模块入口'
   });
 });

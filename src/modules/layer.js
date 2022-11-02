@@ -1,6 +1,6 @@
-/**
+﻿/**
  * layer - 通用 Web 彈出層組件
- * MIT Licensed 
+ * MIT Licensed
  */
 
 ;!function(window, undefined){
@@ -73,9 +73,9 @@ var isLayui = window.layui && layui.define, $, win, ready = {
 
       //css 加載就緒
       if(parseInt(ready.getStyle(getLinkElem, 'width')) === 1989){
-        //如果參數來自於初始輪詢（即未加載就緒時的），則移除 link 標簽狀態
+        //如果參數來自於初始輪詢（即未加載就緒時的），則移除 link 標籤狀態
         if(status === STAUTS_NAME) getLinkElem.removeAttribute('lay-status');
-        //如果 link 標簽的狀態仍為「創建中」，則繼續進入輪詢，直到狀態改變，則執行回調
+        //如果 link 標籤的狀態仍為「創建中」，則繼續進入輪詢，直到狀態改變，則執行回調
         getLinkElem.getAttribute('lay-status') === STAUTS_NAME ? setTimeout(poll, delay) : fn();
       } else {
         getLinkElem.setAttribute('lay-status', STAUTS_NAME);
@@ -363,7 +363,7 @@ Class.pt.creat = function(){
 
   config.type == 2 && layer.ie == 6 && that.layero.find('iframe').attr('src', content[0]);
 
-  //坐標自適應瀏覽器窗口尺寸
+  //座標自適應瀏覽器窗口尺寸
   config.type == 4 ? that.tips() : function(){
     that.offset()
     //首次彈出時，若 css 尚未加載，則等待 css 加載完畢後，重新設定尺寸
@@ -446,7 +446,7 @@ Class.pt.auto = function(index){
   return that;
 };
 
-//計算坐標
+//計算座標
 Class.pt.offset = function(){
   var that = this, config = that.config, layero = that.layero;
   var area = [layero.outerWidth(), layero.outerHeight()];
@@ -772,7 +772,7 @@ Class.pt.openLayer = function(){
   };
 };
 
-//記錄寬高坐標，用於還原
+//記錄寬高座標，用於還原
 ready.record = function(layero){
   var area = [
     layero.width(),
@@ -880,7 +880,7 @@ layer.min = function(index, options){
     ,overflow: 'hidden'
   };
 
-  //記錄寬高坐標，用於還原
+  //記錄寬高座標，用於還原
   ready.record(layero);
 
   if(ready.minLeft[0]){
@@ -1377,7 +1377,7 @@ window.layui && layui.define ? (
   (typeof define === 'function' && define.amd) ? define(['jquery'], function(){ //requirejs 加載
     ready.run(window.jQuery);
     return layer;
-  }) : function(){ //普通 script 標簽加載
+  }) : function(){ //普通 script 標籤加載
     layer.ready();
     ready.run(window.jQuery);
   }()

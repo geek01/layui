@@ -3,7 +3,7 @@
  * 構建後則為移動模塊集合
  */
 
- 
+
 if(!layui['layui.mobile']){
   layui.config({
     base: layui.cache.dir + 'lay/modules/mobile/'
@@ -13,7 +13,7 @@ if(!layui['layui.mobile']){
     ,'upload-mobile': 'upload-mobile'
     ,'layim-mobile': 'layim-mobile'
   });
-}  
+}
 
 layui.define([
   'layer-mobile'
