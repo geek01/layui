@@ -1,77 +1,77 @@
-/** laydate 日期与时间控件 | MIT Licensed */
+/** laydate 日期與時間控件 | MIT Licensed */
 
 ;!function(window, document){ //gulp build: laydate-header
   "use strict";
 
   var isLayui = window.layui && layui.define, ready = {
     getPath: (window.lay && lay.getPath) ? lay.getPath : ''
-    
-    // 载入 CSS 依赖
+
+    // 載入 CSS 依賴
     ,link: function(href, fn, cssname){
-      
-      // 未设置路径，则不主动加载 css
+
+      // 未設置路徑，則不主動加載 css
       if(!laydate.path) return;
-      
-      // 加载 css
+
+      // 加載 css
       if(window.lay && lay.layui){
         lay.layui.link(laydate.path + href, fn, cssname);
       }
     }
   };
-  
-  // 识别预先可能定义的指定全局对象
+
+  // 識別預先可能定義的指定全局對象
   var GLOBAL = window.LAYUI_GLOBAL || {};
 
-  // 模块名
+  // 模塊名
   var MOD_NAME = 'laydate';
-  var MOD_ID = 'layui-'+ MOD_NAME +'-id' // 已渲染过的索引标记名
-  
-  // 外部调用
+  var MOD_ID = 'layui-'+ MOD_NAME +'-id' // 已渲染過的索引標記名
+
+  // 外部調用
   var laydate = {
-    v: '5.5.0' // layDate 版本号
+    v: '5.5.0' // layDate 版本號
     ,config: {
-      weekStart: 0, // 默认周日一周的开始
-    } // 全局配置项
+      weekStart: 0, // 默認週日一週的開始
+    } // 全局配置項
     ,index: (window.laydate && window.laydate.v) ? 100000 : 0
     ,path: GLOBAL.laydate_dir || ready.getPath
-    
-    // 设置全局项
+
+    // 設置全局項
     ,set: function(options){
       var that = this;
       that.config = lay.extend({}, that.config, options);
       return that;
     }
-    
-    // 主体 CSS 等待事件
+
+    // 主體 CSS 等待事件
     ,ready: function(callback){
       var cssname = 'laydate';
       var ver = ''
       var path = (isLayui ? 'modules/' : '') + 'laydate.css?v='+ laydate.v + ver;
 
       isLayui ? (
-        layui['layui.all'] 
-          ? (typeof callback === 'function' && callback()) 
+        layui['layui.all']
+          ? (typeof callback === 'function' && callback())
         : layui.addcss(path, callback, cssname)
       ) : ready.link(path, callback, cssname);
 
       return this;
     }
   };
-  
-  // 操作当前实例
+
+  // 操作當前實例
   var thisModule = function(){
     var that = this;
     var options = that.config;
     var id = options.id;
-    
-    thisModule.that[id] = that; // 记录当前实例对象
+
+    thisModule.that[id] = that; // 記錄當前實例對象
 
     return that.inst = {
       // 提示框
       hint: function(content){
         that.hint.call(that, content);
       },
-      // 重载实例
+      // 重載實例
       reload: function(options){
         that.reload.call(that, options);
       },
@@ -87,7 +87,7 @@
   var HIDE = 'layui-hide';
   var DISABLED = 'laydate-disabled';
   var LIMIT_YEAR = [100, 200000];
-  
+
   var ELEM_STATIC = 'layui-laydate-static';
   var ELEM_LIST = 'layui-laydate-list';
   var ELEM_SELECTED = 'laydate-selected';
@@ -105,13 +105,13 @@
   var ELEM_MAIN = 'layui-laydate-main';
   var ELEM_SHADE = 'layui-laydate-shade';
 
-  // 组件构造器
+  // 組件構造器
   var Class = function(options){
     var that = this;
     that.index = ++laydate.index;
     that.config = lay.extend({}, that.config, laydate.config, options);
 
-    // 若 elem 非唯一，则拆分为多个实例
+    // 若 elem 非唯一，則拆分為多個實例
     var elem = lay(options.elem || that.config.elem);
     if(elem.length > 1){
       lay.each(elem, function(){
@@ -121,97 +121,97 @@
       });
       return that;
     }
-    
-    // 初始化属性
-    options = lay.extend(that.config, lay.options(elem[0])); // 继承节点上的属性
 
-    // 若重复执行 render，则视为 reload 处理
+    // 初始化屬性
+    options = lay.extend(that.config, lay.options(elem[0])); // 繼承節點上的屬性
+
+    // 若重複執行 render，則視為 reload 處理
     if(elem[0] && elem.attr(MOD_ID)){
       var newThat = thisModule.getThis(elem.attr(MOD_ID));
       if(!newThat) return;
       return newThat.reload(options);
     }
 
-    // 初始化 id 属性 - 优先取 options > 元素 id > 自增索引
+    // 初始化 id 屬性 - 優先取 options > 元素 id > 自增索引
     options.id = 'id' in options ? options.id : (
       elem.attr('id') || that.index
     );
 
     // 自增索引
     options.index = that.index;
-    
+
     // 初始化
     laydate.ready(function(){
       that.init();
     });
   };
-  
+
   // 日期格式字符
   var dateType = 'yyyy|y|MM|M|dd|d|HH|H|mm|m|ss|s';
-  
-  // 将日期格式字符转换为数组
+
+  // 將日期格式字符轉換為數組
   thisModule.formatArr = function(format){
     return (format || '').match(new RegExp(dateType + '|.', 'g')) || []
   };
-  
+
   /*
-    组件操作
+    組件操作
   */
-  
-  // 是否闰年
+
+  // 是否閏年
   Class.isLeapYear = function(year){
     return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
   };
-  
-  // 默认配置
+
+  // 默認配置
   Class.prototype.config = {
-    type: 'date' //控件类型，支持：year/month/date/time/datetime
-    ,range: false //是否开启范围选择，即双控件
-    ,format: 'yyyy-MM-dd' //默认日期格式
-    ,value: null //默认日期，支持传入new Date()，或者符合format参数设定的日期格式字符
-    ,isInitValue: true //用于控制是否自动向元素填充初始值（需配合 value 参数使用）
-    ,min: '1900-1-1' //有效最小日期，年月日必须用“-”分割，时分秒必须用“:”分割。注意：它并不是遵循 format 设定的格式。
+    type: 'date' //控件類型，支持：year/month/date/time/datetime
+    ,range: false //是否開啟範圍選擇，即雙控件
+    ,format: 'yyyy-MM-dd' //默認日期格式
+    ,value: null //默認日期，支持傳入new Date()，或者符合format參數設定的日期格式字符
+    ,isInitValue: true //用於控制是否自動向元素填充初始值（需配合 value 參數使用）
+    ,min: '1900-1-1' //有效最小日期，年月日必須用“-”分割，時分秒必須用“:”分割。注意：它並不是遵循 format 設定的格式。
     ,max: '2099-12-31' //有效最大日期，同上
     ,trigger: 'click' //呼出控件的事件
-    ,show: false //是否直接显示，如果设置 true，则默认直接显示控件
-    ,showBottom: true //是否显示底部栏
-    ,isPreview: true //是否显示值预览
-    ,btns: ['clear', 'now', 'confirm'] //右下角显示的按钮，会按照数组顺序排列
-    ,lang: 'cn' //语言，只支持cn/en，即中文和英文
-    ,theme: 'default' //主题
-    ,position: null //控件定位方式定位, 默认absolute，支持：fixed/absolute/static
-    ,calendar: false //是否开启公历重要节日，仅支持中文版
-    ,mark: {} //日期备注，如重要事件或活动标记
-    ,holidays: null // 标注法定节假日或补假上班
-    ,zIndex: null //控件层叠顺序
-    ,done: null //控件选择完毕后的回调，点击清空/现在/确定也均会触发
-    ,change: null //日期时间改变后的回调
-    ,autoConfirm: true //是否自动确认（日期|年份|月份选择器非range下是否自动确认）
+    ,show: false //是否直接顯示，如果設置 true，則默認直接顯示控件
+    ,showBottom: true //是否顯示底部欄
+    ,isPreview: true //是否顯示值預覽
+    ,btns: ['clear', 'now', 'confirm'] //右下角顯示的按鈕，會按照數組順序排列
+    ,lang: 'cn' //語言，只支持cn/en，即中文和英文
+    ,theme: 'default' //主題
+    ,position: null //控件定位方式定位, 默認absolute，支持：fixed/absolute/static
+    ,calendar: false //是否開啟公曆重要節日，僅支持中文版
+    ,mark: {} //日期備註，如重要事件或活動標記
+    ,holidays: null // 標註法定節假日或補假上班
+    ,zIndex: null //控件層疊順序
+    ,done: null //控件選擇完畢後的回調，點擊清空/現在/確定也均會觸發
+    ,change: null //日期時間改變後的回調
+    ,autoConfirm: true //是否自動確認（日期|年份|月份選擇器非range下是否自動確認）
     ,shade: 0
   };
-  
-  //多语言
+
+  //多語言
   Class.prototype.lang = function(){
     var that = this
     ,options = that.config
     ,text = {
       cn: {
         weeks: ['日', '一', '二', '三', '四', '五', '六']
-        ,time: ['时', '分', '秒']
-        ,timeTips: '选择时间'
-        ,startTime: '开始时间'
-        ,endTime: '结束时间'
+        ,time: ['時', '分', '秒']
+        ,timeTips: '選擇時間'
+        ,startTime: '開始時間'
+        ,endTime: '結束時間'
         ,dateTips: '返回日期'
         ,month: ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二']
         ,tools: {
-          confirm: '确定'
+          confirm: '確定'
           ,clear: '清空'
-          ,now: '现在'
+          ,now: '現在'
         }
-        ,timeout: '结束时间不能早于开始时间<br>请重新选择'
-        ,invalidDate: '不在有效日期或时间范围内'
-        ,formatError: ['日期格式不合法<br>必须遵循下述格式：<br>', '<br>已为你重置']
-        ,preview: '当前选中的结果'
+        ,timeout: '結束時間不能早於開始時間<br>請重新選擇'
+        ,invalidDate: '不在有效日期或時間範圍內'
+        ,formatError: ['日期格式不合法<br>必須遵循下述格式：<br>', '<br>已為你重置']
+        ,preview: '當前選中的結果'
       }
       ,en: {
         weeks: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
@@ -235,14 +235,14 @@
     return text[options.lang] || text['cn'];
   };
 
-  // 重载实例
+  // 重載實例
   Class.prototype.reload = function(options){
     var that = this;
     that.config = lay.extend({}, that.config, options);
     that.init();
   };
-  
-  //初始准备
+
+  //初始準備
   Class.prototype.init = function(){
     var that = this
     ,options = that.config
@@ -254,14 +254,14 @@
       ,time: 'HH:mm:ss'
       ,datetime: 'yyyy-MM-dd HH:mm:ss'
     };
-    
+
     options.elem = lay(options.elem);
     options.eventElem = lay(options.eventElem);
-    
+
     if(!options.elem[0]) return;
 
     layui.type(options.theme) !== 'array' && (options.theme = [options.theme]);
-    // 设置了全面版模式
+    // 設置了全面版模式
     if (options.fullPanel) {
       if (options.type !== 'datetime' || options.range) {
         // 目前只支持datetime的全面版
@@ -269,49 +269,49 @@
       }
     }
 
-    //日期范围分隔符
+    //日期範圍分隔符
     that.rangeStr =  options.range ? (
       typeof options.range === 'string' ? options.range : '-'
     ) : '';
 
-    //日期范围的日历面板是否联动
+    //日期範圍的日曆面板是否聯動
     that.rangeLinked = !!(options.range && options.rangeLinked && (options.type === 'date' || options.type === 'datetime'))
 
-    //切换日历联动方式
+    //切換日曆聯動方式
     that.autoCalendarModel = function () {
       var state = that.rangeLinked;
       that.rangeLinked = (options.range && (options.type === 'date' || options.type === 'datetime'))
         && ((!that.startDate || !that.endDate) || (that.startDate && that.endDate && that.startDate.year === that.endDate.year && that.startDate.month === that.endDate.month));
       lay(that.elem)[that.rangeLinked ? 'addClass' : 'removeClass']('layui-laydate-linkage');
-      return that.rangeLinked != state; // 返回发生了变化
+      return that.rangeLinked != state; // 返回發生了變化
     };
 
-    //是否自动切换
+    //是否自動切換
     that.autoCalendarModel.auto = that.rangeLinked && options.rangeLinked === 'auto';
 
-    //若 range 参数为数组，则表示为开始日期和结束日期的 input 对象
+    //若 range 參數為數組，則表示為開始日期和結束日期的 input 對象
     if(layui.type(options.range) === 'array'){
       that.rangeElem = [
         lay(options.range[0]),
         lay(options.range[1])
       ];
     }
-    
-    //若 type 设置非法，则初始化为 date 类型
+
+    //若 type 設置非法，則初始化為 date 類型
     if(!format[options.type]){
       window.console && console.error && console.error('laydate type error:\''+ options.type + '\' is not supported')
       options.type = 'date';
     }
-    
-    //根据不同 type，初始化默认 format
+
+    //根據不同 type，初始化默認 format
     if(options.format === format.date){
       options.format = format[options.type] || format.date;
     }
-    
-    //将日期格式转化成数组
+
+    //將日期格式轉化成數組
     that.format = thisModule.formatArr(options.format);
 
-    // 设置了一周的开始是周几，此处做一个控制
+    // 設置了一週的開始是周幾，此處做一個控制
     if (options.weekStart) {
       if (!/^[0-6]$/.test(options.weekStart)) {
         var lang = that.lang();
@@ -320,11 +320,11 @@
       }
     }
 
-    //生成正则表达式
-    that.EXP_IF = ''; 
-    that.EXP_SPLIT = ''; 
+    //生成正則表達式
+    that.EXP_IF = '';
+    that.EXP_SPLIT = '';
     lay.each(that.format, function(i, item){
-      var EXP =  new RegExp(dateType).test(item) 
+      var EXP =  new RegExp(dateType).test(item)
         ? '\\d{'+ function(){
           if(new RegExp(dateType).test(that.format[i === 0 ? i + 1 : i - 1]||'')){
             if(/^yyyy|y$/.test(item)) return 4;
@@ -333,66 +333,66 @@
           if(/^yyyy$/.test(item)) return '1,4';
           if(/^y$/.test(item)) return '1,308';
           return '1,2';
-        }() +'}' 
+        }() +'}'
       : '\\' + item;
       that.EXP_IF = that.EXP_IF + EXP;
       that.EXP_SPLIT = that.EXP_SPLIT + '(' + EXP + ')';
     });
-    //验证日期格式正则
-    that.EXP_IF_ONE = new RegExp('^'+ that.EXP_IF +'$'); //验证单个日期格式
+    //驗證日期格式正則
+    that.EXP_IF_ONE = new RegExp('^'+ that.EXP_IF +'$'); //驗證單個日期格式
     that.EXP_IF = new RegExp('^'+ (
-      options.range ? 
+      options.range ?
         that.EXP_IF + '\\s\\'+ that.rangeStr + '\\s' + that.EXP_IF
       : that.EXP_IF
     ) +'$');
     that.EXP_SPLIT = new RegExp('^'+ that.EXP_SPLIT +'$', '');
-    
-    //如果不是 input|textarea 元素，则默认采用 click 事件
+
+    //如果不是 input|textarea 元素，則默認採用 click 事件
     if(!that.isInput(options.elem[0])){
       if(options.trigger === 'focus'){
         options.trigger = 'click';
       }
     }
-    
-    // 设置唯一 KEY
+
+    // 設置唯一 KEY
     options.elem.attr('lay-key', that.index);
     options.eventElem.attr('lay-key', that.index);
-    options.elem.attr(MOD_ID, options.id); // 渲染过的标记
+    options.elem.attr(MOD_ID, options.id); // 渲染過的標記
 
-    //记录重要日期
+    //記錄重要日期
     options.mark = lay.extend({}, (options.calendar && options.lang === 'cn') ? {
       '0-1-1': '元旦'
       ,'0-2-14': '情人'
-      ,'0-3-8': '妇女'
-      ,'0-3-12': '植树'
+      ,'0-3-8': '婦女'
+      ,'0-3-12': '植樹'
       ,'0-4-1': '愚人'
-      ,'0-5-1': '劳动'
+      ,'0-5-1': '勞動'
       ,'0-5-4': '青年'
-      ,'0-6-1': '儿童'
-      ,'0-9-10': '教师'
-      ,'0-10-1': '国庆'
-      ,'0-12-25': '圣诞'
+      ,'0-6-1': '兒童'
+      ,'0-9-10': '教師'
+      ,'0-10-1': '國慶'
+      ,'0-12-25': '聖誕'
     } : {}, options.mark);
-    
-    //获取限制内日期
+
+    //獲取限制內日期
     lay.each(['min', 'max'], function(i, item){
       var ymd = [];
       var hms = [];
-      if(typeof options[item] === 'number'){ //如果为数字
+      if(typeof options[item] === 'number'){ //如果為數字
         var day = options[item]
         ,tDate = new Date()
-        ,time = that.newDate({ //今天的最大毫秒数
+        ,time = that.newDate({ //今天的最大毫秒數
           year: tDate.getFullYear()
           ,month: tDate.getMonth()
           ,date: tDate.getDate()
           ,hours: i ? 23 : 0
           ,minutes: i ? 59 : 0
           ,seconds: i ? 59 : 0
-        }).getTime() 
-        ,STAMP = 86400000 //代表一天的毫秒数
+        }).getTime()
+        ,STAMP = 86400000 //代表一天的毫秒數
         ,thisDate = new Date(
           day ? (
-            day < STAMP ? time + day*STAMP : day //如果数字小于一天的毫秒数，则数字为天数，否则为毫秒数
+            day < STAMP ? time + day*STAMP : day //如果數字小於一天的毫秒數，則數字為天數，否則為毫秒數
           ) : time
         );
         ymd = [thisDate.getFullYear(), thisDate.getMonth() + 1, thisDate.getDate()];
@@ -412,29 +412,29 @@
         ,seconds: hms[2] | 0
       };
     });
-    
+
     that.elemID = 'layui-laydate'+ options.elem.attr('lay-key');
-    
+
     if(options.show || isStatic) that.render();
     isStatic || that.events();
-    
-    //默认赋值
+
+    //默認賦值
     if(options.value && options.isInitValue){
       if(layui.type(options.value) === 'date'){
-        that.setValue(that.parse(0, that.systemDate(options.value))); 
+        that.setValue(that.parse(0, that.systemDate(options.value)));
       } else {
-        that.setValue(options.value); 
+        that.setValue(options.value);
       }
     }
   };
-  
-  //控件主体渲染
+
+  //控件主體渲染
   Class.prototype.render = function(){
     var that = this
     ,options = that.config
     ,lang = that.lang()
     ,isStatic = options.position === 'static'
-    
+
     //主面板
     ,elem = that.elem = lay.elem('div', {
       id: that.elemID
@@ -456,37 +456,37 @@
         })()
       ].join('')
     })
-    
-    //主区域
+
+    //主區域
     ,elemMain = that.elemMain = []
     ,elemHeader = that.elemHeader = []
     ,elemCont = that.elemCont = []
     ,elemTable = that.table = []
 
-    //底部区域
+    //底部區域
     ,divFooter = that.footer = lay.elem('div', {
       "class": ELEM_FOOTER
     })
 
-    //快捷栏
+    //快捷欄
     ,divShortcut = that.shortcut = lay.elem('ul', {
       "class": ELEM_SHORTCUT
     });
-    
+
     if(options.zIndex) elem.style.zIndex = options.zIndex;
-    
-    //单双日历区域
+
+    //單雙日曆區域
     lay.each(new Array(2), function(i){
       if(!options.range && i > 0){
         return true;
       }
 
-      //头部区域
+      //頭部區域
       var divHeader = lay.elem('div', {
         "class": 'layui-laydate-header'
       })
-      
-      //左右切换
+
+      //左右切換
       ,headerChild = [function(){ //上一年
         var elem = lay.elem('i', {
           "class": 'layui-icon laydate-icon laydate-prev-y'
@@ -499,7 +499,7 @@
         });
         elem.innerHTML = '&#xe603;';
         return elem;
-      }(), function(){ //年月选择
+      }(), function(){ //年月選擇
         var elem = lay.elem('div', {
           "class": 'laydate-set-ym'
         }), spanY = lay.elem('span'), spanM = lay.elem('span');
@@ -519,22 +519,22 @@
         elem.innerHTML = '&#xe65b;';
         return elem;
       }()]
-      
-      //日历内容区域
+
+      //日曆內容區域
       ,divContent = lay.elem('div', {
         "class": 'layui-laydate-content'
       })
       ,table = lay.elem('table')
       ,thead = lay.elem('thead'), theadTr = lay.elem('tr');
-      
-      //生成年月选择
+
+      //生成年月選擇
       lay.each(headerChild, function(i, item){
         divHeader.appendChild(item);
       });
-      
+
        //生成表格
       thead.appendChild(theadTr);
-      lay.each(new Array(6), function(i){ //表体
+      lay.each(new Array(6), function(i){ //表體
         var tr = table.insertRow(0);
         lay.each(new Array(7), function(j){
           if(i === 0){
@@ -545,22 +545,22 @@
           tr.insertCell(j);
         });
       });
-      table.insertBefore(thead, table.children[0]); //表头
+      table.insertBefore(thead, table.children[0]); //表頭
       divContent.appendChild(table);
-      
+
       elemMain[i] = lay.elem('div', {
         "class": ELEM_MAIN + ' laydate-main-list-'+ i
       });
-      
+
       elemMain[i].appendChild(divHeader);
       elemMain[i].appendChild(divContent);
-      
+
       elemHeader.push(headerChild);
       elemCont.push(divContent);
       elemTable.push(table);
     });
-    
-    //生成底部栏
+
+    //生成底部欄
     lay(divFooter).html(function(){
       var html = [], btns = [];
       if(options.type === 'datetime'){
@@ -569,7 +569,7 @@
       if(!(!options.range && options.type === 'datetime') || options.fullPanel){
         html.push('<span class="'+ ELEM_PREVIEW +'" title="'+ lang.preview +'"></span>')
       }
-      
+
       lay.each(options.btns, function(i, item){
         var title = lang.tools[item] || 'btn';
         if(options.range && item === 'now') return;
@@ -580,7 +580,7 @@
       return html.join('');
     }());
 
-    // 生成快捷键栏
+    // 生成快捷鍵欄
     if (options.shortcuts) {
       elem.appendChild(divShortcut);
       lay(divShortcut).html(function () {
@@ -614,7 +614,7 @@
               seconds: dateTime.seconds,
             }
           }
-          if (i === 0) { // 第一个值作为startDate
+          if (i === 0) { // 第一個值作為startDate
             that.startDate = lay.extend({}, dateTime);
           } else {
             that.endState = true;
@@ -645,13 +645,13 @@
       })
     }
 
-    //插入到主区域
+    //插入到主區域
     lay.each(elemMain, function(i, main){
       elem.appendChild(main);
     });
     options.showBottom && elem.appendChild(divFooter);
-    
-    //生成自定义主题
+
+    //生成自定義主題
     var style = lay.elem('style');
     var styleText = [];
     var colorTheme;
@@ -665,7 +665,7 @@
         ].join('').replace(/{{id}}/g, that.elemID).replace(/{{theme}}/g, theme));
       }
     });
-    //快捷栏样式
+    //快捷欄樣式
     if (options.shortcuts && options.range) {
       styleText.push('#{{id}}.layui-laydate-range{width: 628px;}'.replace(/{{id}}/g, that.elemID))
     }
@@ -682,41 +682,41 @@
       elem.appendChild(style);
     }
 
-    //移除上一个控件
+    //移除上一個控件
     that.remove(Class.thisElemDate);
 
-    //记录当前执行的实例索引
+    //記錄當前執行的實例索引
     laydate.thisId = options.id;
 
-    //如果是静态定位，则插入到指定的容器中，否则，插入到body
+    //如果是靜態定位，則插入到指定的容器中，否則，插入到body
     isStatic ? options.elem.append(elem) : (
       document.body.appendChild(elem)
       ,that.position() //定位
     );
-    
+
     var shade = options.shade ? ('<div class="'+ ELEM_SHADE +'" style="'+ ('z-index:'+ (parseInt(layui.getStyle(elem, 'z-index'))-1) +'; background-color: ' + (options.shade[1] || '#000') + '; opacity: ' + (options.shade[0] || options.shade)) +'"></div>') : '';
     elem.insertAdjacentHTML('beforebegin', shade);
 
-    that.checkDate().calendar(null, 0, 'init'); //初始校验
-    that.changeEvent(); //日期切换
-    
+    that.checkDate().calendar(null, 0, 'init'); //初始校驗
+    that.changeEvent(); //日期切換
+
     Class.thisElemDate = that.elemID;
 
     that.renderAdditional()
     typeof options.ready === 'function' && options.ready(lay.extend({}, options.dateTime, {
       month: options.dateTime.month + 1
     }));
-    
+
     that.preview();
   };
-  
+
   //控件移除
   Class.prototype.remove = function(prev){
     var that = this
     ,options = that.config
     ,elem = lay('#'+ (prev || that.elemID));
     if(!elem[0]) return that;
-    
+
     if(!elem.hasClass(ELEM_STATIC)){
       that.checkDate(function(){
         elem.remove();
@@ -733,7 +733,7 @@
     lay('.' + ELEM_SHADE).remove();
     return that;
   };
-  
+
   //定位算法
   Class.prototype.position = function(){
     var that = this
@@ -743,7 +743,7 @@
     });
     return that;
   };
-  
+
   // 提示
   Class.prototype.hint = function(opts){
     var that = this;
@@ -751,10 +751,10 @@
     var div = lay.elem('div', {
       "class": ELEM_HINT
     });
-    
+
     if(!that.elem) return;
 
-    // 兼容旧版参数
+    // 兼容舊版參數
     if(typeof opts === 'object'){
       opts = opts || {};
     } else {
@@ -762,7 +762,7 @@
         content: opts
       }
     }
-    
+
     div.innerHTML = opts.content || '';
     lay(that.elem).find('.'+ ELEM_HINT).remove();
     that.elem.appendChild(div);
@@ -772,8 +772,8 @@
       lay(that.elem).find('.'+ ELEM_HINT).remove();
     }, 'ms' in opts ? opts.ms : 3000);
   };
-  
-  //获取递增/减后的年月
+
+  //獲取遞增/減後的年月
   Class.prototype.getAsYM = function(Y, M, type){
     type ? M-- : M++;
     if(M < 0){
@@ -786,21 +786,21 @@
     }
     return [Y, M];
   };
-  
-  //系统日期
+
+  //系統日期
   Class.prototype.systemDate = function(newDate){
     var thisDate = newDate || new Date();
     return {
       year: thisDate.getFullYear() //年
       ,month: thisDate.getMonth() //月
       ,date: thisDate.getDate() //日
-      ,hours: newDate ? newDate.getHours() : 0 //时
+      ,hours: newDate ? newDate.getHours() : 0 //時
       ,minutes: newDate ? newDate.getMinutes() : 0 //分
       ,seconds: newDate ? newDate.getSeconds() : 0 //秒
     }
   };
-  
-  //日期校验
+
+  //日期校驗
   Class.prototype.checkDate = function(fn){
     var that = this
     ,thisDate = new Date()
@@ -808,11 +808,11 @@
     ,lang = that.lang()
     ,dateTime = options.dateTime = options.dateTime || that.systemDate()
     ,thisMaxDate, error
-    
+
     ,elem = options.elem[0]
     ,valType = that.isInput(elem) ? 'val' : 'html'
     ,value = function(){
-      //如果传入了开始和结束日期的 input 对象，则将其拼接为日期范围字符
+      //如果傳入了開始和結束日期的 input 對象，則將其拼接為日期範圍字符
       if(that.rangeElem){
         var vals = [that.rangeElem[0].val(), that.rangeElem[1].val()];
 
@@ -820,33 +820,33 @@
           return vals.join(' ' + that.rangeStr + ' ');
         }
       }
-      return that.isInput(elem) 
-        ? elem.value 
+      return that.isInput(elem)
+        ? elem.value
       : (options.position === 'static' ? '' : lay(elem).attr('lay-date'));
     }()
-    
-    //校验日期有效数字
+
+    //校驗日期有效數字
     ,checkValid = function(dateTime){
       if (!dateTime) {
         return;
       }
-      if(dateTime.year > LIMIT_YEAR[1]) dateTime.year = LIMIT_YEAR[1], error = true; //不能超过20万年
+      if(dateTime.year > LIMIT_YEAR[1]) dateTime.year = LIMIT_YEAR[1], error = true; //不能超過20萬年
       if(dateTime.month > 11) dateTime.month = 11, error = true;
       if(dateTime.seconds > 59) dateTime.seconds = 0, dateTime.minutes++, error = true;
       if(dateTime.minutes > 59) dateTime.minutes = 0, dateTime.hours++, error = true;
       if(dateTime.hours > 23) dateTime.hours = 0, error = true;
 
-      //计算当前月的最后一天
+      //計算當前月的最後一天
       thisMaxDate = laydate.getEndDate(dateTime.month + 1, dateTime.year);
       if(dateTime.date > thisMaxDate) dateTime.date = thisMaxDate, error = true;
     }
-    
-    //获得初始化日期值
+
+    //獲得初始化日期值
     ,initDate = function(dateTime, value, index){
       var startEnd = ['startTime', 'endTime'];
       value = (value.match(that.EXP_SPLIT) || []).slice(1);
       index = index || 0;
-      
+
       if(options.range){
         that[startEnd[index]] = that[startEnd[index]] || {};
       }
@@ -854,7 +854,7 @@
         var thisv = parseFloat(value[i]);
         if(value[i].length < item.length) error = true;
         if(/yyyy|y/.test(item)){ //年
-          if(thisv < LIMIT_YEAR[0]) thisv = LIMIT_YEAR[0], error = true; //年不能低于100年
+          if(thisv < LIMIT_YEAR[0]) thisv = LIMIT_YEAR[0], error = true; //年不能低於100年
           dateTime.year = thisv;
         } else if(/MM|M/.test(item)){ //月
           if(thisv < 1) thisv = 1, error = true;
@@ -862,7 +862,7 @@
         } else if(/dd|d/.test(item)){ //日
           if(thisv < 1) thisv = 1, error = true;
           dateTime.date = thisv;
-        } else if(/HH|H/.test(item)){ //时
+        } else if(/HH|H/.test(item)){ //時
           if (thisv < 0) thisv = 0, error = true;
           if (thisv > 23) thisv = 23, error = true;
           dateTime.hours = thisv;
@@ -881,52 +881,52 @@
       });
       checkValid(dateTime);
     };
-    
+
     if(fn === 'limit') {
       if (options.range) {
-        checkValid(that.rangeLinked ? that.startDate : dateTime); // 校验开始时间
-        that.endDate && checkValid(that.endDate); // 校验结束时间
+        checkValid(that.rangeLinked ? that.startDate : dateTime); // 校驗開始時間
+        that.endDate && checkValid(that.endDate); // 校驗結束時間
       } else {
         checkValid(dateTime);
       }
       return that;
     }
-    
+
     value = value || options.value;
     if(typeof value === 'string'){
       value = value.replace(/\s+/g, ' ').replace(/^\s|\s$/g, '');
     }
 
-    //如果开启范围，则计算结束日期
+    //如果開啟範圍，則計算結束日期
     var getEndDate = function(){
       if(options.range){
         that.endDate = that.endDate || lay.extend({}, options.dateTime, function(){
           var obj = {}
           ,dateTime = options.dateTime
           ,EYM = that.getAsYM(dateTime.year, dateTime.month);
-          
-          //初始右侧面板的年月
+
+          //初始右側面板的年月
           if(options.type === 'year'){
             obj.year = dateTime.year + 1;
           } else if(options.type !== 'time'){
             obj.year = EYM[0];
             obj.month = EYM[1];
           }
-          
-          //初始右侧面板的时间
+
+          //初始右側面板的時間
           if(options.type === 'datetime' || options.type === 'time'){
             obj.hours = 23;
             obj.minutes = obj.seconds = 59;
           }
-          
+
           return obj;
         }());
       }
     };
     getEndDate();
-    
+
     if(typeof value === 'string' && value){
-      if(that.EXP_IF.test(value)){ //校验日期格式
+      if(that.EXP_IF.test(value)){ //校驗日期格式
         if(options.range){
           value = value.split(' '+ that.rangeStr +' ');
           lay.each([options.dateTime, that.endDate], function(i, item){
@@ -942,61 +942,61 @@
         ) + lang.formatError[1]);
         error = true;
       }
-    } else if(value && layui.type(value) === 'date'){ //若值为日期对象
+    } else if(value && layui.type(value) === 'date'){ //若值為日期對象
       options.dateTime = that.systemDate(value);
     } else {
-      //重置开始日期
+      //重置開始日期
       options.dateTime = that.systemDate();
       delete that.startTime;
-      
-      //重置结束日期
-      delete that.endDate; //删除原有的结束日期
-      getEndDate(); //并重新获得新的结束日期
+
+      //重置結束日期
+      delete that.endDate; //刪除原有的結束日期
+      getEndDate(); //並重新獲得新的結束日期
       delete that.endTime;
     }
-    
-    //从日期范围表单中获取初始值
+
+    //從日期範圍表單中獲取初始值
     (function(){
       if(that.rangeElem){
         var vals = [that.rangeElem[0].val(), that.rangeElem[1].val()]
         ,arrDate = [options.dateTime, that.endDate];
         lay.each(vals, function(_i, _v){
-          if(that.EXP_IF_ONE.test(_v)){ //校验日期格式
+          if(that.EXP_IF_ONE.test(_v)){ //校驗日期格式
             initDate(arrDate[_i], _v, _i);
           }
         });
       }
     })();
-    
-    //校验日期有效数字
+
+    //校驗日期有效數字
     checkValid(dateTime);
     if(options.range) checkValid(that.endDate);
 
-    //如果初始值格式错误，则纠正初始值
+    //如果初始值格式錯誤，則糾正初始值
     if(error && value){
       that.setValue(
         options.range ? (that.endDate ? that.parse() : '') : that.parse()
       );
     }
-    
-    //如果当前日期不在设定的最大小日期区间，则自动纠正在可选区域
-    //校验主面板是否在可选日期区间
+
+    //如果當前日期不在設定的最大小日期區間，則自動糾正在可選區域
+    //校驗主面板是否在可選日期區間
     var minMaxError;
     if(that.getDateTime(dateTime) > that.getDateTime(options.max)){ //若超出最大日期
       dateTime = options.dateTime = lay.extend({}, options.max);
       minMaxError = true;
-    } else if(that.getDateTime(dateTime) < that.getDateTime(options.min)){ //若少于最小日期
+    } else if(that.getDateTime(dateTime) < that.getDateTime(options.min)){ //若少於最小日期
       dateTime = options.dateTime = lay.extend({}, options.min);
       minMaxError = true;
     }
-    
-    //校验右侧面板是否在可选日期区间
+
+    //校驗右側面板是否在可選日期區間
     if(options.range){
       if(that.getDateTime(that.endDate) < that.getDateTime(options.min) || that.getDateTime(that.endDate) > that.getDateTime(options.max)){
         that.endDate = lay.extend({}, options.max);
         minMaxError = true;
       }
-      // 有时间范围的情况下初始化startTime和endTime
+      // 有時間範圍的情況下初始化startTime和endTime
       that.startTime = {
         hours: options.dateTime.hours,
         minutes: options.dateTime.minutes,
@@ -1007,28 +1007,28 @@
         minutes: that.endDate.minutes,
         seconds: that.endDate.seconds,
       }
-      // 如果是年月范围，将对应的日期统一成当月的1日进行比较，避免出现同一个月但是开始日期大于结束日期的情况
+      // 如果是年月範圍，將對應的日期統一成當月的1日進行比較，避免出現同一個月但是開始日期大於結束日期的情況
       if (options.type === 'month') {
         options.dateTime.date = 1;
         that.endDate.date = 1;
       }
     }
 
-    // 初始值不在最大最小范围内
+    // 初始值不在最大最小範圍內
     if(minMaxError && value){
       that.setValue(that.parse());
       that.hint('value ' + lang.invalidDate + lang.formatError[1]);
     }
 
-    that.startDate = that.startDate || value && lay.extend({}, options.dateTime); // 有默认值才初始化startDate
+    that.startDate = that.startDate || value && lay.extend({}, options.dateTime); // 有默認值才初始化startDate
     that.autoCalendarModel.auto && that.autoCalendarModel();
-    that.endState = !options.range || !that.rangeLinked || !!(that.startDate && that.endDate); // 初始化选中范围状态
+    that.endState = !options.range || !that.rangeLinked || !!(that.startDate && that.endDate); // 初始化選中範圍狀態
 
     fn && fn();
     return that;
   };
-  
-  // 公历重要日期与自定义备注
+
+  // 公曆重要日期與自定義備註
   Class.prototype.mark = function(td, YMD){
     var that = this
     ,mark, options = that.config;
@@ -1041,18 +1041,18 @@
       }
     });
     mark && td.find('div').html('<span class="laydate-day-mark">'+ mark +'</span>');
-    
+
     return that;
   };
 
-  // 标注法定节假日或补假上班
+  // 標註法定節假日或補假上班
   Class.prototype.holidays = function(td, YMD) {
     var that = this;
     var options = that.config;
     var type = ['', 'work'];
 
     if(layui.type(options.holidays) !== 'array') return that;
-    
+
     lay.each(options.holidays, function(idx, item) {
       lay.each(item, function(i, dayStr) {
         if(dayStr === td.attr('lay-ymd')){
@@ -1065,8 +1065,8 @@
 
     return that;
   };
-  
-  // 无效日期范围的标记
+
+  // 無效日期範圍的標記
   Class.prototype.limit = function(opts){
     opts = opts || {};
 
@@ -1083,31 +1083,31 @@
     }, function(key, item){
       timestamp[key] = that.newDate(lay.extend({
         year: item.year
-        ,month: opts.type === 'year' ? 0 : item.month // 年份的时候只比较年
-        ,date: (opts.type === 'year' || opts.type === 'month') ? 1 : item.date // 年月只比较年月不与最大最小比日期
+        ,month: opts.type === 'year' ? 0 : item.month // 年份的時候只比較年
+        ,date: (opts.type === 'year' || opts.type === 'month') ? 1 : item.date // 年月只比較年月不與最大最小比日期
       }, function(){
         var hms = {};
         lay.each(opts.time, function(i, keys){
           hms[keys] = item[keys];
         });
         return hms;
-      }())).getTime();  //time：是否比较时分秒
+      }())).getTime();  //time：是否比較時分秒
     });
-    
+
     isOut = timestamp.now < timestamp.min || timestamp.now > timestamp.max;
     opts.elem && opts.elem[isOut ? 'addClass' : 'removeClass'](DISABLED);
 
     return isOut;
   };
-  
-  //当前日期对象
+
+  //當前日期對象
   Class.prototype.thisDateTime = function(index){
     var that = this
     ,options = that.config;
     return index ? that.endDate: options.dateTime;
   };
-  
-  //日历表
+
+  //日曆表
   Class.prototype.calendar = function(value, index, type){
     var that = this
     ,options = that.config
@@ -1115,27 +1115,27 @@
     ,dateTime = value || that.thisDateTime(index)
     ,thisDate = new Date(), startWeek, prevMaxDate, thisMaxDate
     ,lang = that.lang()
-    
+
     ,isAlone = options.type !== 'date' && options.type !== 'datetime'
     ,tds = lay(that.table[index]).find('td')
     ,elemYM = lay(that.elemHeader[index][2]).find('span');
-    
+
     if(dateTime.year < LIMIT_YEAR[0]) dateTime.year = LIMIT_YEAR[0], that.hint(lang.invalidDate);
     if(dateTime.year > LIMIT_YEAR[1]) dateTime.year = LIMIT_YEAR[1], that.hint(lang.invalidDate);
-    
-    //记录初始值
+
+    //記錄初始值
     if(!that.firstDate){
       that.firstDate = lay.extend({}, dateTime);
     }
-    
-    //计算当前月第一天的星期
+
+    //計算當前月第一天的星期
     thisDate.setFullYear(dateTime.year, dateTime.month, 1);
     startWeek = (thisDate.getDay() + (7 - options.weekStart)) % 7;
 
-    prevMaxDate = laydate.getEndDate(dateTime.month || 12, dateTime.year); //计算上个月的最后一天
-    thisMaxDate = laydate.getEndDate(dateTime.month + 1, dateTime.year); //计算当前月的最后一天
-    
-    //赋值日
+    prevMaxDate = laydate.getEndDate(dateTime.month || 12, dateTime.year); //計算上個月的最後一天
+    thisMaxDate = laydate.getEndDate(dateTime.month + 1, dateTime.year); //計算當前月的最後一天
+
+    //賦值日
     lay.each(tds, function(index_, item){
       var YMD = [dateTime.year, dateTime.month], st = 0;
       item = lay(item);
@@ -1166,12 +1166,12 @@
         },
         index: index_
       });
-    });  
-    
-    //同步头部年月
+    });
+
+    //同步頭部年月
     lay(elemYM[0]).attr('lay-ym', dateTime.year + '-' + (dateTime.month + 1));
     lay(elemYM[1]).attr('lay-ym', dateTime.year + '-' + (dateTime.month + 1));
-    
+
     if(options.lang === 'cn'){
       lay(elemYM[0]).attr('lay-type', 'year').html(dateTime.year + ' 年')
       lay(elemYM[1]).attr('lay-type', 'month').html((dateTime.month + 1) + ' 月');
@@ -1180,81 +1180,81 @@
       lay(elemYM[1]).attr('lay-type', 'year').html(dateTime.year);
     }
 
-    //初始默认选择器
-    if(isAlone){ //年、月等独立选择器
+    //初始默認選擇器
+    if(isAlone){ //年、月等獨立選擇器
       if(options.range){
-        if(value || type !== 'init'){ // 判断是否需要显示年月时间列表
+        if(value || type !== 'init'){ // 判斷是否需要顯示年月時間列表
           that.listYM = [
             [(that.startDate || options.dateTime).year, (that.startDate || options.dateTime).month + 1]
             ,[that.endDate.year, that.endDate.month + 1]
-          ];  
+          ];
           that.list(options.type, 0).list(options.type, 1);
-          
-          //同步按钮可点状态
-          options.type === 'time' ? that.setBtnStatus('时间'
+
+          //同步按鈕可點狀態
+          options.type === 'time' ? that.setBtnStatus('時間'
             ,lay.extend({}, that.systemDate(), that.startTime)
             ,lay.extend({}, that.systemDate(), that.endTime)
           ) : that.setBtnStatus(true);
-        }        
+        }
       } else {
         that.listYM = [[dateTime.year, dateTime.month + 1]];
         that.list(options.type, 0);
       }
     }
-    
-    //初始赋值双日历
+
+    //初始賦值雙日曆
     if(options.range && type === 'init'){
-      //执行渲染第二个日历
+      //執行渲染第二個日曆
       if (that.rangeLinked) {
         var EYM = that.getAsYM(dateTime.year, dateTime.month, index ? 'sub' : null)
         that.calendar(lay.extend({}, dateTime, {
           year: EYM[0]
           ,month: EYM[1]
-        }), 1 - index); // 渲染另外一个
+        }), 1 - index); // 渲染另外一個
       } else {
         that.calendar(null, 1 - index);
       }
     }
-    
-    // 通过检测当前有效日期，来设定底部按钮状态
+
+    // 通過檢測當前有效日期，來設定底部按鈕狀態
     if(!options.range){
       var timeParams = ['hours', 'minutes', 'seconds'];
 
-      // 现在按钮
+      // 現在按鈕
       that.limit({
         elem: lay(that.footer).find(ELEM_NOW),
         date: that.systemDate(),
         index: 0,
         time: timeParams
       });
-      // 确认按钮
+      // 確認按鈕
       that.limit({
         elem: lay(that.footer).find(ELEM_CONFIRM),
         index: 0,
         time: timeParams
       });
     }
-    
-    //同步按钮可点状态
+
+    //同步按鈕可點狀態
     that.setBtnStatus();
 
-    // 重置快捷栏选中状态
+    // 重置快捷欄選中狀態
     lay(that.shortcut).find('li.' + THIS).removeClass(THIS);
 
-    //标记选择范围
+    //標記選擇範圍
     if(options.range && !isAlone && type !== 'init') that.stampRange();
 
     return that;
   };
 
-  //生成年月时分秒列表
+  //生成年月時分秒列表
   Class.prototype.list = function(type, index){
     var that = this
     ,options = that.config
     ,dateTime = that.rangeLinked ? options.dateTime : [options.dateTime, that.endDate][index]
     ,lang = that.lang()
-    ,isAlone = options.range && options.type !== 'date' && options.type !== 'datetime' //独立范围选择器
-    
+    ,isAlone = options.range && options.type !== 'date' && options.type !== 'datetime' //獨立範圍選擇器
+
     ,ul = lay.elem('ul', {
       "class": ELEM_LIST + ' ' + ({
         year: 'laydate-year-list'
@@ -1268,13 +1268,13 @@
     ,haveList = lay(elemCont).find('.'+ ELEM_LIST)[0]
     ,isCN = options.lang === 'cn'
     ,text = isCN ? '年' : ''
-   
+
     ,listYM = that.listYM[index] || {}
     ,hms = ['hours', 'minutes', 'seconds']
     ,startEnd = ['startTime', 'endTime'][index];
 
     if(listYM[0] < 1) listYM[0] = 1;
-    
+
     //生成年列表
     if(type === 'year'){
       var yearNum, startY = yearNum = listYM[0] - 7;
@@ -1315,7 +1315,7 @@
       lay(elemYM[isCN ? 0 : 1]).attr('lay-ym', (yearNum - 8) + '-' + listYM[1])
       .html((startY + text) + ' - ' + (yearNum - 1 + text));
     }
-    
+
     //生成月列表
     else if(type === 'month'){
       lay.each(new Array(12), function(i){
@@ -1350,11 +1350,11 @@
 
       lay(elemYM[isCN ? 0 : 1]).attr('lay-ym', listYM[0] + '-' + listYM[1])
       .html(listYM[0] + text);
-    } 
-    
-    //生成时间列表
+    }
+
+    //生成時間列表
     else if(type === 'time'){
-      //检测时分秒状态是否在有效日期时间范围内
+      //檢測時分秒狀態是否在有效日期時間範圍內
       var setTimeStatus = function(){
         lay(ul).find('ol').each(function(i, ol){
           lay(ol).find('li').each(function(ii, li){
@@ -1372,8 +1372,8 @@
               }][i],
               index: index,
               time: [
-                ['hours'], 
-                ['hours', 'minutes'], 
+                ['hours'],
+                ['hours', 'minutes'],
                 ['hours', 'minutes', 'seconds']
               ][i]
             });
@@ -1388,8 +1388,8 @@
           });
         }
       };
-      
-      //初始化时间对象
+
+      //初始化時間對象
       if(options.range){
         if(!that[startEnd]){
           that[startEnd] = startEnd === 'startTime' ? dateTime : that.endDate;
@@ -1397,8 +1397,8 @@
       } else {
         that[startEnd] = dateTime;
       }
-      
-      //生成时分秒
+
+      //生成時分秒
       lay.each([24, 60, 60], function(i, item){
         var li = lay.elem('li'), childUL = ['<p>'+ lang.time[i] +'</p><ol>'];
         lay.each(new Array(item), function(ii){
@@ -1409,17 +1409,17 @@
       });
       setTimeStatus();
     }
-    
+
     //插入容器
     if(haveList) elemCont.removeChild(haveList);
     elemCont.appendChild(ul);
-    
-    //年月面板 - 选择事件
-    if(type === 'year' || type === 'month'){      
-      //显示切换箭头
+
+    //年月面板 - 選擇事件
+    if(type === 'year' || type === 'month'){
+      //顯示切換箭頭
       lay(that.elemMain[index]).addClass('laydate-ym-show');
-      
-      //选中
+
+      //選中
       lay(ul).find('li').on('click', function(){
         var ym = lay(this).attr('lay-ym') | 0;
         if(lay(this).hasClass(DISABLED)) return;
@@ -1431,29 +1431,29 @@
         } else {
           dateTime[type] = ym;
         }
-        
-        //当为年选择器或者年月选择器
+
+        //當為年選擇器或者年月選擇器
         var isYearOrMonth = options.type === 'year' || options.type === 'month';
         if(isYearOrMonth){
           lay(ul).find('.'+ THIS).removeClass(THIS);
           lay(this).addClass(THIS);
-          
-          //如果为年月选择器，点击了年列表，则切换到月选择器
+
+          //如果為年月選擇器，點擊了年列表，則切換到月選擇器
           if(options.type === 'month' && type === 'year'){
             that.listYM[index][0] = ym;
             isAlone && ((index ? that.endDate : dateTime).year = ym);
             that.list('month', index);
           }
         } else {
-          that.checkDate('limit').calendar(dateTime, index, 'init'); // 重新渲染一下两个面板
+          that.checkDate('limit').calendar(dateTime, index, 'init'); // 重新渲染一下兩個面板
           that.closeList();
         }
 
-        that.setBtnStatus(); //同步按钮可点状态
-        
-        //若为月选择器，只有当选择月份时才自动关闭；
-        //若为年选择器，选择年份即自动关闭
-        //且在范围未开启时
+        that.setBtnStatus(); //同步按鈕可點狀態
+
+        //若為月選擇器，只有當選擇月份時才自動關閉；
+        //若為年選擇器，選擇年份即自動關閉
+        //且在範圍未開啟時
         if(!options.range && options.autoConfirm){
           if((options.type === 'month' && type === 'month') || (options.type === 'year' && type === 'year')){
             that.setValue(that.parse()).done().remove();
@@ -1463,12 +1463,12 @@
         (that.autoCalendarModel.auto && !that.rangeLinked) ? that.choose(lay(elemCont).find('td.layui-this'), index) : (that.endState && that.done(null, 'change'));
         lay(that.footer).find('.'+ ELEM_TIME_BTN).removeClass(DISABLED);
       });
-    } else { //时间选择面板 - 选择事件
+    } else { //時間選擇面板 - 選擇事件
       var span = lay.elem('span', {
         "class": ELEM_TIME_TEXT
       })
-      
-      //滚动条定位
+
+      //滾動條定位
       ,scroll = function(){
         lay(ul).find('ol').each(function(i){
           var ol = this
@@ -1485,21 +1485,21 @@
         });
       }
       ,haveSpan = lay(elemHeader[2]).find('.'+ ELEM_TIME_TEXT);
-      
+
       scroll();
       span.innerHTML = options.range ? [lang.startTime,lang.endTime][index] : lang.timeTips;
       lay(that.elemMain[index]).addClass('laydate-time-show');
-      
+
       if(haveSpan[0]) haveSpan.remove();
       elemHeader[2].appendChild(span);
 
       lay(ul).find('ol').each(function(i){
         var ol = this;
-        //选择时分秒
+        //選擇時分秒
         lay(ol).find('li').on('click', function(){
           var value = this.innerHTML | 0;
           if(lay(this).hasClass(DISABLED)) return;
-          
+
           if(options.range){
             that[startEnd][hms[i]]  = value;
           } else {
@@ -1511,32 +1511,32 @@
           setTimeStatus();
           scroll();
           (that.endDate || options.type === 'time' || (options.type === 'datetime' && options.fullPanel)) && that.done(null, 'change');
-          
-          //同步按钮可点状态
+
+          //同步按鈕可點狀態
           that.setBtnStatus();
         });
       });
     }
-    
+
     return that;
   };
-  
-  //记录列表切换后的年月
+
+  //記錄列表切換後的年月
   Class.prototype.listYM = [];
-  
-  //关闭列表
+
+  //關閉列表
   Class.prototype.closeList = function(){
     var that = this
     ,options = that.config;
-    
+
     lay.each(that.elemCont, function(index, item){
       lay(this).find('.'+ ELEM_LIST).remove();
       lay(that.elemMain[index]).removeClass('laydate-ym-show laydate-time-show');
     });
     lay(that.elem).find('.'+ ELEM_TIME_TEXT).remove();
   };
-  
-  //检测结束日期是否超出开始日期
+
+  //檢測結束日期是否超出開始日期
   Class.prototype.setBtnStatus = function(tips, start, end){
     var that = this
     ,options = that.config
@@ -1547,44 +1547,44 @@
       end = end || that.endDate;
       isOut = !that.endState || that.newDate(start).getTime() > that.newDate(end).getTime();
 
-      //如果不在有效日期内，直接禁用按钮，否则比较开始和结束日期
+      //如果不在有效日期內，直接禁用按鈕，否則比較開始和結束日期
       (that.limit({
         date: start
       }) || that.limit({
         date: end
-      })) 
+      }))
         ? elemBtn.addClass(DISABLED)
       : elemBtn[isOut ? 'addClass' : 'removeClass'](DISABLED);
-      
-      //是否异常提示
+
+      //是否異常提示
       if(tips && isOut) that.hint(
         typeof tips === 'string' ? lang.timeout.replace(/日期/g, tips) : lang.timeout
       );
     }
   };
-  
-  //转义为规定格式的日期字符
+
+  //轉義為規定格式的日期字符
   Class.prototype.parse = function(state, date){
     var that = this
     ,options = that.config
     ,dateTime = date || (state == 'end'
       ? lay.extend({}, that.endDate, that.endTime)
     : (
-      options.range 
+      options.range
         ? lay.extend({}, that.rangeLinked ? that.startDate : options.dateTime, that.startTime)
       : options.dateTime)
     )
     ,format = laydate.parse(dateTime, that.format, 1);
-    
-    //返回日期范围字符
+
+    //返回日期範圍字符
     if(options.range && state === undefined){
       return format + ' '+ that.rangeStr +' ' + that.parse('end');
     }
 
     return format;
   };
-  
-  //创建指定日期时间对象
+
+  //創建指定日期時間對象
   Class.prototype.newDate = function(dateTime){
     dateTime = dateTime || {};
     return new Date(
@@ -1597,27 +1597,27 @@
     );
   };
 
-  // 获得指定日期时间对象的毫秒数
+  // 獲得指定日期時間對象的毫秒數
   Class.prototype.getDateTime = function(obj){
     return this.newDate(obj).getTime();
   }
 
-  //赋值
+  //賦值
   Class.prototype.setValue = function(value){
     var that = this
     ,options = that.config
     ,elem = options.elem[0];
-    
-    //静态展现则不作默认赋值
+
+    //靜態展現則不作默認賦值
     if(options.position === 'static') return that;
-    
+
     value = value || '';
-    
-    //绑定的元素是否为 input
+
+    //綁定的元素是否為 input
     if(that.isInput(elem)){
       lay(elem).val(value);
     } else {
-      //如果 range 传入了开始和结束的 input 对象，则分别对其赋值
+      //如果 range 傳入了開始和結束的 input 對象，則分別對其賦值
       var rangeElem = that.rangeElem;
       if(rangeElem){
         if(layui.type(value) !== 'array'){
@@ -1632,24 +1632,24 @@
         lay(elem).attr('lay-date', value);
       }
     }
-    
+
     return that;
   };
-  
-  //预览
+
+  //預覽
   Class.prototype.preview = function(){
     var that = this
     ,options = that.config;
-    
+
     if(!options.isPreview) return;
-    
+
     var elemPreview =  lay(that.elem).find('.'+ ELEM_PREVIEW)
     ,value = options.range ? ((that.rangeLinked ? that.endState : that.endDate) ? that.parse() : '') : that.parse();
-    
-    // 显示预览
+
+    // 顯示預覽
     elemPreview.html(value);
-    
-    // 预览颜色渐变
+
+    // 預覽顏色漸變
     var oldValue = elemPreview.html();
     oldValue && (elemPreview.css({
       'color': '#16b777'
@@ -1661,18 +1661,18 @@
     }, 300));
   };
 
-  // 附加的渲染处理，在 ready 和 change 的时候调用
+  // 附加的渲染處理，在 ready 和 change 的時候調用
   Class.prototype.renderAdditional = function(){
     var that = this;
     var options = that.config;
 
-    // 处理全面板
+    // 處理全面板
     if (options.fullPanel) {
       that.list('time', 0);
     }
   };
 
-  // 标记范围内的日期
+  // 標記範圍內的日期
   Class.prototype.stampRange = function(){
     var that = this
       ,options = that.config
@@ -1704,7 +1704,7 @@
         ,date: ymd[2]
       }).getTime();
 
-      // 标记当天
+      // 標記當天
       if(options.rangeLinked && !that.startDate){
         if(thisTime === that.newDate(that.systemDate()).getTime()){
           lay(item).addClass(
@@ -1714,9 +1714,9 @@
           );
         }
       }
-      
+
       /*
-       * 标注区间
+       * 標註區間
        */
 
       lay(item).removeClass(ELEM_SELECTED + ' ' + THIS);
@@ -1735,40 +1735,40 @@
     });
   };
 
-  //执行 done/change 回调
+  //執行 done/change 回調
   Class.prototype.done = function(param, type){
     var that = this
     ,options = that.config
     ,start = lay.extend({}, lay.extend(options.dateTime, that.startTime))
     ,end = lay.extend({}, lay.extend(that.endDate, that.endTime))
-    
+
     lay.each([start, end], function(i, item){
       if(!('month' in item)) return;
       lay.extend(item, {
         month: item.month + 1
       });
     });
-    
+
     that.preview();
-    
+
     param = param || [that.parse(), start, end];
     type === 'change' && that.renderAdditional();
     typeof options[type || 'done'] === 'function' && options[type || 'done'].apply(options, param);
-    
+
     return that;
   };
-  
-  //选择日期
+
+  //選擇日期
   Class.prototype.choose = function(td, index){
     if(td.hasClass(DISABLED)) return;
 
     var that = this
     ,options = that.config
-    ,panelIndex = index; // 记录点击的是哪一个面板的
+    ,panelIndex = index; // 記錄點擊的是哪一個面板的
 
     if (that.rangeLinked) {
       if (that.endState || !that.startDate) {
-        // 重新选择或者第一次选择
+        // 重新選擇或者第一次選擇
         index = 0;
         that.endState = false;
         that.endDate = {};
@@ -1782,7 +1782,7 @@
 
     ,tds = lay(that.elem).find('td')
     ,YMD = td.attr('lay-ymd').split('-');
-    
+
     YMD = {
       year: YMD[0] | 0
       ,month: (YMD[1] | 0) - 1
@@ -1791,9 +1791,9 @@
 
     lay.extend(dateTime, YMD); //同步 dateTime
 
-    //范围选择
+    //範圍選擇
     if(options.range){
-      //补充时分秒
+      //補充時分秒
       lay.each(['startTime', 'endTime'], function(i, item){
         that[item] = that[item] || {
           hours: i ? 23: 0
@@ -1801,7 +1801,7 @@
           ,seconds: i ? 59: 0
         };
         if (index === i) {
-          // 判断选择之后的是否在范围内，超出则需要调整时分秒
+          // 判斷選擇之後的是否在範圍內，超出則需要調整時分秒
           if (that.getDateTime(lay.extend({}, dateTime, that[item])) < that.getDateTime(options.min)) {
             that[item] = {
               hours: options.min.hours
@@ -1822,21 +1822,21 @@
       if (!index) {
         that.startDate = lay.extend({}, dateTime); // 同步startDate
       }
-      // 校验另外一个日期是否在有效的范围内
+      // 校驗另外一個日期是否在有效的範圍內
       if (that.endState && !that.limit({date: that.thisDateTime(1 - index)})) {
-        // 根据选择之后判断是否需要切换模式
+        // 根據選擇之後判斷是否需要切換模式
         var isChange;
         if (that.endState && that.autoCalendarModel.auto) {
           isChange = that.autoCalendarModel();
         }
         if ((isChange || that.rangeLinked && that.endState) && that.newDate(that.startDate) > that.newDate(that.endDate)) {
           var isSameDate = that.startDate.year === that.endDate.year && that.startDate.month === that.endDate.month && that.startDate.date === that.endDate.date;
-          // 判断是否反选
+          // 判斷是否反選
           var startDate = that.startDate;
           that.startDate = lay.extend({}, that.endDate, isSameDate ? {} : that.startTime);
           options.dateTime = lay.extend({}, that.startDate);
           that.endDate = lay.extend({}, startDate, isSameDate ? {} : that.endTime);
-          isSameDate && ( // 如果是同一天并且出现了反选证明是时分秒出现开始时间大于结束时间的现象
+          isSameDate && ( // 如果是同一天並且出現了反選證明是時分秒出現開始時間大於結束時間的現象
             startDate = that.startTime,
               that.startTime = that.endTime,
               that.endTime = startDate
@@ -1846,8 +1846,8 @@
       }
       if (that.rangeLinked) {
         var dateTimeTemp = lay.extend({}, dateTime);
-        if (panelIndex && !index && !isChange) { // 处理可能出现的联动面板中点击右面板但是判定为开始日期这个时候点击头部的切换上下月第一次没有反应的问题
-          // 选择了右面板但是判断之后作为开始时间
+        if (panelIndex && !index && !isChange) { // 處理可能出現的聯動面板中點擊右面板但是判定為開始日期這個時候點擊頭部的切換上下月第一次沒有反應的問題
+          // 選擇了右面板但是判斷之後作為開始時間
           var YM = that.getAsYM(dateTime.year, dateTime.month, 'sub');
           lay.extend(options.dateTime, {
             year: YM[0]
@@ -1859,16 +1859,16 @@
         that.calendar(null, index, isChange ? 'init' : null);
       }
       that.endState && that.done(null, 'change');
-    } else if(options.position === 'static'){ //直接嵌套的选中
-      that.calendar().done().done(null, 'change'); //同时执行 done 和 change 回调
+    } else if(options.position === 'static'){ //直接嵌套的選中
+      that.calendar().done().done(null, 'change'); //同時執行 done 和 change 回調
     } else if(options.type === 'date'){
       options.autoConfirm ? that.setValue(that.parse()).done().remove() : that.calendar().done(null, 'change');
     } else if(options.type === 'datetime'){
       that.calendar().done(null, 'change');
     }
   };
-  
-  //底部按钮
+
+  //底部按鈕
   Class.prototype.tool = function(btn, type){
     var that = this
     ,options = that.config
@@ -1876,20 +1876,20 @@
     ,dateTime = options.dateTime
     ,isStatic = options.position === 'static'
     ,active = {
-      //选择时间
+      //選擇時間
       datetime: function(){
         if(lay(btn).hasClass(DISABLED)) return;
         that.list('time', 0);
         options.range && that.list('time', 1);
         lay(btn).attr('lay-type', 'date').html(that.lang().dateTips);
       }
-      
-      //选择日期
+
+      //選擇日期
       ,date: function(){
         that.closeList();
         lay(btn).attr('lay-type', 'datetime').html(that.lang().timeTips);
       }
-      
+
       //清空、重置
       ,clear: function(){
         isStatic && (
@@ -1905,12 +1905,12 @@
         that.setValue('');
         that.done(null, 'onClear').done(['', {}, {}]).remove();
       }
-      
-      // 现在
+
+      // 現在
       ,now: function(){
         var thisDate = new Date();
 
-        // 当前系统时间未在 min/max 范围内，则不可点击
+        // 當前系統時間未在 min/max 範圍內，則不可點擊
         if(lay(btn).hasClass(DISABLED)){
           return that.hint(lang.tools.now +', '+ lang.invalidDate);
         }
@@ -1925,54 +1925,54 @@
         isStatic && that.calendar();
         that.done(null, 'onNow').done().remove();
       }
-      
-      //确定
+
+      //確定
       ,confirm: function(){
         if(options.range){
           if(lay(btn).hasClass(DISABLED)) return that.hint(
-            options.type === 'time' ? lang.timeout.replace(/日期/g, '时间') : lang.timeout
+            options.type === 'time' ? lang.timeout.replace(/日期/g, '時間') : lang.timeout
           );
         } else {
           if(lay(btn).hasClass(DISABLED)) return that.hint(lang.invalidDate);
         }
-        
+
         that.setValue(that.parse());
         that.done(null, 'onConfirm').done().remove();
       }
     };
     active[type] && active[type]();
   };
-  
-  //统一切换处理
+
+  //統一切換處理
   Class.prototype.change = function(index){
     var that = this
     ,options = that.config
     ,dateTime = that.thisDateTime(index)
     ,isAlone = options.range && (options.type === 'year' || options.type === 'month')
-    
+
     ,elemCont = that.elemCont[index || 0]
     ,listYM = that.listYM[index]
     ,addSubYeay = function(type){
       var isYear = lay(elemCont).find('.laydate-year-list')[0]
       ,isMonth = lay(elemCont).find('.laydate-month-list')[0];
-      
-      //切换年列表
+
+      //切換年列表
       if(isYear){
         listYM[0] = type ? listYM[0] - 15 : listYM[0] + 15;
         that.list('year', index);
       }
-      
-      if(isMonth){ //切换月面板中的年
+
+      if(isMonth){ //切換月面板中的年
         type ? listYM[0]-- : listYM[0]++;
         that.list('month', index);
       }
-      
+
       if(isYear || isMonth){
         lay.extend(dateTime, {
           year: listYM[0]
         });
         if(isAlone) dateTime.year = listYM[0];
-        options.range || that.done(null, 'change');     
+        options.range || that.done(null, 'change');
         options.range || that.limit({
           elem: lay(that.footer).find(ELEM_CONFIRM),
           date: {
@@ -1980,11 +1980,11 @@
           }
         });
       }
-      
+
       that.setBtnStatus();
       return isYear || isMonth;
     };
-    
+
     return {
       prevYear: function(){
         if(addSubYeay('sub')) return;
@@ -1994,7 +1994,7 @@
         } else {
           dateTime.year--;
           that.checkDate('limit').calendar(null, index);
-          // 面板自动切换的模式下重新判定是否发生模式转换等细节处理
+          // 面板自動切換的模式下重新判定是否發生模式轉換等細節處理
           that.autoCalendarModel.auto ? that.choose(lay(elemCont).find('td.layui-this'), index) : that.done(null, 'change');
         }
       }
@@ -2041,39 +2041,39 @@
       }
     };
   };
-  
-  //日期切换事件
+
+  //日期切換事件
   Class.prototype.changeEvent = function(){
     var that = this
     ,options = that.config;
 
-    //日期选择事件
+    //日期選擇事件
     lay(that.elem).on('click', function(e){
       lay.stope(e);
     }).on('mousedown', function(e){
       lay.stope(e);
     });
-    
-    //年月切换
+
+    //年月切換
     lay.each(that.elemHeader, function(i, header){
       //上一年
       lay(header[0]).on('click', function(e){
         that.change(i).prevYear();
       });
-      
+
       //上一月
       lay(header[1]).on('click', function(e){
         that.change(i).prevMonth();
       });
-      
-      //选择年月
+
+      //選擇年月
       lay(header[2]).find('span').on('click', function(e){
         var othis = lay(this)
         ,layYM = othis.attr('lay-ym')
         ,layType = othis.attr('lay-type');
-        
+
         if(!layYM) return;
-        
+
         layYM = layYM.split('-');
 
         that.listYM[i] = [layYM[0] | 0, layYM[1] | 0];
@@ -2085,34 +2085,34 @@
       lay(header[3]).on('click', function(e){
         that.change(i).nextMonth();
       });
-      
+
       //下一年
       lay(header[4]).on('click', function(e){
         that.change(i).nextYear();
       });
     });
-    
-    //点击日期
+
+    //點擊日期
     lay.each(that.table, function(i, table){
       var tds = lay(table).find('td');
       tds.on('click', function(){
         that.choose(lay(this), i);
       });
     });
-    
-    //点击底部按钮
+
+    //點擊底部按鈕
     lay(that.footer).find('span').on('click', function(){
       var type = lay(this).attr('lay-type');
       that.tool(this, type);
     });
   };
-  
-  //是否输入框
+
+  //是否輸入框
   Class.prototype.isInput = function(elem){
     return /input|textarea/.test(elem.tagName.toLocaleLowerCase()) || /INPUT|TEXTAREA/.test(elem.tagName);
   };
 
-  //绑定的元素事件处理
+  //綁定的元素事件處理
   Class.prototype.events = function(){
     var that = this
     var options = that.config
@@ -2120,17 +2120,17 @@
     if(!options.elem[0] || options.elem[0].eventHandler) return;
 
     var showEvent = function(){
-      // 已经打开的面板避免重新渲染
+      // 已經打開的面板避免重新渲染
       if(laydate.thisId === options.id) return;
       that.render();
     };
 
-    //绑定呼出控件事件
+    //綁定呼出控件事件
     options.elem.on(options.trigger, showEvent);
     options.elem[0].eventHandler = true;
     options.eventElem.on(options.trigger, showEvent);
 
-    // 元素解绑
+    // 元素解綁
     that.unbind = function () {
       that.remove();
       options.elem.off(options.trigger, showEvent);
@@ -2142,41 +2142,41 @@
       delete thisModule.that[options.id];
     };
   };
-  
-  //记录所有实例
-  thisModule.that = {}; //记录所有实例对象
-  
-  //获取当前实例对象
+
+  //記錄所有實例
+  thisModule.that = {}; //記錄所有實例對象
+
+  //獲取當前實例對象
   thisModule.getThis = function(id){
     var that = thisModule.that[id];
     if(!that && isLayui) layui.hint().error(id ? (MOD_NAME +' instance with ID \''+ id +'\' not found') : 'ID argument required');
     return that;
   };
-  
-  //初始执行
+
+  //初始執行
   ready.run = function(lay){
-    //绑定关闭控件事件
+    //綁定關閉控件事件
     lay(document).on('mousedown', function(e){
       if(!laydate.thisId) return;
       var that = thisModule.getThis(laydate.thisId);
       if(!that) return;
-      
+
       var options = that.config;
-      
+
       if(
-        e.target === options.elem[0] || 
+        e.target === options.elem[0] ||
         e.target === options.eventElem[0] ||
         e.target === lay(options.closeStop)[0]
       ) return;
-      
+
       that.remove();
-      
+
     }).on('keydown', function(e){
       if(!laydate.thisId) return;
       var that = thisModule.getThis(laydate.thisId);
       if(!that) return;
-      
-      // 回车触发确认
+
+      // 回車觸發確認
       if(that.config.position === 'static') return;
       if(e.keyCode === 13){
         if(lay('#'+ that.elemID)[0] && that.elemID === Class.thisElemDate){
@@ -2185,35 +2185,35 @@
         }
       }
     });
-    
-    //自适应定位
+
+    //自適應定位
     lay(window).on('resize', function(){
       if(!laydate.thisId) return;
       var that = thisModule.getThis(laydate.thisId);
       if(!that) return;
-      
+
       if(!that.elem || !lay(ELEM)[0]){
         return false;
       }
-      
+
       that.position();
     });
   };
-  
+
   // 渲染 - 核心接口
   laydate.render = function(options){
     var inst = new Class(options);
     return thisModule.call(inst);
   };
 
-  // 重载
+  // 重載
   laydate.reload = function (id, options) {
     var that = thisModule.getThis(id);
     if(!that) return;
     return that.reload(options);
   };
 
-  // 获取对应 ID 的实例
+  // 獲取對應 ID 的實例
   laydate.getInst = function (id) {
     var that = thisModule.getThis(id);
     if(that){
@@ -2228,32 +2228,32 @@
     return that.hint(opts);
   };
 
-  // 解绑实例
+  // 解綁實例
   laydate.unbind = function(id){
     var that = thisModule.getThis(id);
     if(!that) return;
     return that.unbind();
   };
 
-  // 关闭日期面板
+  // 關閉日期面板
   laydate.close = function(id){
     var that = thisModule.getThis(id || laydate.thisId);
     if(!that) return;
     return that.remove();
   };
 
-  // 将指定对象转化为日期值
+  // 將指定對象轉化為日期值
   laydate.parse = function(dateTime, format, one){
     dateTime = dateTime || {};
-    
-    //如果 format 是字符型，则转换为数组格式
+
+    //如果 format 是字符型，則轉換為數組格式
     if(typeof format === 'string'){
       format = thisModule.formatArr(format);
     }
-    
+
     format = (format || []).concat();
-    
-    //转义为规定格式
+
+    //轉義為規定格式
     lay.each(format, function(i, item){
       if(/yyyy|y/.test(item)){ //年
         format[i] = lay.digit(dateTime.year, item.length);
@@ -2261,7 +2261,7 @@
         format[i] = lay.digit(dateTime.month + (one || 0), item.length);
       } else if(/dd|d/.test(item)){ //日
         format[i] = lay.digit(dateTime.date, item.length);
-      } else if(/HH|H/.test(item)){ //时
+      } else if(/HH|H/.test(item)){ //時
         format[i] = lay.digit(dateTime.hours, item.length);
       } else if(/mm|m/.test(item)){ //分
         format[i] = lay.digit(dateTime.minutes, item.length);
@@ -2269,35 +2269,35 @@
         format[i] = lay.digit(dateTime.seconds, item.length);
       }
     });
-    
+
     return format.join('');
   };
-  
-  // 得到某月的最后一天
+
+  // 得到某月的最後一天
   laydate.getEndDate = function(month, year){
     var thisDate = new Date();
-    //设置日期为下个月的第一天
+    //設置日期為下個月的第一天
     thisDate.setFullYear(
       year || thisDate.getFullYear()
       ,month || (thisDate.getMonth() + 1)
     ,1);
-    //减去一天，得到当前月最后一天
+    //減去一天，得到當前月最後一天
     return new Date(thisDate.getTime() - 1000*60*60*24).getDate();
   };
 
-  //加载方式
+  //加載方式
   isLayui ? (
     laydate.ready()
-    ,layui.define('lay', function(exports){ //layui 加载
+    ,layui.define('lay', function(exports){ //layui 加載
       laydate.path = layui.cache.dir;
       ready.run(lay);
       exports(MOD_NAME, laydate);
     })
   ) : (
-    (typeof define === 'function' && define.amd) ? define(function(){ //requirejs 加载
+    (typeof define === 'function' && define.amd) ? define(function(){ //requirejs 加載
       ready.run(lay);
       return laydate;
-    }) : function(){ //普通 script 标签加载
+    }) : function(){ //普通 script 標籤加載
       laydate.ready();
       ready.run(window.lay);
       window.laydate = laydate;

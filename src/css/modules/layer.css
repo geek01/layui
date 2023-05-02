@@ -18,16 +18,16 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 .layui-layer-move{display: none; position: fixed; *position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; cursor: move; opacity: 0; filter:alpha(opacity=0); background-color: #fff; z-index: 2147483647;}
 .layui-layer-resize{position: absolute; width: 15px; height: 15px; right: 0; bottom: 0; cursor: se-resize;}
 
-/* 动画 */
+/* 動畫 */
 .layer-anim{-webkit-animation-fill-mode: both; animation-fill-mode: both; -webkit-animation-duration:.3s; animation-duration:.3s;}
 
-@-webkit-keyframes layer-bounceIn { /* 默认 */
-	0% {opacity: 0; -webkit-transform: scale(.5); transform: scale(.5)}
-	100% {opacity: 1; -webkit-transform: scale(1); transform: scale(1)}
+@-webkit-keyframes layer-bounceIn { /* 默認 */
+  0% {opacity: 0; -webkit-transform: scale(.5); transform: scale(.5)}
+  100% {opacity: 1; -webkit-transform: scale(1); transform: scale(1)}
 }
 @keyframes layer-bounceIn {
-	0% {opacity: 0; -webkit-transform: scale(.5); -ms-transform: scale(.5); transform: scale(.5)}
-	100% {opacity: 1; -webkit-transform: scale(1); -ms-transform: scale(1); transform: scale(1)}
+  0% {opacity: 0; -webkit-transform: scale(.5); -ms-transform: scale(.5); transform: scale(.5)}
+  100% {opacity: 1; -webkit-transform: scale(1); -ms-transform: scale(1); transform: scale(1)}
 }
 .layer-anim-00{-webkit-animation-name: layer-bounceIn;animation-name: layer-bounceIn}
 
@@ -43,7 +43,7 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 
 @-webkit-keyframes layer-shake{0%,100%{-webkit-transform:translateX(0);transform:translateX(0)}10%,30%,50%,70%,90%{-webkit-transform:translateX(-10px);transform:translateX(-10px)}20%,40%,60%,80%{-webkit-transform:translateX(10px);transform:translateX(10px)}}@keyframes layer-shake{0%,100%{-webkit-transform:translateX(0);-ms-transform:translateX(0);transform:translateX(0)}10%,30%,50%,70%,90%{-webkit-transform:translateX(-10px);-ms-transform:translateX(-10px);transform:translateX(-10px)}20%,40%,60%,80%{-webkit-transform:translateX(10px);-ms-transform:translateX(10px);transform:translateX(10px)}}.layer-anim-06{-webkit-animation-name:layer-shake;animation-name:layer-shake}@-webkit-keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
 
-/* 从上往下 */
+/* 從上往下 */
 @keyframes layer-slide-down {
   from {
     transform: translate3d(0,-100%,0);
@@ -61,7 +61,7 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 .layer-anim-slide-down{animation-name: layer-slide-down}
 .layer-anim-slide-down-out{animation-name: layer-slide-down-out}
 
-/* 从右往左 */
+/* 從右往左 */
 @keyframes layer-slide-left {
   from {
     transform: translate3d(100%,0,0);
@@ -79,7 +79,7 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 .layer-anim-slide-left{animation-name: layer-slide-left}
 .layer-anim-slide-left-out{animation-name: layer-slide-left-out}
 
-/* 从下往上 */
+/* 從下往上 */
 @keyframes layer-slide-up {
   from {
     transform: translate3d(0,100%,0);
@@ -97,7 +97,7 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 .layer-anim-slide-up{animation-name: layer-slide-up}
 .layer-anim-slide-up-out{animation-name: layer-slide-up-out}
 
-/* 从左往右 */
+/* 從左往右 */
 @keyframes layer-slide-right {
   from {
     transform: translate3d(-100%,0,0);
@@ -117,7 +117,7 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 
 
 
-/* 标题栏 */
+/* 標題欄 */
 .layui-layer-title{padding: 0 81px 0 16px; height: 50px; line-height: 50px; border-bottom:1px solid #F0F0F0; font-size: 14px; color:#333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-radius: 2px 2px 0 0;}
 .layui-layer-setwin{position:absolute; right: 15px; *right:0; top: 16px; font-size:0; line-height: initial;}
 .layui-layer-setwin span{position:relative; width: 16px; height: 16px; line-height: 18px; margin-left: 10px; text-align: center; font-size: 16px; cursor: pointer; color: #000; _overflow:hidden;}
@@ -136,7 +136,7 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 .layui-layer-setwin .layui-layer-close2{position:absolute; right: -28px; top: -28px; color: #fff; background-color: #787878; padding: 3px; border: 3px solid; width: 18px; height: 18px; font-size: 18px; font-weight: bolder; border-radius: 50%; margin-left: 0; *right:-18px; _display:none;}
 .layui-layer-setwin .layui-layer-close2:hover{opacity: unset; background-color: #3888f6;}
 
-/* 按钮栏 */
+/* 按鈕欄 */
 .layui-layer-btn{text-align: right; padding: 0 15px 12px; pointer-events: auto; user-select: none; -webkit-user-select: none;}
 .layui-layer-btn a{height: 28px; line-height: 28px; margin: 5px 5px 0; padding: 0 15px; border: 1px solid #dedede; background-color:#fff; color: #333; border-radius: 2px; font-weight:400; cursor:pointer; text-decoration: none;}
 .layui-layer-btn a:hover{opacity: 0.9; text-decoration: none;}
@@ -145,7 +145,7 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 .layui-layer-btn-l{text-align: left;}
 .layui-layer-btn-c{text-align: center;}
 
-/* 定制化 */
+/* 定製化 */
 .layui-layer-dialog{min-width: 240px;}
 .layui-layer-dialog .layui-layer-content{position: relative; padding: 16px; line-height: 24px; word-break: break-all; overflow:hidden; font-size:14px; overflow-x: hidden; overflow-y:auto;}
 .layui-layer-dialog .layui-layer-content .layui-layer-face{position: absolute; top: 18px; left: 16px; color: #959595; font-size: 32px; _left: -40px;}
@@ -189,7 +189,7 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 .layui-layer-tips i.layui-layer-TipsR{left:-8px;}
 .layui-layer-tips i.layui-layer-TipsL{right:-8px;}
 
-/* 内置 skin */
+/* 內置 skin */
 .layui-layer-lan .layui-layer-title{background:#4476A7; color:#fff; border: none;}
 .layui-layer-lan .layui-layer-btn{padding: 5px 10px 10px; text-align: right; border-top:1px solid #E9E7E7}
 .layui-layer-lan .layui-layer-btn a{background: #fff; border-color: #E9E7E7; color: #333;}
@@ -200,7 +200,7 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 .layui-layer-lan .layui-layer-setwin .layui-icon,
 .layui-layer-molv .layui-layer-setwin .layui-icon{color: #fff;}
 
-/* Windows 10 风格主题  */
+/* Windows 10 風格主題  */
 .layui-layer-win10{border: 1px solid #aaa; box-shadow: 1px 1px 6px rgba(0,0,0,.3); border-radius: none;}
 .layui-layer-win10 .layui-layer-title{height: 32px; line-height: 32px; padding-left: 8px; border-bottom: none; font-size: 12px;}
 .layui-layer-win10 .layui-layer-setwin{right: 0; top: 0;}
@@ -209,6 +209,7 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 .layui-layer-win10 .layui-layer-setwin span:hover{background-color: #E5E5E5;}
 .layui-layer-win10 .layui-layer-setwin span.layui-icon-close:hover{background-color: #E81123; color: #fff;}
 .layui-layer-win10.layui-layer-dialog .layui-layer-content{padding: 8px 16px 32px; color: #0033BC;}
+.layui-layer-win10.layui-layer-dialog .layui-layer-padding{padding-top: 18px; padding-left: 58px;}
 .layui-layer-win10 .layui-layer-btn{padding: 5px 5px 10px; border-top:1px solid #DFDFDF; background-color: #F0F0F0;}
 .layui-layer-win10 .layui-layer-btn a{height: 18px; line-height: 18px; background-color: #E1E1E1; border-color: #ADADAD; color: #000; font-size: 12px; transition: all .3s;}
 .layui-layer-win10 .layui-layer-btn a:hover{border-color: #2A8EDD; background-color: #E5F1FB;}
@@ -216,9 +217,9 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 
 
 /**
- 
- @Name: layer拓展样式
- 
+
+ @Name: layer拓展樣式
+
  */
 
 /* prompt模式 */
@@ -253,7 +254,7 @@ html #layuicss-layer{display: none; position: absolute; width: 1989px;}
 .layui-layer-imgtit a:hover{color: #fff; text-decoration: underline;}
 .layui-layer-imgtit em{font-style: normal;}
 
-/* 关闭动画 */
+/* 關閉動畫 */
 @-webkit-keyframes layer-bounceOut {
   100% {opacity: 0; -webkit-transform: scale(.7); transform: scale(.7)}
   30% {-webkit-transform: scale(1.05); transform: scale(1.05)}

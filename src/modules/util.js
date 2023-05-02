@@ -1,40 +1,40 @@
 /**
- * util 工具组件  
+ * util 工具組件
  */
 
 layui.define('jquery', function(exports){
   "use strict";
-  
+
   var $ = layui.$;
   var hint = layui.hint();
-  
+
   // 外部接口
   var util = {
-    // 固定块
+    // 固定塊
     fixbar: function(options){
       var ELEM = 'layui-fixbar';
       var $doc = $(document);
 
-      // 默认可选项
+      // 默認可選項
       options = $.extend(true, {
-        target: 'body', // fixbar 的插入目标选择器
+        target: 'body', // fixbar 的插入目標選擇器
         bars: [], //  bar 信息
-        default: true, // 是否显示默认 bar
-        margin: 160, // 出现 top bar 的滚动条高度临界值
-        duration: 320 // top bar 等动画时长（毫秒）
+        default: true, // 是否顯示默認 bar
+        margin: 160, // 出現 top bar 的滾動條高度臨界值
+        duration: 320 // top bar 等動畫時長（毫秒）
       }, options);
 
-      // 目标元素对象
+      // 目標元素對象
       var $target = $(options.target);
 
-      // 滚动条所在元素对象
-      var $scroll = options.scroll 
-        ? $(options.scroll) 
+      // 滾動條所在元素對象
+      var $scroll = options.scroll
+        ? $(options.scroll)
       : $(options.target === 'body' ? $doc : $target)
 
-      // 是否提供默认图标
+      // 是否提供默認圖標
       if(options.default){
-        // 兼容旧版本的一些属性
+        // 兼容舊版本的一些屬性
         if(options.bar1){
           options.bars.push({
             type: 'bar1',
@@ -47,7 +47,7 @@ layui.define('jquery', function(exports){
             icon: 'layui-icon-help'
           });
         }
-        // 默认 top bar
+        // 默認 top bar
         options.bars.push({
           type: 'top',
           icon: 'layui-icon-top'
@@ -57,23 +57,23 @@ layui.define('jquery', function(exports){
       var elem = $('<ul>').addClass(ELEM);
       var elemTopBar;
 
-      // 遍历生成 bars 节点
+      // 遍歷生成 bars 節點
       layui.each(options.bars, function(i, item){
         var elemBar = $('<li class="layui-icon">');
 
-        // 设置 bar 相关属性
+        // 設置 bar 相關屬性
         elemBar.addClass(item.icon).attr({
           'lay-type': item.type,
           'style': item.style || ('background-color: '+ options.bgcolor)
         }).html(item.content);
 
-        // bar 点击事件
+        // bar 點擊事件
         elemBar.on('click', function(){
           var type = $(this).attr('lay-type');
           if(type === 'top'){
             (
-              options.target === 'body' 
-                ? $('html,body') 
+              options.target === 'body'
+                ? $('html,body')
               : $scroll
             ).animate({
               scrollTop : 0
@@ -82,7 +82,7 @@ layui.define('jquery', function(exports){
           typeof options.click === 'function' && options.click.call(this, type);
         });
 
-        // 自定义任意事件
+        // 自定義任意事件
         if(layui.type(options.on) === 'object'){
           layui.each(options.on, function(eventName, callback){
             elemBar.on(eventName, function(){
@@ -92,23 +92,23 @@ layui.define('jquery', function(exports){
           })
         }
 
-        // 获得 top bar 节点
+        // 獲得 top bar 節點
         if(item.type === 'top'){
           elemBar.addClass('layui-fixbar-top');
           elemTopBar = elemBar;
         }
 
-        elem.append(elemBar); // 插入 bar 节点
+        elem.append(elemBar); // 插入 bar 節點
       });
 
-      // 若目标元素已存在 fixbar，则移除旧的节点
+      // 若目標元素已存在 fixbar，則移除舊的節點
       $target.find('.'+ ELEM).remove();
 
-      // 向目标元素插入 fixbar 节点
+      // 向目標元素插入 fixbar 節點
       typeof options.css === 'object' && elem.css(options.css);
       $target.append(elem);
 
-      // top bar 的显示隐藏
+      // top bar 的顯示隱藏
       if(elemTopBar){
         var lock;
         var setTopBar = (function setTopBar(){
@@ -122,7 +122,7 @@ layui.define('jquery', function(exports){
         })();
       }
 
-      // 根据 scrollbar 设置 fixbar 相关状态
+      // 根據 scrollbar 設置 fixbar 相關狀態
       var timer;
       $scroll.on('scroll', function(){
         if(!setTopBar) return;
@@ -130,10 +130,10 @@ layui.define('jquery', function(exports){
         timer = setTimeout(function(){
           setTopBar();
         }, 100);
-      }); 
+      });
     }
-    
-    //倒计时
+
+    //倒計時
     ,countdown: function(endTime, serverTime, callback){
       var that = this
       ,type = typeof serverTime === 'function'
@@ -142,37 +142,37 @@ layui.define('jquery', function(exports){
       ,count = end - now
       ,time = [
         Math.floor(count/(1000*60*60*24)) //天
-        ,Math.floor(count/(1000*60*60)) % 24 //时
+        ,Math.floor(count/(1000*60*60)) % 24 //時
         ,Math.floor(count/(1000*60)) % 60 //分
         ,Math.floor(count/1000) % 60 //秒
       ];
-      
+
       if(type) callback = serverTime;
-       
+
       var timer = setTimeout(function(){
         that.countdown(endTime, now + 1000, callback);
       }, 1000);
-      
+
       callback && callback(count > 0 ? time : [0,0,0,0], serverTime, timer);
-      
+
       if(count <= 0) clearTimeout(timer);
       return timer;
     }
-    
-    //某个时间在当前时间的多久前
+
+    //某個時間在當前時間的多久前
     ,timeAgo: function(time, onlyDate){
       var that = this
       ,arr = [[], []]
       ,stamp = new Date().getTime() - new Date(time).getTime();
-      
-      //返回具体日期
+
+      //返回具體日期
       if(stamp > 1000*60*60*24*31){
         stamp =  new Date(time);
         arr[0][0] = that.digit(stamp.getFullYear(), 4);
         arr[0][1] = that.digit(stamp.getMonth() + 1);
         arr[0][2] = that.digit(stamp.getDate());
-        
-        //是否输出时间
+
+        //是否輸出時間
         if(!onlyDate){
           arr[1][0] = that.digit(stamp.getHours());
           arr[1][1] = that.digit(stamp.getMinutes());
@@ -180,22 +180,22 @@ layui.define('jquery', function(exports){
         }
         return arr[0].join('-') + ' ' + arr[1].join(':');
       }
-      
-      //30天以内，返回“多久前”
+
+      //30天以內，返回“多久前”
       if(stamp >= 1000*60*60*24){
         return ((stamp/1000/60/60/24)|0) + ' 天前';
       } else if(stamp >= 1000*60*60){
-        return ((stamp/1000/60/60)|0) + ' 小时前';
-      } else if(stamp >= 1000*60*3){ //3分钟以内为：刚刚
-        return ((stamp/1000/60)|0) + ' 分钟前';
+        return ((stamp/1000/60/60)|0) + ' 小時前';
+      } else if(stamp >= 1000*60*3){ //3分鐘以內為：剛剛
+        return ((stamp/1000/60)|0) + ' 分鐘前';
       } else if(stamp < 0){
-        return '未来';
+        return '未來';
       } else {
-        return '刚刚';
+        return '剛剛';
       }
     }
-    
-    //数字前置补零
+
+    //數字前置補零
     ,digit: function(num, length){
       var str = '';
       num = String(num);
@@ -205,12 +205,12 @@ layui.define('jquery', function(exports){
       }
       return num < Math.pow(10, length) ? str + (num|0) : num;
     }
-    
-    //转化为日期格式字符
+
+    //轉化為日期格式字符
     ,toDateString: function(time, format){
-      //若 null 或空字符，则返回空字符
+      //若 null 或空字符，則返回空字符
       if(time === null || time === '') return '';
-      
+
       var that = this
       ,date = new Date(function(){
         if(!time) return;
@@ -226,9 +226,9 @@ layui.define('jquery', function(exports){
         ,that.digit(date.getMinutes())
         ,that.digit(date.getSeconds())
       ];
-      
+
       if(!date.getDate()) return hint.error('Invalid Msec for "util.toDateString(Msec)"'), '';
-      
+
       format = format || 'yyyy-MM-dd HH:mm:ss';
       return format.replace(/yyyy/g, ymd[0])
       .replace(/MM/g, ymd[1])
@@ -237,8 +237,8 @@ layui.define('jquery', function(exports){
       .replace(/mm/g, hms[1])
       .replace(/ss/g, hms[2]);
     }
-    
-    //转义 html
+
+    //轉義 html
     ,escape: function(html){
       var exp = /[<"'>]|&(?=#[a-zA-Z0-9]+)/g;
       if(html === undefined || html === null) return '';
@@ -250,8 +250,8 @@ layui.define('jquery', function(exports){
       .replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/'/g, '&#39;').replace(/"/g, '&quot;');
     }
-    
-    //还原转义的 html
+
+    //還原轉義的 html
     ,unescape: function(html){
       if(html === undefined || html === null) html = '';
       html += '';
@@ -261,7 +261,7 @@ layui.define('jquery', function(exports){
       .replace(/\&#39;/g, '\'').replace(/\&quot;/g, '"');
     }
 
-    // 打开新窗口
+    // 打開新窗口
     ,openWin: function(options){
       var win;
       options = options || {};
@@ -271,68 +271,68 @@ layui.define('jquery', function(exports){
       win.document.write(options.content || '');
       win.document.close();
     }
-    
-    //让指定的元素保持在可视区域
+
+    //讓指定的元素保持在可視區域
     ,toVisibleArea: function(options){
       options = $.extend({
-        margin: 160 //触发动作的边界值
-        ,duration: 200 //动画持续毫秒数
-        ,type: 'y' //触发方向，x 水平、y 垂直
+        margin: 160 //觸發動作的邊界值
+        ,duration: 200 //動畫持續毫秒數
+        ,type: 'y' //觸發方向，x 水平、y 垂直
       }, options);
-      
+
       if(!options.scrollElem[0] || !options.thisElem[0]) return;
-      
-      var scrollElem = options.scrollElem //滚动元素
-      ,thisElem = options.thisElem //目标元素
+
+      var scrollElem = options.scrollElem //滾動元素
+      ,thisElem = options.thisElem //目標元素
       ,vertical = options.type === 'y' //是否垂直方向
-      ,SCROLL_NAME = vertical ? 'scrollTop' : 'scrollLeft' //滚动方法
-      ,OFFSET_NAME = vertical ? 'top' : 'left' //坐标方式
-      ,scrollValue = scrollElem[SCROLL_NAME]() //当前滚动距离
-      ,size = scrollElem[vertical ? 'height' : 'width']() //滚动元素的尺寸
-      ,scrollOffet = scrollElem.offset()[OFFSET_NAME] //滚动元素所处位置
-      ,thisOffset = thisElem.offset()[OFFSET_NAME] - scrollOffet //目标元素当前的所在位置
+      ,SCROLL_NAME = vertical ? 'scrollTop' : 'scrollLeft' //滾動方法
+      ,OFFSET_NAME = vertical ? 'top' : 'left' //座標方式
+      ,scrollValue = scrollElem[SCROLL_NAME]() //當前滾動距離
+      ,size = scrollElem[vertical ? 'height' : 'width']() //滾動元素的尺寸
+      ,scrollOffet = scrollElem.offset()[OFFSET_NAME] //滾動元素所處位置
+      ,thisOffset = thisElem.offset()[OFFSET_NAME] - scrollOffet //目標元素當前的所在位置
       ,obj = {};
-      
-      //边界满足条件
+
+      //邊界滿足條件
       if(thisOffset > size - options.margin || thisOffset < options.margin){
         obj[SCROLL_NAME] = thisOffset - size/2 + scrollValue
         scrollElem.animate(obj, options.duration);
       }
     }
-    
+
     //批量事件
     ,event: function(attr, obj, eventType){
       var _body = $('body');
       eventType = eventType || 'click';
-      
-      //记录事件回调集合
+
+      //記錄事件回調集合
       obj = util.event[attr] = $.extend(true, util.event[attr], obj) || {};
-      
-      //清除委托事件
+
+      //清除委託事件
       util.event.UTIL_EVENT_CALLBACK = util.event.UTIL_EVENT_CALLBACK || {};
       _body.off(eventType, '*['+ attr +']', util.event.UTIL_EVENT_CALLBACK[attr])
-      
-      //绑定委托事件
+
+      //綁定委託事件
       util.event.UTIL_EVENT_CALLBACK[attr] = function(){
         var othis = $(this)
         ,key = othis.attr(attr);
         (typeof obj[key] === 'function') && obj[key].call(this, othis);
       };
 
-      //清除旧事件，绑定新事件
+      //清除舊事件，綁定新事件
       _body.on(eventType, '*['+ attr +']', util.event.UTIL_EVENT_CALLBACK[attr]);
-      
+
       return obj;
     }
   };
 
   util.on = util.event;
-  
-  // DOM 尺寸变化，该创意来自：http://benalman.com/projects/jquery-resize-plugin/
+
+  // DOM 尺寸變化，該創意來自：http://benalman.com/projects/jquery-resize-plugin/
   /*
   !function(a,b,c){"$:nomunge";function l(){f=b[g](function(){d.each(function(){var b=a(this),c=b.width(),d=b.height(),e=a.data(this,i);(c!==e.w||d!==e.h)&&b.trigger(h,[e.w=c,e.h=d])}),l()},e[j])}var f,d=a([]),e=a.resize=a.extend(a.resize,{}),g="setTimeout",h="resize",i=h+"-special-event",j="delay",k="throttleWindow";e[j]=250,e[k]=!0,a.event.special[h]={setup:function(){if(!e[k]&&this[g])return!1;var b=a(this);d=d.add(b),a.data(this,i,{w:b.width(),h:b.height()}),1===d.length&&l()},teardown:function(){if(!e[k]&&this[g])return!1;var b=a(this);d=d.not(b),b.removeData(i),d.length||clearTimeout(f)},add:function(b){function f(b,e,f){var g=a(this),h=a.data(this,i)||{};h.w=e!==c?e:g.width(),h.h=f!==c?f:g.height(),d.apply(this,arguments)}if(!e[k]&&this[g])return!1;var d;return a.isFunction(b)?(d=b,f):(d=b.handler,b.handler=f,void 0)}}}($,window);
   */
-  
-  // 输出接口
+
+  // 輸出接口
   exports('util', util);
 });

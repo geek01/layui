@@ -1,9 +1,9 @@
 /**
- * layui 移动模块入口
- * 构建后则为移动模块集合 
+ * layui 移動模塊入口
+ * 構建後則為移動模塊集合
  */
 
- 
+
 if(!layui['layui.mobile']){
   layui.config({
     base: layui.cache.dir + 'lay/modules/mobile/'
@@ -13,7 +13,7 @@ if(!layui['layui.mobile']){
     ,'upload-mobile': 'upload-mobile'
     ,'layim-mobile': 'layim-mobile'
   });
-}  
+}
 
 layui.define([
   'layer-mobile'
@@ -21,7 +21,7 @@ layui.define([
   ,'layim-mobile'
 ], function(exports){
   exports('mobile', {
-    layer: layui['layer-mobile'] //弹层
+    layer: layui['layer-mobile'] //彈層
     ,layim: layui['layim-mobile'] //WebIM
   });
 });

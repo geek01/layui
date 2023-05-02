@@ -1,22 +1,22 @@
 
-/** lay 基础模块 | MIT Licensed */
+/** lay 基礎模塊 | MIT Licensed */
 
 ;!function(window){ //gulp build: lay-header
   "use strict";
-  
-  var MOD_NAME = 'lay' //模块名
+
+  var MOD_NAME = 'lay' //模塊名
   ,document = window.document
-  
+
   //DOM查找
-  ,lay = function(selector){   
+  ,lay = function(selector){
     return new LAY(selector);
   }
-  
-  // DOM 构造器
+
+  // DOM 構造器
   ,LAY = function(selector){
     var index = 0;
     var nativeDOM = typeof selector === 'object' ? function(){
-      // 仅适配简单元素对象
+      // 僅適配簡單元素對象
       return layui.isArray(selector) ? selector : [selector];
     }() : (
       this.selector = selector,
@@ -26,23 +26,23 @@
       this.push(nativeDOM[index]);
     }
   };
-  
+
   /*
-    lay 对象操作
+    lay 對象操作
   */
-  
+
   LAY.prototype = [];
   LAY.prototype.constructor = LAY;
-  
-  //普通对象深度扩展
+
+  //普通對象深度擴展
   lay.extend = function(){
     var ai = 1
     ,length
     ,args = arguments
     ,clone = function(target, obj){
-      target = target || (layui.type(obj) === 'array' ? [] : {}); //目标对象
+      target = target || (layui.type(obj) === 'array' ? [] : {}); //目標對象
       for(var i in obj){
-        //如果值为普通对象，则进入递归，继续深度合并
+        //如果值為普通對象，則進入遞歸，繼續深度合併
         target[i] = (obj[i] && obj[i].constructor === Object)
           ? clone(target[i], obj[i])
         : obj[i];
@@ -60,40 +60,40 @@
     }
     return args[0];
   };
-  
-  //lay 模块版本
+
+  //lay 模塊版本
   lay.v = '1.0.8';
-  
+
   //ie版本
   lay.ie = function(){
     var agent = navigator.userAgent.toLowerCase();
     return (!!window.ActiveXObject || "ActiveXObject" in window) ? (
-      (agent.match(/msie\s(\d+)/) || [])[1] || '11' //由于 ie11 并没有 msie 的标识
+      (agent.match(/msie\s(\d+)/) || [])[1] || '11' //由於 ie11 並沒有 msie 的標識
     ) : false;
   }();
-  
-  
-  
-  
-  
-  
-  /** 
-   * 获取 layui 常见方法，以便用于组件单独版
+
+
+
+
+
+
+  /**
+   * 獲取 layui 常見方法，以便用於組件單獨版
    */
-  
+
   lay.layui = layui || {};
-  lay.getPath = layui.cache.dir; //获取当前 JS 所在目录
+  lay.getPath = layui.cache.dir; //獲取當前 JS 所在目錄
   lay.stope = layui.stope; //中止冒泡
-  lay.each = function(){ //遍历
+  lay.each = function(){ //遍歷
     layui.each.apply(layui, arguments);
     return this;
   };
-  
-  
-  
-  
-  
-  //数字前置补零
+
+
+
+
+
+  //數字前置補零
   lay.digit = function(num, length){
     if(!(typeof num === 'string' || typeof num === 'number')) return '';
 
@@ -105,8 +105,8 @@
     }
     return num < Math.pow(10, length) ? str + num : num;
   };
-  
-  //创建元素
+
+  //創建元素
   lay.elem = function(elemName, attr){
     var elem = document.createElement(elemName);
     lay.each(attr || {}, function(key, value){
@@ -115,22 +115,22 @@
     return elem;
   };
 
-  //当前页面是否存在滚动条
+  //當前頁面是否存在滾動條
   lay.hasScrollbar = function(){
     return document.body.scrollHeight > (window.innerHeight || document.documentElement.clientHeight);
   };
-  
+
   //元素定位
   lay.position = function(elem, elemView, obj){
     if(!elemView) return;
     obj = obj || {};
-    
-    //如果绑定的是 document 或 body 元素，则直接获取鼠标坐标
+
+    //如果綁定的是 document 或 body 元素，則直接獲取鼠標座標
     if(elem === document || elem === lay('body')[0]){
       obj.clickType = 'right';
     }
 
-    //绑定绑定元素的坐标
+    //綁定綁定元素的座標
     var rect = obj.clickType === 'right' ? function(){
       var e = obj.e || window.event || {};
       return {
@@ -140,62 +140,62 @@
         ,bottom: e.clientY
       }
     }() : elem.getBoundingClientRect()
-    ,elemWidth = elemView.offsetWidth //控件的宽度
+    ,elemWidth = elemView.offsetWidth //控件的寬度
     ,elemHeight = elemView.offsetHeight //控件的高度
-    
-    //滚动条高度
+
+    //滾動條高度
     ,scrollArea = function(type){
       type = type ? 'scrollLeft' : 'scrollTop';
       return document.body[type] | document.documentElement[type];
     }
-    
-    //窗口宽高
+
+    //窗口寬高
     ,winArea = function(type){
       return document.documentElement[type ? 'clientWidth' : 'clientHeight']
     }, margin = 5, left = rect.left, top = rect.bottom;
-    
-    //相对元素居中
+
+    //相對元素居中
     if(obj.align === 'center'){
       left = left - (elemWidth - elem.offsetWidth)/2;
     } else if(obj.align === 'right'){
       left = left - elemWidth + elem.offsetWidth;
     }
 
-    //判断右侧是否超出边界
+    //判斷右側是否超出邊界
     if(left + elemWidth + margin > winArea('width')){
-      left = winArea('width') - elemWidth - margin; //如果超出右侧，则将面板向右靠齐
+      left = winArea('width') - elemWidth - margin; //如果超出右側，則將面板向右靠齊
     }
-    //左侧是否超出边界
+    //左側是否超出邊界
     if(left < margin) left = margin;
-    
-    //判断底部和顶部是否超出边界
+
+    //判斷底部和頂部是否超出邊界
     if(top + elemHeight + margin > winArea()){
-      //优先顶部是否有足够区域显示完全
+      //優先頂部是否有足夠區域顯示完全
       if(rect.top > elemHeight + margin){
-        top = rect.top - elemHeight - margin*2; //顶部有足够的区域显示
+        top = rect.top - elemHeight - margin*2; //頂部有足夠的區域顯示
       } else {
-        //如果面板是鼠标右键弹出，且顶部没有足够区域显示，则将面板向底部靠齐
+        //如果面板是鼠標右鍵彈出，且頂部沒有足夠區域顯示，則將面板向底部靠齊
         if(obj.clickType === 'right'){
           top = winArea() - elemHeight - margin*2;
-          if(top < 0) top = 0; //不能溢出窗口顶部
+          if(top < 0) top = 0; //不能溢出窗口頂部
         } else {
-          top = margin; // 位置计算逻辑完备性处理
+          top = margin; // 位置計算邏輯完備性處理
         }
       }
     }
-    
-    //定位类型
+
+    //定位類型
     var position = obj.position;
     if(position) elemView.style.position = position;
-    
-    //设置坐标
+
+    //設置座標
     elemView.style.left = left + (position === 'fixed' ? 0 : scrollArea(1)) + 'px';
     elemView.style.top = top + (position === 'fixed' ? 0 : scrollArea()) + 'px';
 
-    //防止页面无滚动条时，又因为弹出面板而出现滚动条导致的坐标计算偏差
+    //防止頁面無滾動條時，又因為彈出面板而出現滾動條導致的座標計算偏差
     if(!lay.hasScrollbar()){
       var rect1 = elemView.getBoundingClientRect();
-      //如果弹出面板的溢出窗口底部，则表示将出现滚动条，此时需要重新计算坐标
+      //如果彈出面板的溢出窗口底部，則表示將出現滾動條，此時需要重新計算座標
       if(!obj.SYSTEM_RELOAD && (rect1.bottom + margin) > winArea()){
         obj.SYSTEM_RELOAD = true;
         setTimeout(function(){
@@ -204,8 +204,8 @@
       }
     }
   };
-  
-  // 获取元素上的属性配置项
+
+  // 獲取元素上的屬性配置項
   lay.options = function(elem, opts){
     opts = typeof opts === 'object' ? opts : {attr: opts};
 
@@ -219,14 +219,14 @@
       return new Function('return '+ (attrValue || '{}'))();
     } catch(ev) {
       layui.hint().error(opts.errorText || [
-        attrName + '="'+ attrValue + '"', 
+        attrName + '="'+ attrValue + '"',
         '\n parseerror: '+ ev
       ].join('\n'), 'error');
       return {};
     }
   };
-  
-  //元素是否属于顶级元素（document 或 body）
+
+  //元素是否屬於頂級元素（document 或 body）
   lay.isTopElem = function(elem){
     var topElems = [document, lay('body')[0]]
     ,matched = false;
@@ -237,7 +237,7 @@
     });
     return matched;
   };
-  
+
   //追加字符
   LAY.addStr = function(str, new_str){
     str = str.replace(/\s+/, ' ');
@@ -249,7 +249,7 @@
     });
     return str.replace(/^\s|\s$/, '');
   };
-  
+
   //移除值
   LAY.removeStr = function(str, new_str){
     str = str.replace(/\s+/, ' ');
@@ -262,13 +262,13 @@
     });
     return str.replace(/\s+/, ' ').replace(/^\s|\s$/, '');
   };
-  
+
   //查找子元素
   LAY.prototype.find = function(selector){
     var that = this;
     var index = 0, arr = []
     ,isObject = typeof selector === 'object';
-    
+
     this.each(function(i, item){
       var nativeDOM = isObject ? item.contains(selector) : item.querySelectorAll(selector || null);
       for(; index < nativeDOM.length; index++){
@@ -276,36 +276,36 @@
       }
       that.shift();
     });
-    
+
     if(!isObject){
       that.selector =  (that.selector ? that.selector + ' ' : '') + selector
     }
-    
+
     lay.each(arr, function(i, item){
       that.push(item);
     });
-    
+
     return that;
   };
-  
-  //DOM遍历
+
+  //DOM遍歷
   LAY.prototype.each = function(fn){
     return lay.each.call(this, this, fn);
   };
-  
-  //添加css类
+
+  //添加css類
   LAY.prototype.addClass = function(className, type){
     return this.each(function(index, item){
       item.className = LAY[type ? 'removeStr' : 'addStr'](item.className, className)
     });
   };
-  
-  //移除 css 类
+
+  //移除 css 類
   LAY.prototype.removeClass = function(className){
     return this.addClass(className, true);
   };
-  
-  //是否包含 css 类
+
+  //是否包含 css 類
   LAY.prototype.hasClass = function(className){
     var has = false;
     this.each(function(index, item){
@@ -315,8 +315,8 @@
     });
     return has;
   };
-  
-  //添加或获取 css style
+
+  //添加或獲取 css style
   LAY.prototype.css = function(key, value){
     var that = this
     ,parseValue = function(v){
@@ -328,47 +328,47 @@
       typeof key === 'object' ? lay.each(key, function(thisKey, thisValue){
         item.style[thisKey] = parseValue(thisValue);
       }) : item.style[key] = parseValue(value);
-    });   
+    });
   };
-  
-  //添加或获取宽度
+
+  //添加或獲取寬度
   LAY.prototype.width = function(value){
     var that = this;
     return value === undefined ? function(){
-      if(that.length > 0) return that[0].offsetWidth; //此处还需做兼容
+      if(that.length > 0) return that[0].offsetWidth; //此處還需做兼容
     }() : that.each(function(index, item){
       that.css('width', value);
-    });   
+    });
   };
-  
-  //添加或获取高度
+
+  //添加或獲取高度
   LAY.prototype.height = function(value){
     var that = this;
     return value === undefined ? function(){
-      if(that.length > 0) return that[0].offsetHeight; //此处还需做兼容
+      if(that.length > 0) return that[0].offsetHeight; //此處還需做兼容
     }() : that.each(function(index, item){
       that.css('height', value);
-    });   
+    });
   };
-  
-  //添加或获取属性
+
+  //添加或獲取屬性
   LAY.prototype.attr = function(key, value){
     var that = this;
     return value === undefined ? function(){
       if(that.length > 0) return that[0].getAttribute(key);
     }() : that.each(function(index, item){
       item.setAttribute(key, value);
-    });   
+    });
   };
-  
-  //移除属性
+
+  //移除屬性
   LAY.prototype.removeAttr = function(key){
     return this.each(function(index, item){
       item.removeAttribute(key);
     });
   };
-  
-  //设置或获取 HTML 内容
+
+  //設置或獲取 HTML 內容
   LAY.prototype.html = function(html){
     var that = this;
     return html === undefined ? function(){
@@ -377,8 +377,8 @@
       item.innerHTML = html;
     });
   };
-  
-  //设置或获取值
+
+  //設置或獲取值
   LAY.prototype.val = function(value){
     var that = this;
     return value === undefined ? function(){
@@ -387,24 +387,24 @@
         item.value = value;
     });
   };
-  
-  //追加内容
+
+  //追加內容
   LAY.prototype.append = function(elem){
     return this.each(function(index, item){
-      typeof elem === 'object' 
+      typeof elem === 'object'
         ? item.appendChild(elem)
       :  item.innerHTML = item.innerHTML + elem;
     });
   };
-  
-  //移除内容
+
+  //移除內容
   LAY.prototype.remove = function(elem){
     return this.each(function(index, item){
       elem ? item.removeChild(elem) : item.parentNode.removeChild(item);
     });
   };
-  
-  //事件绑定
+
+  //事件綁定
   LAY.prototype.on = function(eventName, fn){
     return this.each(function(index, item){
       item.attachEvent ? item.attachEvent('on' + eventName, function(e){
@@ -413,22 +413,22 @@
       }) : item.addEventListener(eventName, fn, false);
     });
   };
-  
+
   //解除事件
   LAY.prototype.off = function(eventName, fn){
     return this.each(function(index, item){
-      item.detachEvent 
-        ? item.detachEvent('on'+ eventName, fn)  
+      item.detachEvent
+        ? item.detachEvent('on'+ eventName, fn)
       : item.removeEventListener(eventName, fn, false);
     });
   };
-  
+
   //暴露 lay 到全局作用域
   window.lay = lay;
-  
-  //如果在 layui 体系中
+
+  //如果在 layui 體系中
   if(window.layui && layui.define){
-    layui.define(function(exports){ //layui 加载
+    layui.define(function(exports){ //layui 加載
       exports(MOD_NAME, lay);
     });
   }
