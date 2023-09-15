@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>util 组件 - layui</title>
+<title>util 組件 - layui</title>
 
 <link rel="stylesheet" href="../src/css/layui.css">
 
@@ -29,6 +29,14 @@ body{padding: 50px;}
 
 <hr>
 
+請編輯格式：
+<div class="layui-inline">
+  <input type="text" value="yyyy-MM-dd HH:mm:ss" class="layui-input" id="test2"/>
+</div>
+<span class="layui-word-aux" id="test3"></span>
+
+<hr>
+
 <div id="target-test" style1="position: relative; height: 300px; overflow: auto;">
   1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>1<br>
 </div>
@@ -40,15 +48,15 @@ layui.use(['util', 'layer'], function(){
   var util = layui.util;
   var layer = layui.layer;
 
-  // 固定块
+  // 固定塊
   util.fixbar({
-    bars: [{ // 定义可显示的 bar 列表信息 -- v2.8.0 新增
+    bars: [{ // 定義可顯示的 bar 列表信息 -- v2.8.0 新增
       type: 'share',
       icon: 'layui-icon-share'
     }, {
       type: 'help',
       icon: 'layui-icon-help'
-    }, { 
+    }, {
       type: 'cart',
       icon: 'layui-icon-cart',
       style: 'background-color: #FF5722;'
@@ -59,15 +67,15 @@ layui.use(['util', 'layer'], function(){
     }],
     // bar1: true,
     // bar2: true,
-    // default: false, 是否显示默认的 bar 列表 --  v2.8.0 新增
-    // bgcolor: '#393D52', // bar 的默认背景色
+    // default: false, 是否顯示默認的 bar 列表 --  v2.8.0 新增
+    // bgcolor: '#393D52', // bar 的默認背景色
     // css: {right: 100, bottom: 100},
-    // target: '#target-test', // 插入 fixbar 节点的目标元素选择器
-    // duration: 300, // top bar 等动画时长（毫秒）
+    // target: '#target-test', // 插入 fixbar 節點的目標元素選擇器
+    // duration: 300, // top bar 等動畫時長（毫秒）
     on: { // 任意事件 --  v2.8.0 新增
       mouseenter: function(type){
         layer.tips(type, this, {
-          tips: 4, 
+          tips: 4,
           fixed: true
         });
       },
@@ -75,27 +83,27 @@ layui.use(['util', 'layer'], function(){
         layer.closeAll('tips');
       }
     },
-    // 点击事件
+    // 點擊事件
     click: function(type){
       console.log(this, type);
       // layer.msg(type);
     }
   });
-  
-  //倒计时
-  var endTime = new Date(2099,1,1).getTime() //假设为结束日期
-  ,serverTime = new Date().getTime(); //假设为当前服务器时间，这里采用的是本地时间，实际使用一般是取服务端的
-   
+
+  //倒計時
+  var endTime = new Date(2099,1,1).getTime() //假設為結束日期
+  ,serverTime = new Date().getTime(); //假設為當前服務器時間，這裡採用的是本地時間，實際使用一般是取服務端的
+
   util.countdown(endTime, serverTime, function(date, serverTime, timer){
-    var str = date[0] + '天' + date[1] + '时' +  date[2] + '分' + date[3] + '秒';
-    $('#test').html('距离2099年1月1日还有：'+ str);
+    var str = date[0] + '天' + date[1] + '時' +  date[2] + '分' + date[3] + '秒';
+    $('#test').html('距離2099年1月1日還有：'+ str);
   });
-  
-  //某个时间在当前时间的多久前
+
+  //某個時間在當前時間的多久前
   var str = util.timeAgo(new Date(2017,7,15,2,58,0));
-  $('#test1').html('示例写于：'+ str);
-  
-  //处理属性 为 lay-active 的所有元素事件
+  $('#test1').html('示例寫於：'+ str);
+
+  //處理屬性 為 lay-active 的所有元素事件
   util.event('lay-active', {
     e1: function(othis){
       alert(othis.html())
@@ -107,20 +115,30 @@ layui.use(['util', 'layer'], function(){
       alert(othis.html())
     }
   });
-  
-  //测试是否重复绑定
+
+  //測試是否重複綁定
   util.event('lay-active', {
     e1: function(othis){
       alert(othis.html() + '新事件')
     }
   });
-  
-  //测试绑定新事件
+
+  //測試綁定新事件
   util.event('lay-active2', {
     e4: function(othis){
       alert(othis.html())
     }
   });
+
+  // 轉換日期格式
+  var timer = null
+  var toDateString = function (format) {
+    var dateString = util.toDateString(new Date(), format);
+    $('#test3').html(dateString)
+  }
+  timer = setInterval(() => {
+    toDateString($('#test2').val())
+  }, 50)
   
 });
 </script>

@@ -6,76 +6,91 @@
 layui.define(['lay','layer'], function(exports){
   "use strict";
 
-  var $ = layui.$
-  ,layer = layui.layer
-  ,device = layui.device()
+  var $ = layui.$;
+  var layer = layui.layer;
+  var device = layui.device();
 
-  //外部接口
-  ,upload = {
-    config: {} //全局配置項
-
-    //設置全局項
-    ,set: function(options){
+  // 外部接口
+  var upload = {
+    config: {}, // 全局配置項
+    // 設置全局項
+    set: function(options){
       var that = this;
       that.config = $.extend({}, that.config, options);
       return that;
-    }
-
-    //事件
-    ,on: function(events, callback){
+    },
+    // 事件
+    on: function(events, callback){
       return layui.onevent.call(this, MOD_NAME, events, callback);
     }
-  }
+  };
 
-  //操作當前實例
-  ,thisUpload = function(){
+  // 操作當前實例
+  var thisUpload = function(){
     var that = this;
     return {
       upload: function(files){
         that.upload.call(that, files);
-      }
-      ,reload: function(options){
+      },
+      reload: function(options){
         that.reload.call(that, options);
-      }
-      ,config: that.config
+      },
+      config: that.config
     }
-  }
+  };
 
-  //字符常量
-  ,MOD_NAME = 'upload', ELEM = 'layui-upload', THIS = 'layui-this', SHOW = 'layui-show', HIDE = 'layui-hide', DISABLED = 'layui-disabled'
+  // 字符常量
+  var MOD_NAME = 'upload';
+  var ELEM = 'layui-upload';
+  var THIS = 'layui-this';
+  var SHOW = 'layui-show';
+  var HIDE = 'layui-hide';
+  var DISABLED = 'layui-disabled';
 
-  ,ELEM_FILE = 'layui-upload-file', ELEM_FORM = 'layui-upload-form', ELEM_IFRAME = 'layui-upload-iframe', ELEM_CHOOSE = 'layui-upload-choose', ELEM_DRAG = 'layui-upload-drag'
+  var ELEM_FILE = 'layui-upload-file';
+  var ELEM_FORM = 'layui-upload-form';
+  var ELEM_IFRAME = 'layui-upload-iframe';
+  var ELEM_CHOOSE = 'layui-upload-choose';
+  var ELEM_DRAG = 'layui-upload-drag';
+  var UPLOADING = 'UPLOADING';
 
-
-  //構造器
-  ,Class = function(options){
+  // 構造器
+  var Class = function(options){
     var that = this;
     that.config = $.extend({}, that.config, upload.config, options);
     that.render();
   };
 
-  //默認配置
+  // 默認配置
   Class.prototype.config = {
-    accept: 'images' //允許上傳的文件類型：images/file/video/audio
-    ,exts: '' //允許上傳的文件後綴名
-    ,auto: true //是否選完文件後自動上傳
-    ,bindAction: '' //手動上傳觸發的元素
-    ,url: '' //上傳地址
-    ,force: '' //強制規定返回的數據格式，目前只支持是否強制 json
-    ,field: 'file' //文件字段名
-    ,acceptMime: '' //篩選出的文件類型，默認為所有文件
-    ,method: 'post' //請求上傳的 http 類型
-    ,data: {} //請求上傳的額外參數
-    ,drag: true //是否允許拖拽上傳
-    ,size: 0 //文件限制大小，默認不限制
-    ,number: 0 //允許同時上傳的文件數，默認不限制
-    ,multiple: false //是否允許多文件上傳，不支持ie8-9
+    accept: 'images', // 允許上傳的文件類型：images/file/video/audio
+    exts: '', // 允許上傳的文件後綴名
+    auto: true, // 是否選完文件後自動上傳
+    bindAction: '', // 手動上傳觸發的元素
+    url: '', // 上傳地址
+    force: '', // 強制規定返回的數據格式，目前只支持是否強制 json
+    field: 'file', // 文件字段名
+    acceptMime: '', // 篩選出的文件類型，默認為所有文件
+    method: 'post', // 請求上傳的 http 類型
+    data: {}, // 請求上傳的額外參數
+    drag: true, // 是否允許拖拽上傳
+    size: 0, // 文件限制大小，默認不限制
+    number: 0, // 允許同時上傳的文件數，默認不限制
+    multiple: false, // 是否允許多文件上傳，不支持 ie8-9
+    text: { // 自定義提示文本
+      "cross-domain": "Cross-domain requests are not supported", // 跨域
+      "data-format-error": "Please return JSON data format", // 數據格式錯誤
+      "check-error": "", // 文件格式校驗失敗
+      "error": "", // 上傳失敗
+      "limit-number": null, // 限制 number 屬性的提示 --- function
+      "limit-size": null // 限制 size 屬性的提示 --- function
+    }
   };
 
-  //初始渲染
-  Class.prototype.render = function(options){
-    var that = this
-    ,options = that.config;
+  // 初始渲染
+  Class.prototype.render = function(){
+    var that = this;
+    var options = that.config;
 
     options.elem = $(options.elem);
     options.bindAction = $(options.bindAction);
@@ -86,14 +101,14 @@ layui.define(['lay','layer'], function(exports){
 
   //追加文件域
   Class.prototype.file = function(){
-    var that = this
-    ,options = that.config
-    ,elemFile = that.elemFile = $([
+    var that = this;
+    var options = that.config;
+    var elemFile = that.elemFile = $([
       '<input class="'+ ELEM_FILE +'" type="file" accept="'+ options.acceptMime +'" name="'+ options.field +'"'
       ,(options.multiple ? ' multiple' : '')
       ,'>'
-    ].join(''))
-    ,next = options.elem.next();
+    ].join(''));
+    var next = options.elem.next();
 
     if(next.hasClass(ELEM_FILE) || next.hasClass(ELEM_FORM)){
       next.remove();
@@ -105,8 +120,8 @@ layui.define(['lay','layer'], function(exports){
     }
 
     that.isFile() ? (
-      that.elemFile = options.elem
-      ,options.field = options.elem[0].name
+      that.elemFile = options.elem,
+      options.field = options.elem[0].name
     ) : options.elem.after(elemFile);
 
     //初始化ie8/9的Form域
@@ -117,10 +132,10 @@ layui.define(['lay','layer'], function(exports){
 
   //ie8-9初始化
   Class.prototype.initIE = function(){
-    var that = this
-    ,options = that.config
-    ,iframe = $('<iframe id="'+ ELEM_IFRAME +'" class="'+ ELEM_IFRAME +'" name="'+ ELEM_IFRAME +'" frameborder="0"></iframe>')
-    ,elemForm = $(['<form target="'+ ELEM_IFRAME +'" class="'+ ELEM_FORM +'" method="post" key="set-mine" enctype="multipart/form-data" action="'+ options.url +'">'
+    var that = this;
+    var options = that.config;
+    var iframe = $('<iframe id="'+ ELEM_IFRAME +'" class="'+ ELEM_IFRAME +'" name="'+ ELEM_IFRAME +'" frameborder="0"></iframe>');
+    var elemForm = $(['<form target="'+ ELEM_IFRAME +'" class="'+ ELEM_FORM +'" method="post" key="set-mine" enctype="multipart/form-data" action="'+ options.url +'">'
     ,'</form>'].join(''));
 
     //插入iframe
@@ -145,8 +160,8 @@ layui.define(['lay','layer'], function(exports){
   //異常提示
   Class.prototype.msg = function(content){
     return layer.msg(content, {
-      icon: 2
-      ,shift: 6
+      icon: 2,
+      shift: 6
     });
   };
 
@@ -175,6 +190,7 @@ layui.define(['lay','layer'], function(exports){
   Class.prototype.upload = function(files, type){
     var that = this;
     var options = that.config;
+    var text = options.text || {};
     var elemFile = that.elemFile[0];
 
     // 獲取文件隊列
@@ -182,87 +198,135 @@ layui.define(['lay','layer'], function(exports){
       return files || that.files || that.chooseFiles || elemFile.files;
     };
 
-    //高級瀏覽器處理方式，支持跨域
+    // 高級瀏覽器處理方式，支持跨域
     var ajaxSend = function(){
       var successful = 0;
-      var failed = 0
+      var failed = 0;
       var items = getFiles();
-      var allDone = function(){ // 多文件全部上傳完畢的回調
+
+      // 多文件全部上傳完畢的回調
+      var allDone = function(){
         if(options.multiple && successful + failed === that.fileLength){
           typeof options.allDone === 'function' && options.allDone({
-            total: that.fileLength
-            ,successful: successful
-            ,failed: failed
+            total: that.fileLength,
+            successful: successful,
+            failed: failed
           });
         }
       };
-      layui.each(items, function(index, file){
+
+      // 發送請求
+      var request = function(sets){
         var formData = new FormData();
 
-        //追加額外的參數
+        // 刪除正在上傳中的文件隊列
+        var removeUploaded = function(index, file) {
+          if (file[UPLOADING]) {
+            delete items[index];
+            return true;
+          }
+        };
+
+        // 追加額外的參數
         layui.each(options.data, function(key, value){
           value = typeof value === 'function' ? value() : value;
           formData.append(key, value);
         });
 
-        //最後添加 file 到表單域
-        formData.append(options.field, file);
+        /*
+         *添加 file 到表單域
+         */
 
-        //提交文件
+        // 是否統一上傳
+        if (sets.unified) {
+          layui.each(items, function(index, file){
+            if (removeUploaded(index, file)) return;
+            file[UPLOADING] = true;
+            formData.append(options.field, file);
+          });
+        } else { // 逐一上傳
+          if (removeUploaded(sets.index, sets.file)) return;
+          formData.append(options.field, sets.file);
+        }
+
+        sets.file[UPLOADING] = true; // 上傳中的標記
+
+        // ajax 參數
         var opts = {
-          url: options.url
-          ,type: 'post' //統一採用 post 上傳
-          ,data: formData
-          ,contentType: false
-          ,processData: false
-          ,dataType: 'json'
-          ,headers: options.headers || {}
-          //成功回調
-          ,success: function(res){
-            successful++;
-            done(index, res);
+          url: options.url,
+          type: 'post', // 統一採用 post 上傳
+          data: formData,
+          contentType: false,
+          processData: false,
+          headers: options.headers || {},
+          success: function(res){ // 成功回調
+            options.unified ? (successful += that.fileLength) : successful++;
+            done(sets.index, res);
             allDone();
-          }
-          //異常回調
-          ,error: function(e){
-            failed++;
-            that.msg('Request URL is abnormal: '+ (e.statusText || 'error'));
-            error(index);
+          },
+          error: function(e){ // 異常回調
+            options.unified ? (failed += that.fileLength) : failed++;
+            that.msg(text['error'] || [
+              'Upload failed, please try again.',
+              'status: '+ (e.status || '') +' - '+ (e.statusText || 'error')
+            ].join('<br>'));
+            error(sets.index);
             allDone();
           }
         };
-        //進度條
+        // dataType
+        if (options.dataType) {
+          opts.dataType = options.dataType;
+        } else if (options.force === 'json') {
+          opts.dataType = options.force;
+        }
+        // 進度條
         if(typeof options.progress === 'function'){
           opts.xhr = function(){
             var xhr = $.ajaxSettings.xhr();
-            //上傳進度
+            // 上傳進度
             xhr.upload.addEventListener("progress", function (obj) {
               if(obj.lengthComputable){
-                var percent = Math.floor((obj.loaded/obj.total)* 100); //百分比
-                options.progress(percent, (options.item ? options.item[0] : options.elem[0]) , obj, index);
+                var percent = Math.floor((obj.loaded/obj.total)* 100); // 百分比
+                options.progress(percent, (options.item ? options.item[0] : options.elem[0]) , obj, sets.index);
               }
             });
             return xhr;
           }
         }
         $.ajax(opts);
-      });
-    }
+      };
 
-    //低版本 IE 處理方式，不支持跨域
-    ,iframeSend = function(){
+      // 多文件是否一起上傳
+      if(options.unified){
+        request({
+          unified: true,
+          index: 0
+        });
+      } else {
+        layui.each(items, function(index, file){
+          request({
+            index: index,
+            file: file
+          });
+        });
+      }
+    };
+
+    // 低版本 IE 處理方式，不支持跨域
+    var iframeSend = function(){
       var iframe = $('#'+ ELEM_IFRAME);
 
       that.elemFile.parent().submit();
 
-      //獲取響應信息
+      // 獲取響應信息
       clearInterval(Class.timer);
       Class.timer = setInterval(function() {
         var res, iframeBody = iframe.contents().find('body');
         try {
           res = iframeBody.text();
         } catch(e) {
-          that.msg('Cross-domain requests are not supported');
+          that.msg(text['cross-domain']);
           clearInterval(Class.timer);
           error();
         }
@@ -272,10 +336,10 @@ layui.define(['lay','layer'], function(exports){
           done(0, res);
         }
       }, 30);
-    }
+    };
 
-    //統一回調
-    ,done = function(index, res){
+    // 統一回調
+    var done = function(index, res){
       that.elemFile.next('.'+ ELEM_CHOOSE).remove();
       elemFile.value = '';
 
@@ -285,7 +349,7 @@ layui.define(['lay','layer'], function(exports){
             res = JSON.parse(res);
           } catch(e){
             res = {};
-            return that.msg('Please return JSON data format');
+            return that.msg(text['data-format-error']);
           }
         }
       }
@@ -293,122 +357,123 @@ layui.define(['lay','layer'], function(exports){
       typeof options.done === 'function' && options.done(res, index || 0, function(files){
         that.upload(files);
       });
-    }
+    };
 
-    //統一網絡異常回調
-    ,error = function(index){
+    // 統一網絡異常回調
+   var error = function(index){
       if(options.auto){
         elemFile.value = '';
       }
       typeof options.error === 'function' && options.error(index || 0, function(files){
         that.upload(files);
       });
-    }
+    };
 
-    ,exts = options.exts
-    ,check ,value = function(){
+    var check;
+    var exts = options.exts;
+    var value = function(){
       var arr = [];
       layui.each(files || that.chooseFiles, function(i, item){
         arr.push(item.name);
       });
       return arr;
-    }()
+    }();
 
-    //回調返回的參數
-    ,args = {
-      //預覽
+    // 回調函數返回的參數
+    var args = {
+      // 預覽
       preview: function(callback){
         that.preview(callback);
-      }
-      //上傳
-      ,upload: function(index, file){
+      },
+      // 上傳
+      upload: function(index, file){
         var thisFile = {};
         thisFile[index] = file;
         that.upload(thisFile);
-      }
-      //追加文件到隊列
-      ,pushFile: function(){
+      },
+      // 追加文件到隊列
+      pushFile: function(){
         that.files = that.files || {};
         layui.each(that.chooseFiles, function(index, item){
           that.files[index] = item;
         });
         return that.files;
-      }
-      //重置文件
-      ,resetFile: function(index, file, filename){
+      },
+      // 重置文件
+      resetFile: function(index, file, filename){
         var newFile = new File([file], filename);
         that.files = that.files || {};
         that.files[index] = newFile;
       }
-    }
+    };
 
-    //提交上傳
-    ,send = function(){
-      //上傳前的回調 - 如果回調函數明確返回false，則停止上傳(#pulls55)
+    // 提交上傳
+    var send = function(){
+      // 上傳前的回調 - 如果回調函數明確返回 false，則停止上傳
       if(options.before && (options.before(args) === false)) return;
 
-      //IE兼容處理
+      // IE 兼容處理
       if(device.ie){
         return device.ie > 9 ? ajaxSend() : iframeSend();
       }
 
       ajaxSend();
-    }
+    };
 
-    //文件類型名稱
-    ,typeName = ({
-      file: '文件'
-      ,images: '圖片'
-      ,video: '視頻'
-      ,audio: '音頻'
+    // 文件類型名稱
+    var typeName = ({
+      file: '文件',
+      images: '圖片',
+      video: '視頻',
+      audio: '音頻'
     })[options.accept] || '文件';
 
-    //校驗文件格式
+    // 校驗文件格式
     value = value.length === 0
       ? ((elemFile.value.match(/[^\/\\]+\..+/g)||[]) || '')
     : value;
 
     if(value.length === 0) return;
 
-    //根據文件類型校驗
+    // 根據文件類型校驗
     switch(options.accept){
-      case 'file': //一般文件
+      case 'file': // 一般文件
         layui.each(value, function(i, item){
           if(exts && !RegExp('.\\.('+ exts +')$', 'i').test(escape(item))){
             return check = true;
           }
         });
       break;
-      case 'video': //視頻文件
+      case 'video': // 視頻文件
         layui.each(value, function(i, item){
           if(!RegExp('.\\.('+ (exts || 'avi|mp4|wma|rmvb|rm|flash|3gp|flv') +')$', 'i').test(escape(item))){
             return check = true;
           }
         });
       break;
-      case 'audio': //音頻文件
+      case 'audio': // 音頻文件
         layui.each(value, function(i, item){
           if(!RegExp('.\\.('+ (exts || 'mp3|wav|mid') +')$', 'i').test(escape(item))){
             return check = true;
           }
         });
       break;
-      default: //圖片文件
+      default: // 圖片文件
         layui.each(value, function(i, item){
-          if(!RegExp('.\\.('+ (exts || 'jpg|png|gif|bmp|jpeg') +')$', 'i').test(escape(item))){
+          if(!RegExp('.\\.('+ (exts || 'jpg|png|gif|bmp|jpeg|svg') +')$', 'i').test(escape(item))){
             return check = true;
           }
         });
       break;
     }
 
-    //校驗失敗提示
+    // 校驗失敗提示
     if(check){
-      that.msg('選擇的'+ typeName +'中包含不支持的格式');
+      that.msg(text['check-error'] || ('選擇的'+ typeName +'中包含不支持的格式'));
       return elemFile.value = '';
     }
 
-    //選擇文件的回調
+    // 選擇文件的回調
     if(type === 'choose' || options.auto){
       options.choose && options.choose(args);
       if(type === 'choose'){
@@ -416,7 +481,7 @@ layui.define(['lay','layer'], function(exports){
       }
     }
 
-    //檢驗文件數量
+    // 檢驗文件數量
     that.fileLength = function(){
       var length = 0;
       var items = getFiles();
@@ -427,10 +492,12 @@ layui.define(['lay','layer'], function(exports){
     }();
 
     if(options.number && that.fileLength > options.number){
-      return that.msg(
+      return that.msg(typeof text['limit-number'] === 'function'
+        ? text['limit-number'](options, that.fileLength)
+      : (
         '同時最多隻能上傳: '+ options.number + ' 個文件'
         +'<br>您當前已經選擇了: '+ that.fileLength +' 個文件'
-      );
+      ));
     }
 
     // 檢驗文件大小
@@ -445,27 +512,29 @@ layui.define(['lay','layer'], function(exports){
           limitSize = size;
         }
       });
-      if(limitSize) return that.msg('文件大小不能超過 '+ limitSize);
+      if(limitSize) return that.msg(typeof text['limit-size'] === 'function'
+        ? text['limit-size'](options, limitSize)
+      : '文件大小不能超過 '+ limitSize);
     }
 
     send();
   };
 
-  //重置方法
-  Class.prototype.reload = function(options){
-    options = options || {};
-    delete options.elem;
-    delete options.bindAction;
+  // 重置方法
+  Class.prototype.reload = function(opts){
+    opts = opts || {};
+    delete opts.elem;
+    delete opts.bindAction;
 
-    var that = this
-    ,options = that.config = $.extend({}, that.config, upload.config, options)
-    ,next = options.elem.next();
+    var that = this;
+    var options = that.config = $.extend({}, that.config, upload.config, opts);
+    var next = options.elem.next();
 
-    //更新文件域相關屬性
+    // 更新文件域相關屬性
     next.attr({
-      name: options.name
-      ,accept: options.acceptMime
-      ,multiple: options.multiple
+      name: options.name,
+      accept: options.acceptMime,
+      multiple: options.multiple
     });
   };
 
@@ -485,9 +554,9 @@ layui.define(['lay','layer'], function(exports){
 
     // 設置選擇的文本
     var setChooseText = function(files, filename){
-      var elemFile = that.elemFile
-      ,item = options.item ? options.item : options.elem
-      ,value = files.length > 1
+      var elemFile = that.elemFile;
+      var item = options.item ? options.item : options.elem;
+      var value = files.length > 1
         ? files.length + '個文件'
       : ((files[0] || {}).name || (elemFile[0].value.match(/[^\/\\]+\..+/g)||[]) || '');
 
@@ -511,7 +580,7 @@ layui.define(['lay','layer'], function(exports){
       }
     };
 
-    //點擊上傳容器
+    // 點擊上傳容器
     options.elem.off('upload.start').on('upload.start', function(){
       var othis = $(this);
 
@@ -520,7 +589,7 @@ layui.define(['lay','layer'], function(exports){
       that.elemFile[0].click();
     });
 
-    //拖拽上傳
+    // 拖拽上傳
     if(!(device.ie && device.ie < 10)){
       options.elem.off('upload.over').on('upload.over', function(){
         var othis = $(this)
@@ -538,36 +607,39 @@ layui.define(['lay','layer'], function(exports){
         extendAttrs.call(this);
         setChooseFile(files);
 
-        options.auto ? that.upload() : setChooseText(files); //是否自動觸發上傳
+        options.auto ? that.upload() : setChooseText(files); // 是否自動觸發上傳
       });
     }
 
-    //文件選擇
+    // 文件選擇
     that.elemFile.off('upload.change').on('upload.change', function(){
       var files = this.files || [];
 
+      if(files.length === 0) return;
+
       extendAttrs.call(this);
       setChooseFile(files);
-      options.auto ? that.upload() : setChooseText(files); //是否自動觸發上傳
+
+      options.auto ? that.upload() : setChooseText(files); // 是否自動觸發上傳
     });
 
-    //手動觸發上傳
+    // 手動觸發上傳
     options.bindAction.off('upload.action').on('upload.action', function(){
       that.upload();
     });
 
-    //防止事件重複綁定
+    // 防止事件重複綁定
     if(options.elem.data('haveEvents')) return;
-    
+
     that.elemFile.on('change', function(){
       $(this).trigger('upload.change');
     });
-    
+
     options.elem.on('click', function(){
       if(that.isFile()) return;
       $(this).trigger('upload.start');
     });
-    
+
     if(options.drag){
       options.elem.on('dragover', function(e){
         e.preventDefault();
@@ -579,15 +651,15 @@ layui.define(['lay','layer'], function(exports){
         $(this).trigger('upload.drop', e);
       });
     }
-    
+
     options.bindAction.on('click', function(){
       $(this).trigger('upload.action');
     });
-    
+
     options.elem.data('haveEvents', true);
   };
-  
-  //核心入口  
+
+  // 核心入口
   upload.render = function(options){
     var inst = new Class(options);
     return thisUpload.call(inst);

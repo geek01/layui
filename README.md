@@ -1,6 +1,6 @@
 <p align="center">
-  <a href="https://layui.github.io/">
-    <img src="https://unpkg.com/outeres@0.0.6/img/layui/icon-1.png" width="81" alt="Layui">
+  <a href="https://layui.dev">
+    <img src="https://unpkg.com/outeres@0.1.0/img/layui/logo-icon.png" width="81" alt="Layui">
   </a>
 </p>
 <h1 align="center">Layui</h1>
@@ -8,7 +8,7 @@
   Classic modular front-end UI library
 </p>
 
-<p align="center">  
+<p align="center">
   <a href="https://www.npmjs.com/package/layui">
     <img src="https://img.shields.io/npm/v/layui" alt="Version">
   </a>
@@ -65,13 +65,13 @@ Layui 是一套開源免費的 Web UI 組件庫，採用自身輕量級模塊化
 
 ## 破舊立新 🌱
 
-2016年10月14日，Layui 發佈了 `1.0.0` 首版，此後多年被廣泛應用在不計其數的 Web 平臺。
+2016年10月14日，Layui 發佈了 `1.0.0` 首版，此後多年被廣泛應用於眾多 Web 平臺。
 
-2021年10月13日，Layui 發佈了原官網下線的公告（<a href="https://unpkg.com/outeres@0.0.7/img/layui/notice-2021.png"  target="_blank">導讀</a>），並將文檔站點切換到了 Gitee Pages，社區及日常維護亦全面轉移到了 Gitee 和 Github 平臺，並順帶呼籲大家擁抱其他更好的主流框架，導致大家誤以為 Layui 停更了。事實上，自那以後，Layui 仍然在 Github 和 Gitee 保持活躍，並不存在所謂的停止更新，從當時的 `2.6.8` 一直連續迭代到如今的最新版本。
+2021年10月13日，Layui 發佈了原官網下線的公告（<a href="https://unpkg.com/outeres@0.0.7/img/layui/notice-2021.png"  target="_blank">導讀</a>），並將文檔站點切換到了 Gitee Pages，社區及日常維護亦全面轉移到了 Gitee 和 Github 平臺，以此呼籲大家擁抱其他更好的主流框架，導致大家誤以為 Layui 停更了。事實上，自那以後，Layui 仍然在 Github 和 Gitee 保持活躍，並不存在所謂的停止更新，從當時的 `2.6.8` 一直連續迭代到如今的最新版本。
 
 2023年4月24日，Layui 發佈了 `2.8.0` 正式版，並上線了[新的文檔站點](https://layui.dev)，這是一次樸實的迴歸，更是情懷的延續。 但我們仍然堅持兩年前那則公告中的觀點， _即仍然推薦大家去擁抱主流，始終保持對前沿技術的無限熱愛，是開發者們都應具備的思維屬性_。 **而 Layui 所做的，是為填補主流之外的那些略顯狹小的空隙**。Layui 雖不是前端主流，但也早已不是作者個人的 Layui，而是所有仍在堅持使用它的人的 Layui，它仍然支撐著許多項目，也代表著許多人的工作。作為開源創作者，應該要為這些堅持者而守望。
 
-未來，Layui 會持續陪伴著所有為之熱愛的人們，共同去探索和論證 Layui 開發模式的可行性。
+未來，Layui 會持續陪伴著所有為之熱愛的人們，共同去論證 Layui 開發模式的可行性。
 
 ## 開源許可
 

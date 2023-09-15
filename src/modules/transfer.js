@@ -193,28 +193,37 @@ layui.define(['laytpl', 'form'], function(exports){
     that.events(); //事件
   };
 
-  //渲染數據
+  // 渲染數據
   Class.prototype.renderData = function(){
-    var that = this
-    ,options = that.config;
+    var that = this;
+    var options = that.config;
 
-    //左右穿梭框差異數據
+    // 左右穿梭框差異數據
     var arr = [{
-      checkName: 'layTransferLeftCheck'
-      ,views: []
+      checkName: 'layTransferLeftCheck',
+      views: []
     }, {
-      checkName: 'layTransferRightCheck'
-      ,views: []
+      checkName: 'layTransferRightCheck',
+      views: []
     }];
 
-    //解析格式
+    // 解析格式
     that.parseData(function(item){
-      //標註為 selected 的為右邊的數據
+      // 標註為 selected 的為右邊的數據
       var _index = item.selected ? 1 : 0
-      ,listElem = ['<li>'
-        ,'<input type="checkbox" name="'+ arr[_index].checkName +'" lay-skin="primary" lay-filter="layTransferCheckbox" title="'+ item.title +'"'+ (item.disabled ? ' disabled' : '') + (item.checked ? ' checked' : '') +' value="'+ item.value +'">'
-      ,'</li>'].join('');
-      arr[_index].views.push(listElem);
+      var listElem = ['<li>',
+        '<input type="checkbox" name="'+ arr[_index].checkName +'" lay-skin="primary" lay-filter="layTransferCheckbox" title="'+ item.title +'"'+ (item.disabled ? ' disabled' : '') + (item.checked ? ' checked' : '') +' value="'+ item.value +'">',
+      '</li>'].join('');
+      // 按照 options.value 順序排列右側數據
+      if(_index){
+        layui.each(options.value, function(i, v){
+          if(v == item.value && item.selected){
+            arr[_index].views[i] = listElem;
+          }
+        });
+      } else {
+        arr[_index].views.push(listElem);
+      }
       delete item.selected;
     });
 
@@ -222,7 +231,7 @@ layui.define(['laytpl', 'form'], function(exports){
     that.layData.eq(1).html(arr[1].views.join(''));
 
     that.renderCheckBtn();
-  }
+  };
 
   //渲染表單
   Class.prototype.renderForm = function(type){

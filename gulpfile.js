@@ -17,11 +17,11 @@ const yargs = require('yargs');
 const config = {
   // 註釋
   comment: [
-    '/** v<%= pkg.version %> | <%= pkg.license %> Licensed */<%= js %>'
-    ,{pkg: pkg, js: ';'}
-  ]
+    '/** v<%= pkg.version %> | <%= pkg.license %> Licensed */<%= js %>',
+    {pkg: pkg, js: ';'}
+  ],
   // 模塊
-  ,modules: 'lay,laytpl,laypage,laydate,jquery,layer,util,dropdown,slider,colorpicker,element,upload,form,table,treeTable,tree,transfer,carousel,rate,flow,code'
+  modules: 'lay,laytpl,laypage,laydate,jquery,layer,util,dropdown,slider,colorpicker,element,upload,form,table,treeTable,tree,transfer,carousel,rate,flow,code'
 };
 
 // 獲取參數
@@ -38,8 +38,8 @@ const dir = {
 
 // 輸出目錄
 const dest = ({
-  dist: './dist'
-  ,rls: dir.rls + '/layui'
+  dist: './dist',
+  rls: dir.rls + '/layui'
 }[argv.dest || 'dist'] || argv.dest) + (argv.vs ? '/'+ pkg.version : '');
 
 // js
@@ -136,11 +136,11 @@ exports.laydate = () => { // gulp laydate
   // js
   return gulp.src(['./src/layui.js', './src/modules/{lay,laydate}.js'])
   .pipe(replace('win.layui =', 'var layui =')) // 將 layui 替換為局部變量
-  .pipe(replace('}(window); //gulp build: layui-footer', '')) // 替換 layui.js 的落腳
-  .pipe(replace(';!function(window){ //gulp build: lay-header', '')) // 替換 lay.js 的頭部
-  .pipe(replace('}(window, window.document); //gulp build: lay-footer', '')) // 替換 lay.js 的落腳
+  .pipe(replace('}(window); // gulp build: layui-footer', '')) // 替換 layui.js 的落腳
+  .pipe(replace(';!function(window){ // gulp build: lay-header', '')) // 替換 lay.js 的頭部
+  .pipe(replace('}(window, window.document); // gulp build: lay-footer', '')) // 替換 lay.js 的落腳
   .pipe(concat('laydate.js', {newLine: ''}))
-  .pipe(replace(';!function(window, document){ //gulp build: laydate-header', '')) // 替換 laydate.js 的頭部
+  .pipe(replace(';!function(window, document){ // gulp build: laydate-header', '')) // 替換 laydate.js 的頭部
   .pipe(header.apply(null, comment)) // 追加頭部
   .pipe(gulp.dest(dest + 'src'));
 };
@@ -150,21 +150,21 @@ exports.help = () => {
   let usage = '\nUsage: gulp [options] tasks';
   let parser = yargs.usage(usage, {
     dest: {
-      type: 'string'
-      ,desc: '定義輸出目錄，可選項：dist（默認）、rls、任意路徑'
-    }
-    ,vs: {
-      type: 'boolean'
-      ,desc: '生成一個帶版本號的文件夾'
+      type: 'string',
+      desc: '定義輸出目錄，可選項：dist（默認）、rls、任意路徑'
+    },
+    vs: {
+      type: 'boolean',
+      desc: '生成一個帶版本號的文件夾'
     }
   });
 
   parser.showHelp(console.log);
   console.log([
-    'Tasks:'
-    ,'  default  默認任務'
-    ,'  rls  發行任務'
-    ,'  cp  將 dist 目錄複製一份到參數 --dest 指向的目錄'
+    'Tasks:',
+    '  default  默認任務',
+    '  rls  發行任務',
+    '  cp  將 dist 目錄複製一份到參數 --dest 指向的目錄'
   ].join('\n'), '\n\nExamples:\n  gulp cp --dest ./v --vs', '\n');
   return gulp.src('./');
 };

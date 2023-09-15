@@ -10,42 +10,47 @@ layui.define(['jquery', 'lay'],function(exports){
 
   // 外部接口
   var rate = {
-    config: {}
-    ,index: layui.rate ? (layui.rate.index + 10000) : 0
+    config: {},
+    index: layui.rate ? (layui.rate.index + 10000) : 0,
 
     //設置全局項
-    ,set: function(options){
+    set: function(options){
       var that = this;
       that.config = $.extend({}, that.config, options);
       return that;
-    }
+    },
 
     //事件
-    ,on: function(events, callback){
+    on: function(events, callback){
       return layui.onevent.call(this, MOD_NAME, events, callback);
     }
   }
 
   // 操作當前實例
-  ,thisRate = function(){
-    var that = this
-    ,options = that.config;
+  var thisRate = function () {
+    var that = this;
+    var options = that.config;
 
     return {
-      setvalue: function(value){
+      setvalue: function (value) {
         that.setvalue.call(that, value);
-      }
-      ,config: options
+      },
+      config: options
     }
-  }
+  };
 
   //字符常量
-  ,MOD_NAME = 'rate',ELEM_VIEW = 'layui-rate', ICON_RATE = 'layui-icon-rate', ICON_RATE_SOLID = 'layui-icon-rate-solid', ICON_RATE_HALF = 'layui-icon-rate-half'
-
-  ,ICON_SOLID_HALF = 'layui-icon-rate-solid layui-icon-rate-half',  ICON_SOLID_RATE = 'layui-icon-rate-solid layui-icon-rate',  ICON_HALF_RATE = 'layui-icon-rate layui-icon-rate-half'
+  var MOD_NAME = 'rate';
+  var ELEM_VIEW = 'layui-rate';
+  var ICON_RATE = 'layui-icon-rate';
+  var ICON_RATE_SOLID = 'layui-icon-rate-solid';
+  var ICON_RATE_HALF = 'layui-icon-rate-half';
+  var ICON_SOLID_HALF = 'layui-icon-rate-solid layui-icon-rate-half';
+  var ICON_SOLID_RATE = 'layui-icon-rate-solid layui-icon-rate';
+  var ICON_HALF_RATE = 'layui-icon-rate layui-icon-rate-half';
 
   //構造器
-  ,Class = function(options){
+  var Class = function (options) {
     var that = this;
     that.index = ++rate.index;
     that.config = $.extend({}, that.config, rate.config, options);
@@ -54,12 +59,12 @@ layui.define(['jquery', 'lay'],function(exports){
 
   //默認配置
   Class.prototype.config = {
-    length: 5  //初始長度
-    ,text: false  //是否顯示評分等級
-    ,readonly: false  //是否只讀
-    ,half: false  //是否可以半星
-    ,value: 0 //星星選中個數
-    ,theme: ''
+    length: 5,  //初始長度
+    text: false,  //是否顯示評分等級
+    readonly: false,  //是否只讀
+    half: false,  //是否可以半星
+    value: 0, //星星選中個數
+    theme: ''
   };
 
   //評分渲染
@@ -114,8 +119,8 @@ layui.define(['jquery', 'lay'],function(exports){
     temp += '</ul>' + (options.text ? ('<span class="layui-inline">'+ options.value + '星') : '') + '</span>';
 
     //開始插入替代元素
-    var othis = options.elem
-    ,hasRender = othis.next('.' + ELEM_VIEW);
+    var othis = options.elem;
+    var hasRender = othis.next('.' + ELEM_VIEW);
 
     //生成替代元素
     hasRender[0] && hasRender.remove(); //如果已經渲染，則Rerender
@@ -137,8 +142,8 @@ layui.define(['jquery', 'lay'],function(exports){
 
   //評分重置
   Class.prototype.setvalue = function(value){
-    var that = this
-    ,options = that.config ;
+    var that = this;
+    var options = that.config;
 
     options.value = value ;
     that.render();
@@ -146,14 +151,14 @@ layui.define(['jquery', 'lay'],function(exports){
 
   //li觸控事件
   Class.prototype.action = function(){
-    var that = this
-    ,options = that.config
-    ,_ul = that.elemTemp
-    ,wide = _ul.find("i").width();
+    var that = this;
+    var options = that.config;
+    var _ul = that.elemTemp;
+    var wide = _ul.find("i").width();
 
     _ul.children("li").each(function(index){
-      var ind = index + 1
-      ,othis = $(this);
+      var ind = index + 1;
+      var othis = $(this);
 
       //點擊
       othis.on('click', function(e){
@@ -210,9 +215,9 @@ layui.define(['jquery', 'lay'],function(exports){
   };
 
   //事件處理
-  Class.prototype.events = function(){
-     var that = this
-    ,options = that.config;
+  Class.prototype.events = function () {
+    var that = this;
+    //var options = that.config;
   };
 
   //核心入口
@@ -220,6 +225,6 @@ layui.define(['jquery', 'lay'],function(exports){
     var inst = new Class(options);
     return thisRate.call(inst);
   };
-  
+
   exports(MOD_NAME, rate);
 })

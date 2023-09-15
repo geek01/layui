@@ -61,7 +61,7 @@ layui.define('jquery', function(exports){
 
     //如果允許圖片懶加載
     if(options.isLazyimg){
-      var lazyimg = that.lazyimg({
+      lazyimg = that.lazyimg({
         elem: options.elem + ' img'
         ,scrollElem: options.scrollElem
       });
@@ -154,9 +154,9 @@ layui.define('jquery', function(exports){
         }
       }
     };
-    
+
     render();
-    
+
     if(!haveScroll){
       var timer;
       scrollElem.on('scroll', function(){
@@ -165,12 +165,12 @@ layui.define('jquery', function(exports){
         timer = setTimeout(function(){
           render(null, othis);
         }, 50);
-      }); 
+      });
       haveScroll = true;
     }
     return render;
   };
-  
+
   //暴露接口
   exports('flow', new Flow());
 });

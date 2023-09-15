@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>表格邊框測試</title>
+  <link rel="stylesheet" href="../src/css/layui.css">
+  <style>
+    body {
+      padding: 32px; /*overflow-y: scroll;*/
+    }
+
+    .layui-table-view {
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-xs" lay-event="edit">編輯</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">刪除</a>
+</script>
+
+
+<blockquote class="layui-elem-quote">
+  無統計、無分頁
+</blockquote>
+
+<table id="test"></table>
+
+<blockquote class="layui-elem-quote">
+  有統計、無分頁
+</blockquote>
+
+<table id="test1"></table>
+
+<blockquote class="layui-elem-quote">
+  無統計、有分頁
+</blockquote>
+
+<table id="test2"></table>
+
+<blockquote class="layui-elem-quote">
+  有統計、有分頁
+</blockquote>
+
+<table id="test3"></table>
+
+<script src="../src/layui.js" src1="https://cdn.staticfile.org/layui/2.7.6/layui.js"></script>
+<script>
+  layui.use(['table', 'laydate'], function () {
+    var $ = layui.$;
+    var table = layui.table;
+
+    var url = 'json/table/demo1.json';
+
+    // 無統計、無分頁
+    table.render({
+      elem: '#test'
+      , url: url
+      // , totalRow: true
+      , height: 300
+      , cellMinWidth: 80
+      //,skin: 'line'
+      //,size: 'lg'
+      // , toolbar: true
+      , cols: [[
+        {field: 'id', hide: true}
+        , {field: 'username', title: '用戶名'}
+        , {field: 'email', title: '郵箱'}
+        , {title: '操作', align: 'center', toolbar: '#barDemo'}
+      ]]
+    });
+
+    // 有統計、無分頁
+    table.render({
+      elem: '#test1'
+      , url: url
+      , totalRow: true
+      , height: 300
+      , cellMinWidth: 80
+      //,skin: 'line'
+      //,size: 'lg'
+      // , toolbar: true
+      , cols: [[
+        {field: 'id', hide: true}
+        , {field: 'username', title: '用戶名'}
+        , {field: 'email', title: '郵箱'}
+        , {title: '操作', align: 'center', toolbar: '#barDemo'}
+      ]]
+    });
+
+    // 無統計、有分頁
+    table.render({
+      elem: '#test2'
+      , url: url
+      //,contentType: 'application/json' // 參數為 json 格式傳遞
+      , page: { // 詳細參數可參考 laypage 組件文檔
+        curr: 5
+        , groups: 1
+        , first: false
+        , last: false
+        , layout: ['limit', 'prev', 'page', 'next', 'count'] //自定義分頁佈局
+      }
+      // , totalRow: true
+      , height: 300
+      , cellMinWidth: 80
+      //,skin: 'line'
+      //,size: 'lg'
+      // , toolbar: true
+      , cols: [[
+        {field: 'id', hide: true}
+        , {field: 'username', title: '用戶名'}
+        , {field: 'email', title: '郵箱'}
+        , {title: '操作', align: 'center', toolbar: '#barDemo'}
+      ]]
+    });
+
+    // 有統計、有分頁
+    table.render({
+      elem: '#test3'
+      , url: url
+      //,contentType: 'application/json' // 參數為 json 格式傳遞
+      , page: { // 詳細參數可參考 laypage 組件文檔
+        curr: 5
+        , groups: 1
+        , first: false
+        , last: false
+        , layout: ['limit', 'prev', 'page', 'next', 'count'] //自定義分頁佈局
+      }
+      , totalRow: true
+      , height: 300
+      , cellMinWidth: 80
+      //,skin: 'line'
+      //,size: 'lg'
+      // , toolbar: true
+      , cols: [[
+        {field: 'id', hide: true}
+        , {field: 'username', title: '用戶名'}
+        , {field: 'email', title: '郵箱'}
+        , {title: '操作', align: 'center', toolbar: '#barDemo'}
+      ]]
+    });
+  });
+</script>
+</body>
+</html>

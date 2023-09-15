@@ -1,6 +1,6 @@
 /** laydate 日期與時間控件 | MIT Licensed */
 
-;!function(window, document){ //gulp build: laydate-header
+;!function(window, document){ // gulp build: laydate-header
   "use strict";
 
   var isLayui = window.layui && layui.define, ready = {
@@ -591,7 +591,9 @@
         return shortcutBtns.join('');
       }()).find('li').on('click', function (event) {
         var btnSetting = options.shortcuts[this.dataset['index']] || {};
-        var value = btnSetting.value || [];
+        var value = (typeof btnSetting.value === 'function'
+          ? btnSetting.value()
+          : btnSetting.value) || [];
         if (!layui.isArray(value)) {
           value = [value];
         }
@@ -633,6 +635,11 @@
 
         lay(this).addClass(THIS);
 
+        // 自動確認
+        if(options.position !== 'static'){
+          that.setValue(that.parse()).done().remove();
+        }
+        /*
         if (options.position !== 'static' && !options.range && options.autoConfirm) {
           if (type === 'date') {
             that.choose(lay(elem).find('td.layui-this'))
@@ -642,6 +649,7 @@
             }
           }
         }
+        */
       })
     }
 
@@ -651,17 +659,30 @@
     });
     options.showBottom && elem.appendChild(divFooter);
 
-    //生成自定義主題
+    // 生成自定義主題
     var style = lay.elem('style');
     var styleText = [];
     var colorTheme;
+    var isPrimaryColor = true;
     lay.each(options.theme, function (index, theme) {
-      if(/^#/.test(theme)){
+      // 主色
+      if(isPrimaryColor && /^#/.test(theme)){
         colorTheme = true;
+        isPrimaryColor = false;
         styleText.push([
-          '#{{id}} .layui-laydate-header{background-color:{{theme}};}'
-          ,'#{{id}} li.layui-this,#{{id}} td.layui-this>div{background-color:{{theme}} !important;}'
-          ,options.theme.indexOf('circle') !== -1 ? '' : '#{{id}} .layui-this{background-color:{{theme}} !important;}'
+          '#{{id}} .layui-laydate-header{background-color:{{theme}};}',
+          '#{{id}} li.layui-this,#{{id}} td.layui-this>div{background-color:{{theme}} !important;}',
+          options.theme.indexOf('circle') !== -1 ? '' : '#{{id}} .layui-this{background-color:{{theme}} !important;}',
+          '#{{id}} .laydate-day-now{color:{{theme}} !important;}',
+          '#{{id}} .laydate-day-now:after{border-color:{{theme}} !important;}'
+        ].join('').replace(/{{id}}/g, that.elemID).replace(/{{theme}}/g, theme));
+        return;
+      }
+      // 第二個自定義顏色作為輔色
+      if(!isPrimaryColor && /^#/.test(theme)){
+        styleText.push([
+          '#{{id}} .laydate-selected>div{background-color:{{theme}} !important;}',
+          '#{{id}} .laydate-selected:hover>div{background-color:{{theme}} !important;}'
         ].join('').replace(/{{id}}/g, that.elemID).replace(/{{theme}}/g, theme));
       }
     });
@@ -968,11 +989,11 @@
       }
     })();
 
-    //校驗日期有效數字
+    // 校驗日期有效數字
     checkValid(dateTime);
     if(options.range) checkValid(that.endDate);
 
-    //如果初始值格式錯誤，則糾正初始值
+    // 如果初始值格式錯誤，則糾正初始值
     if(error && value){
       that.setValue(
         options.range ? (that.endDate ? that.parse() : '') : that.parse()
@@ -1020,6 +1041,7 @@
       that.hint('value ' + lang.invalidDate + lang.formatError[1]);
     }
 
+    // 初始賦值 startDate,endState
     that.startDate = that.startDate || value && lay.extend({}, options.dateTime); // 有默認值才初始化startDate
     that.autoCalendarModel.auto && that.autoCalendarModel();
     that.endState = !options.range || !that.rangeLinked || !!(that.startDate && that.endDate); // 初始化選中範圍狀態
@@ -1109,9 +1131,9 @@
 
   //日曆表
   Class.prototype.calendar = function(value, index, type){
+    index = index ? 1 : 0;
     var that = this
     ,options = that.config
-    ,index = index ? 1 : 0
     ,dateTime = value || that.thisDateTime(index)
     ,thisDate = new Date(), startWeek, prevMaxDate, thisMaxDate
     ,lang = that.lang()
@@ -1137,7 +1159,7 @@
 
     //賦值日
     lay.each(tds, function(index_, item){
-      var YMD = [dateTime.year, dateTime.month], st = 0;
+      var YMD = [dateTime.year, dateTime.month], st;
       item = lay(item);
       item.removeAttr("class");
       if(index_ < startWeek){
@@ -1563,21 +1585,22 @@
     }
   };
 
-  //轉義為規定格式的日期字符
-  Class.prototype.parse = function(state, date){
-    var that = this
-    ,options = that.config
-    ,dateTime = date || (state == 'end'
-      ? lay.extend({}, that.endDate, that.endTime)
-    : (
-      options.range
-        ? lay.extend({}, that.rangeLinked ? that.startDate : options.dateTime, that.startTime)
-      : options.dateTime)
-    )
-    ,format = laydate.parse(dateTime, that.format, 1);
+  // 轉義為規定格式的日期字符
+  Class.prototype.parse = function(state, date) {
+    var that = this;
+    var options = that.config;
+    var startDate = (that.rangeLinked ? that.startDate : options.dateTime)
+    var dateTime = date || (
+      state == 'end' ? lay.extend({}, that.endDate, that.endTime) : (
+        options.range
+          ? lay.extend({}, startDate || options.dateTime, that.startTime)
+        : options.dateTime
+      )
+    );
+    var format = laydate.parse(dateTime, that.format, 1);
 
-    //返回日期範圍字符
-    if(options.range && state === undefined){
+    // 返回日期範圍字符
+    if (options.range && state === undefined) {
       return format + ' '+ that.rangeStr +' ' + that.parse('end');
     }
 
@@ -1735,12 +1758,14 @@
     });
   };
 
-  //執行 done/change 回調
+  // 執行 done/change 回調
   Class.prototype.done = function(param, type){
-    var that = this
-    ,options = that.config
-    ,start = lay.extend({}, lay.extend(options.dateTime, that.startTime))
-    ,end = lay.extend({}, lay.extend(that.endDate, that.endTime))
+    var that = this;
+    var options = that.config;
+    var start = lay.extend({},
+      lay.extend(that.rangeLinked ? that.startDate : options.dateTime, that.startTime)
+    );
+    var end = lay.extend({}, lay.extend(that.endDate, that.endTime));
 
     lay.each([start, end], function(i, item){
       if(!('month' in item)) return;
@@ -1952,7 +1977,7 @@
 
     ,elemCont = that.elemCont[index || 0]
     ,listYM = that.listYM[index]
-    ,addSubYeay = function(type){
+    ,addSubYear = function(type){
       var isYear = lay(elemCont).find('.laydate-year-list')[0]
       ,isMonth = lay(elemCont).find('.laydate-month-list')[0];
 
@@ -1987,7 +2012,7 @@
 
     return {
       prevYear: function(){
-        if(addSubYeay('sub')) return;
+        if(addSubYear('sub')) return;
         if (that.rangeLinked) {
           options.dateTime.year--;
           that.checkDate('limit').calendar(null, null, 'init');
@@ -2029,7 +2054,7 @@
         }
       }
       ,nextYear: function(){
-        if(addSubYeay()) return;
+        if(addSubYear()) return;
         if (that.rangeLinked) {
           options.dateTime.year++;
           that.checkDate('limit').calendar(null, 0, 'init');

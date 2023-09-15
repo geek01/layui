@@ -117,7 +117,7 @@ layui.define(function(exports){
 
         //輸出左分割符
         if(config.first !== false && start > 2){
-          pager.push('<span class="layui-laypage-spr">…</span>')
+          pager.push('<span class="layui-laypage-spr">&#x2026;</span>')
         }
 
         //輸出連續頁碼
@@ -133,7 +133,7 @@ layui.define(function(exports){
         //輸出輸出右分隔符 & 末頁
         if(config.pages > groups && config.pages > end && config.last !== false){
           if(end + 1 < config.pages){
-            pager.push('<span class="layui-laypage-spr">…</span>');
+            pager.push('<span class="layui-laypage-spr">&#x2026;</span>');
           }
           if(groups !== 0){
             pager.push('<a class="layui-laypage-last" title="尾頁"  data-page="'+ config.pages +'">'+ (config.last || config.pages) +'</a>');

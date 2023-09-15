@@ -1,5 +1,5 @@
 /**
-  扩展模块，只依赖内置模块
+  擴展模塊，只依賴內置模塊
 **/
 
 layui.define(function(exports){

@@ -12,50 +12,61 @@ layui.define(['jquery', 'lay'], function(exports){
   var hint = layui.hint();
   var device = layui.device();
 
-  //外部接口
+  // 外部接口
   var carousel = {
-    config: {} //全局配置項
+    config: {}, // 全局配置項
 
-    //設置全局項
-    ,set: function(options){
+    // 設置全局項
+    set: function(options){
       var that = this;
       that.config = $.extend({}, that.config, options);
       return that;
-    }
+    },
 
-    //事件
-    ,on: function(events, callback){
+    // 事件
+    on: function(events, callback){
       return layui.onevent.call(this, MOD_NAME, events, callback);
     }
-  }
+  };
 
-  //字符常量
-  ,MOD_NAME = 'carousel', ELEM = '.layui-carousel', THIS = 'layui-this', SHOW = 'layui-show', HIDE = 'layui-hide', DISABLED = 'layui-disabled'
+  // 字符常量
+  var MOD_NAME = 'carousel';
+  var ELEM = '.layui-carousel';
+  var THIS = 'layui-this';
+  var SHOW = 'layui-show';
+  var HIDE = 'layui-hide';
+  var DISABLED = 'layui-disabled'
 
-  ,ELEM_ITEM = '>*[carousel-item]>*', ELEM_LEFT = 'layui-carousel-left', ELEM_RIGHT = 'layui-carousel-right', ELEM_PREV = 'layui-carousel-prev', ELEM_NEXT = 'layui-carousel-next', ELEM_ARROW = 'layui-carousel-arrow', ELEM_IND = 'layui-carousel-ind'
+  var ELEM_ITEM = '>*[carousel-item]>*';
+  var ELEM_LEFT = 'layui-carousel-left';
+  var ELEM_RIGHT = 'layui-carousel-right';
+  var ELEM_PREV = 'layui-carousel-prev';
+  var ELEM_NEXT = 'layui-carousel-next';
+  var ELEM_ARROW = 'layui-carousel-arrow';
+  var ELEM_IND = 'layui-carousel-ind';
 
-  //構造器
-  ,Class = function(options){
+  // 構造器
+  var Class = function(options){
     var that = this;
     that.config = $.extend({}, that.config, carousel.config, options);
     that.render();
   };
 
-  //默認配置
+  // 默認配置
   Class.prototype.config = {
-    width: '600px'
-    ,height: '280px'
-    ,full: false //是否全屏
-    ,arrow: 'hover' //切換箭頭默認顯示狀態：hover/always/none
-    ,indicator: 'inside' //指示器位置：inside/outside/none
-    ,autoplay: true //是否自動切換
-    ,interval: 3000 //自動切換的時間間隔，不能低於800ms
-    ,anim: '' //動畫類型：default/updown/fade
-    ,trigger: 'click' //指示器的觸發方式：click/hover
-    ,index: 0 //初始開始的索引
+    width: '600px',
+    height: '280px',
+    full: false, // 是否全屏
+    arrow: 'hover', // 切換箭頭默認顯示狀態：hover/always/none
+    indicator: 'inside', // 指示器位置：inside/outside/none
+    autoplay: true, // 是否自動切換
+    interval: 3000, // 自動切換的時間間隔，不能低於800ms
+    anim: '', // 動畫類型：default/updown/fade
+    trigger: 'click', // 指示器的觸發方式：click/hover
+    index: 0 // 初始開始的索引
   };
 
-  //輪播渲染
+  // 輪播渲染
   Class.prototype.render = function(){
     var that = this;
     var options = that.config;
@@ -82,35 +93,36 @@ layui.define(['jquery', 'lay'], function(exports){
     if(options.index >= that.elemItem.length) options.index = that.elemItem.length - 1;
     if(options.interval < 800) options.interval = 800;
 
-    //是否全屏模式
+    // 是否全屏模式
     if(options.full){
       options.elem.css({
-        position: 'fixed'
-        ,width: '100%'
-        ,height: '100%'
-        ,zIndex: 9999
+        position: 'fixed',
+        width: '100%',
+        height: '100%',
+        zIndex: 9999
       });
     } else {
       options.elem.css({
-        width: options.width
-        ,height: options.height
+        width: options.width,
+        height: options.height
       });
     }
 
     options.elem.attr('lay-anim', options.anim);
 
-    //初始焦點狀態
+    // 初始焦點狀態
     that.elemItem.eq(options.index).addClass(THIS);
 
-    //指示器等動作
+    // 指示器等動作
     if(that.elemItem.length <= 1) return;
+
     that.indicator();
     that.arrow();
     that.autoplay();
     that.events();
   };
 
-  //重置輪播
+  // 重置輪播
   Class.prototype.reload = function(options){
     var that = this;
     clearInterval(that.timer);
@@ -118,62 +130,64 @@ layui.define(['jquery', 'lay'], function(exports){
     that.render();
   };
 
-  //獲取上一個等待條目的索引
+  // 獲取上一個等待條目的索引
   Class.prototype.prevIndex = function(){
-    var that = this
-    ,options = that.config;
-
+    var that = this;
+    var options = that.config;
     var prevIndex = options.index - 1;
+
     if(prevIndex < 0){
       prevIndex = that.elemItem.length - 1;
     }
+
     return prevIndex;
   };
 
-  //獲取下一個等待條目的索引
+  // 獲取下一個等待條目的索引
   Class.prototype.nextIndex = function(){
-    var that = this
-    ,options = that.config;
-
+    var that = this;
+    var options = that.config;
     var nextIndex = options.index + 1;
+
     if(nextIndex >= that.elemItem.length){
       nextIndex = 0;
     }
+
     return nextIndex;
   };
 
-  //索引遞增
+  // 索引遞增
   Class.prototype.addIndex = function(num){
-    var that = this
-    ,options = that.config;
+    var that = this;
+    var options = that.config;
 
     num = num || 1;
     options.index = options.index + num;
 
-    //index不能超過輪播總數量
+    // index 不能超過輪播總數量
     if(options.index >= that.elemItem.length){
       options.index = 0;
     }
   };
 
-  //索引遞減
+  // 索引遞減
   Class.prototype.subIndex = function(num){
-    var that = this
-    ,options = that.config;
+    var that = this;
+    var options = that.config;
 
     num = num || 1;
     options.index = options.index - num;
 
-    //index不能超過輪播總數量
+    // index 不能超過輪播總數量
     if(options.index < 0){
       options.index = that.elemItem.length - 1;
     }
   };
 
-  //自動輪播
+  // 自動輪播
   Class.prototype.autoplay = function(){
-    var that = this
-    ,options = that.config;
+    var that = this;
+    var options = that.config;
 
     if(!options.autoplay) return;
     clearInterval(that.timer);
@@ -183,30 +197,30 @@ layui.define(['jquery', 'lay'], function(exports){
     }, options.interval);
   };
 
-  //箭頭
+  // 箭頭
   Class.prototype.arrow = function(){
-    var that = this
-    ,options = that.config;
+    var that = this;
+    var options = that.config;
 
-    //模板
+    // 模板
     var tplArrow = $([
-      '<button class="layui-icon '+ ELEM_ARROW +'" lay-type="sub">'+ (options.anim === 'updown' ? '&#xe619;' : '&#xe603;') +'</button>'
-      ,'<button class="layui-icon '+ ELEM_ARROW +'" lay-type="add">'+ (options.anim === 'updown' ? '&#xe61a;' : '&#xe602;') +'</button>'
+      '<button class="layui-icon '+ ELEM_ARROW +'" lay-type="sub">'+ (options.anim === 'updown' ? '&#xe619;' : '&#xe603;') +'</button>',
+      '<button class="layui-icon '+ ELEM_ARROW +'" lay-type="add">'+ (options.anim === 'updown' ? '&#xe61a;' : '&#xe602;') +'</button>'
     ].join(''));
 
-    //預設基礎屬性
+    // 預設基礎屬性
     options.elem.attr('lay-arrow', options.arrow);
 
-    //避免重複插入
+    // 避免重複插入
     if(options.elem.find('.'+ELEM_ARROW)[0]){
       options.elem.find('.'+ELEM_ARROW).remove();
     }
     options.elem.append(tplArrow);
 
-    //事件
+    // 事件
     tplArrow.on('click', function(){
-      var othis = $(this)
-      ,type = othis.attr('lay-type')
+      var othis = $(this);
+      var type = othis.attr('lay-type')
       that.slide(type);
     });
   };
@@ -223,26 +237,26 @@ layui.define(['jquery', 'lay'], function(exports){
     }
   }
 
-  //指示器
+  // 指示器
   Class.prototype.indicator = function(){
-    var that = this
-    ,options = that.config;
+    var that = this;
+    var options = that.config;
 
-    //模板
-    var tplInd = that.elemInd = $(['<div class="'+ ELEM_IND +'"><ul>'
-      ,function(){
+    // 模板
+    var tplInd = that.elemInd = $(['<div class="'+ ELEM_IND +'"><ul>',
+      function(){
         var li = [];
         layui.each(that.elemItem, function(index){
           li.push('<li'+ (options.index === index ? ' class="layui-this"' : '') +'></li>');
         });
         return li.join('');
-      }()
-    ,'</ul></div>'].join(''));
+      }(),
+    '</ul></div>'].join(''));
 
-    //預設基礎屬性
+    // 預設基礎屬性
     options.elem.attr('lay-indicator', options.indicator);
 
-    //避免重複插入
+    // 避免重複插入
     if(options.elem.find('.'+ELEM_IND)[0]){
       options.elem.find('.'+ELEM_IND).remove();
     }
@@ -258,17 +272,17 @@ layui.define(['jquery', 'lay'], function(exports){
     });
   };
 
-  //滑動切換
+  // 滑動切換
   Class.prototype.slide = function(type, num){
-    var that = this
-    ,elemItem = that.elemItem
-    ,options = that.config
-    ,thisIndex = options.index
-    ,filter = options.elem.attr('lay-filter');
+    var that = this;
+    var elemItem = that.elemItem;
+    var options = that.config;
+    var thisIndex = options.index;
+    var filter = options.elem.attr('lay-filter');
 
     if(that.haveSlide) return;
 
-    //滑動方向
+    // 滑動方向
     if(type === 'sub'){
       that.subIndex(num);
       elemItem.eq(options.index).addClass(ELEM_PREV);
@@ -276,7 +290,7 @@ layui.define(['jquery', 'lay'], function(exports){
         elemItem.eq(thisIndex).addClass(ELEM_RIGHT);
         elemItem.eq(options.index).addClass(ELEM_RIGHT);
       }, 50);
-    } else { //默認遞增滑
+    } else { // 默認遞增滑
       that.addIndex(num);
       elemItem.eq(options.index).addClass(ELEM_NEXT);
       setTimeout(function(){
@@ -285,14 +299,14 @@ layui.define(['jquery', 'lay'], function(exports){
       }, 50);
     }
 
-    //移除過度類
+    // 移除過度類
     setTimeout(function(){
       elemItem.removeClass(THIS + ' ' + ELEM_PREV + ' ' + ELEM_NEXT + ' ' + ELEM_LEFT + ' ' + ELEM_RIGHT);
       elemItem.eq(options.index).addClass(THIS);
-      that.haveSlide = false; //解鎖
+      that.haveSlide = false; // 解鎖
     }, 300);
 
-    //指示器焦點
+    // 指示器焦點
     that.elemInd.find('li').eq(options.index).addClass(THIS)
     .siblings().removeClass(THIS);
 
@@ -300,23 +314,23 @@ layui.define(['jquery', 'lay'], function(exports){
 
     // 回調返回的參數
     var params = {
-      index: options.index
-      ,prevIndex: thisIndex
-      ,item: elemItem.eq(options.index)
+      index: options.index,
+      prevIndex: thisIndex,
+      item: elemItem.eq(options.index)
     };
 
     typeof options.change === 'function' && options.change(params);
     layui.event.call(this, MOD_NAME, 'change('+ filter +')', params);
   };
 
-  //事件處理
+  // 事件處理
   Class.prototype.events = function(){
-    var that = this
-    ,options = that.config;
-    
+    var that = this;
+    var options = that.config;
+
     if(options.elem.data('haveEvents')) return;
-    
-    //移入移出容器
+
+    // 移入移出容器
     options.elem.on('mouseenter', function(){
       if (that.config.autoplay === 'always') return;
       clearInterval(that.timer);
@@ -324,11 +338,11 @@ layui.define(['jquery', 'lay'], function(exports){
       if (that.config.autoplay === 'always') return;
       that.autoplay();
     });
-    
+
     options.elem.data('haveEvents', true);
   };
-  
-  //核心入口
+
+  // 核心入口
   carousel.render = function(options){
     return new Class(options);
   };
