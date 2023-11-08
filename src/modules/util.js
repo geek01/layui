@@ -198,7 +198,7 @@ layui.define('jquery', function(exports){
         if(countTime <= 0){
           clearTimeout(inst.timer);
           typeof options.done === 'function' && options.done(result, inst);
-        };
+        }
 
         return fn;
       })();
@@ -267,7 +267,7 @@ layui.define('jquery', function(exports){
         return isNaN(time) ? time : (typeof time === 'string' ? parseInt(time) : time)
       }() || new Date())
 
-      if(!date.getDate()) return hint.error('Invalid Msec for "util.toDateString(Msec)"'), '';
+      if(!date.getDate()) return hint.error('Invalid millisecond for "util.toDateString(millisecond)"'), '';
 
       var years = date.getFullYear();
       var month = date.getMonth();
@@ -372,8 +372,8 @@ layui.define('jquery', function(exports){
       var OFFSET_NAME = vertical ? 'top' : 'left' // 座標方式
       var scrollValue = scrollElem[SCROLL_NAME]() // 當前滾動距離
       var size = scrollElem[vertical ? 'height' : 'width']() // 滾動元素的尺寸
-      var scrollOffet = scrollElem.offset()[OFFSET_NAME] // 滾動元素所處位置
-      var thisOffset = thisElem.offset()[OFFSET_NAME] - scrollOffet // 目標元素當前的所在位置
+      var scrollOffset = scrollElem.offset()[OFFSET_NAME] // 滾動元素所處位置
+      var thisOffset = thisElem.offset()[OFFSET_NAME] - scrollOffset // 目標元素當前的所在位置
       var obj = {};
 
       // 邊界滿足條件

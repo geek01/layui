@@ -17,6 +17,7 @@ layui.define(['lay', 'layer', 'util'], function(exports){
   var SHOW = 'layui-show';
   var HIDE = 'layui-hide';
   var DISABLED = 'layui-disabled';
+  var OUT_OF_RANGE = 'layui-input-number-out-of-range';
 
   var Form = function(){
     this.config = {
@@ -174,6 +175,57 @@ layui.define(['lay', 'layer', 'util'], function(exports){
         // 初始化全局的 autocomplete
         options.autocomplete && inputs.attr('autocomplete', options.autocomplete);
 
+        var handleInputNumber = function(elem, eventType){
+          var that = this;
+          var rawValue = elem.val();
+          var value = Number(rawValue);
+          var step = Number(elem.attr('step')) || 1; // 加減的數字間隔
+          var min = Number(elem.attr('min'));
+          var max = Number(elem.attr('max'));
+          var precision = Number(elem.attr('lay-precision'));
+          var noAction = eventType !== 'click' && rawValue === ''; // 初始渲染和失焦時空值不作處理
+          var isInit = eventType === 'init';
+
+          if(isNaN(value)) return; // 若非數字，則不作處理
+
+          if(eventType === 'click'){
+            var isDecrement = !!$(that).index() // 0: icon-up, 1: icon-down
+            value = isDecrement ? value - step : value + step;
+          }
+
+          // 獲取小數點後位數
+          var decimals = function(step){
+            var decimals = (step.toString().match(/\.(\d+$)/) || [])[1] || '';
+            return decimals.length;
+          };
+
+          precision = precision >= 0 ? precision : Math.max(decimals(step), decimals(rawValue));
+
+          if(!noAction){
+            // 初始渲染時只處理數字精度
+            if(!isInit){
+              if(value <= min) value = min;
+              if(value >= max) value = max;
+            }
+            if(precision) value = value.toFixed(precision);
+            elem.val(value);
+          }
+
+          // 超出範圍的樣式
+          var outOfRange = value < min || value > max;
+          elem[outOfRange && !noAction ? 'addClass' : 'removeClass'](OUT_OF_RANGE);
+
+          if(isInit) return;
+
+          // 更新按鈕狀態
+          var controlBtn = {
+            increment: elem.next().find('.layui-icon-up'),
+            decrement: elem.next().find('.layui-icon-down')
+          }
+          controlBtn.increment[(value >= max && !noAction) ? 'addClass' : 'removeClass'](DISABLED)
+          controlBtn.decrement[(value <= min && !noAction) ? 'addClass' : 'removeClass'](DISABLED)
+        }
+
         // 初始化輸入框動態點綴
         elemForm.find('input[lay-affix],textarea[lay-affix]').each(function(){
           var othis = $(this);
@@ -243,10 +295,17 @@ layui.define(['lay', 'layer', 'util'], function(exports){
 
             opts.show === 'auto' && showAffix(elemAffix, othis.val());
 
+            typeof opts.init === 'function' && opts.init.call(this, othis, opts);
+
             // 輸入事件
             othis.on('input propertychange', function(){
               var value = this.value;
               opts.show === 'auto' && showAffix(elemAffix, value);
+            });
+
+            // 失去焦點事件
+            othis.on('blur', function(){
+              typeof opts.blur === 'function' && opts.blur.call(this, othis, opts);
             });
 
             // 點擊動態後綴事件
@@ -294,36 +353,15 @@ layui.define(['lay', 'layer', 'util'], function(exports){
               split: true,
               className: 'layui-input-number',
               disabled: othis.is('[disabled]'), // 跟隨輸入框禁用狀態
+              init: function(elem){
+                handleInputNumber.call(this, elem, 'init')
+              },
               click: function(elem){
-                var index = $(this).index();
-                var value = elem.val();
-                var rawValue = value;
-                var step = Number(elem.attr('step')) || 1; // 加減的數字間隔
-                var min = Number(elem.attr('min'));
-                var max = Number(elem.attr('max'));
-
-                if(isNaN(value)) return; // 若非數字，則不作處理
-
-                value = Number(value);
-                value = index ? value - step : value + step;
-
-                // min max
-                if(value < min) value = min;
-                if(value > max) value = max;
-
-                // 獲取小數點後位數
-                var decimals = function(step){
-                  var decimals = (step.toString().match(/\.(\d+$)/) || [])[1] || '';
-                  return decimals.length;
-                };
-
-                // 位數比較
-                var fixed = Math.max(decimals(step), decimals(rawValue));
-
-                if(fixed) value = value.toFixed(fixed);
-
-                elem.val(value);
-              }
+                handleInputNumber.call(this, elem, 'click')
+              },
+              blur: function(elem){
+                handleInputNumber.call(this, elem, 'blur')
+              },
             }
           };
 

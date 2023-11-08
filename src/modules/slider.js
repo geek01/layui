@@ -111,10 +111,10 @@ layui.define(['jquery', 'lay'], function(exports){
       options.value = typeof(options.value) == 'object' ? options.value : [options.min, options.value];
       var minValue = Math.min(options.value[0], options.value[1])
       ,maxValue = Math.max(options.value[0], options.value[1]);
-      options.value[0] = minValue > options.min ? minValue : options.min;
-      options.value[1] = maxValue > options.min ? maxValue : options.min;
-      options.value[0] = options.value[0] > options.max ? options.max : options.value[0];
-      options.value[1] = options.value[1] > options.max ? options.max : options.value[1];
+      options.value[0] = Math.max(minValue,options.min);
+      options.value[1] = Math.max(maxValue,options.min);
+      options.value[0] = Math.min(options.value[0],options.max);
+      options.value[1] = Math.min(options.value[1],options.max);
 
       var scaleFir = Math.floor((options.value[0] - options.min) / (options.max - options.min) * 100)
       ,scaleSec = Math.floor((options.value[1] - options.min) / (options.max - options.min) * 100)
@@ -132,7 +132,7 @@ layui.define(['jquery', 'lay'], function(exports){
       if(options.value > options.max) options.value = options.max;
 
       var scale = Math.floor((options.value - options.min) / (options.max - options.min) * 100) + '%';
-    };
+    }
 
 
     //如果禁用，顏色為統一的灰色
@@ -155,7 +155,7 @@ layui.define(['jquery', 'lay'], function(exports){
       that.elemTemp.find('.' + SLIDER_WRAP).eq(1).data('value', options.value[1]);
     }else{
       that.elemTemp.find('.' + SLIDER_WRAP).data('value', options.value);
-    };
+    }
 
     //插入替代元素
     othis.html(that.elemTemp);
@@ -163,7 +163,7 @@ layui.define(['jquery', 'lay'], function(exports){
     //垂直滑塊
     if(options.type === 'vertical'){
       that.elemTemp.height(options.height + 'px');
-    };
+    }
 
     //顯示間斷點
     if(options.showstep){
@@ -173,9 +173,9 @@ layui.define(['jquery', 'lay'], function(exports){
         if(step < 100){
           item += '<div class="layui-slider-step" style="'+ (options.type === 'vertical' ? 'bottom' : 'left') +':'+ step +'%"></div>'
         }
-      };
+      }
       that.elemTemp.append(item);
-    };
+    }
 
     //插入輸入框
     if(options.input && !options.range){
@@ -191,7 +191,7 @@ layui.define(['jquery', 'lay'], function(exports){
       } else {
         that.elemTemp.css("margin-right", elemInput.outerWidth() + 15);
       }
-    };
+    }
 
     //給未禁止的滑塊滑動事件
     if(!options.disabled){
@@ -199,7 +199,7 @@ layui.define(['jquery', 'lay'], function(exports){
     }else{
       that.elemTemp.addClass(DISABLED);
       that.elemTemp.find('.' + SLIDER_WRAP_BTN).addClass(DISABLED);
-    };
+    }
 
     //劃過滑塊顯示數值
     var timer;
@@ -225,7 +225,7 @@ layui.define(['jquery', 'lay'], function(exports){
             "left": left + '%',
             "display": "inline-block"
           });
-        };
+        }
       }, 300);
     }).on('mouseout', function(){
       clearTimeout(timer);
@@ -250,7 +250,7 @@ layui.define(['jquery', 'lay'], function(exports){
         offsetValue = Math.ceil(offsetValue) * step
       }else{
         offsetValue = Math.round(offsetValue) * step
-      };
+      }
       offsetValue = offsetValue > 100 ? 100: offsetValue;
       offsetValue = offsetValue < 0 ? 0: offsetValue;
       sliderWrap.eq(index).css((options.type === 'vertical' ?'bottom':'left'), offsetValue + '%');
@@ -262,7 +262,7 @@ layui.define(['jquery', 'lay'], function(exports){
         secLeft = options.range ? valueTo(sliderWidth() - sliderWrap[1].offsetTop - sliderWrap.height()) : 0;
       }else{
         sliderAct.find('.' + SLIDER_TIPS).css("left",offsetValue + '%');
-      };
+      }
       firLeft = firLeft > 100 ? 100: firLeft;
       secLeft = secLeft > 100 ? 100: secLeft;
       var minLeft = Math.min(firLeft, secLeft)
@@ -271,7 +271,7 @@ layui.define(['jquery', 'lay'], function(exports){
         sliderAct.find('.' + SLIDER_BAR).css({"height":wrapWidth + '%', "bottom":minLeft + '%'});
       }else{
         sliderAct.find('.' + SLIDER_BAR).css({"width":wrapWidth + '%', "left":minLeft + '%'});
-      };
+      }
       var selfValue = options.min + Math.round((options.max - options.min) * offsetValue / 100);
       inputValue = selfValue;
       sliderTxt.children('.' + SLIDER_INPUT_TXT).children('input').val(inputValue);
@@ -298,7 +298,7 @@ layui.define(['jquery', 'lay'], function(exports){
       ,left =  Math.round(oldLeft) * step;
       if(value == sliderWidth()){
         left =  Math.ceil(oldLeft) * step;
-      };
+      }
       return left;
     }
 
@@ -329,7 +329,7 @@ layui.define(['jquery', 'lay'], function(exports){
         if(options.type === 'vertical'){
           oldleft = sliderWidth() - othis.parent()[0].offsetTop - sliderWrap.height()
           oldx = e.clientY;
-        };
+        }
 
         var move = function(e){
           e = e || window.event;
@@ -373,7 +373,7 @@ layui.define(['jquery', 'lay'], function(exports){
           }
         } else {
           index = 0;
-        };
+        }
         change(reaLeft, index, 'done');
         e.preventDefault();
       }
@@ -391,7 +391,7 @@ layui.define(['jquery', 'lay'], function(exports){
           inputValue = Number(inputValue) + options.step > options.max
             ? options.max
           : Number(inputValue) + options.step;
-        };
+        }
         var inputScale =  (inputValue - options.min) / (options.max - options.min) * 100 / step;
         change(inputScale, 0, 'done');
       });
@@ -423,9 +423,9 @@ layui.define(['jquery', 'lay'], function(exports){
 
   //核心入口
   slider.render = function(options){
-    var inst = new Class(options); 
+    var inst = new Class(options);
     return thisSlider.call(inst);
   };
-  
+
   exports(MOD_NAME, slider);
 })

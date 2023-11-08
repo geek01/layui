@@ -8,7 +8,7 @@
   Classic modular front-end UI library
 </p>
 
-<p align="center">
+<p align="center">  
   <a href="https://www.npmjs.com/package/layui">
     <img src="https://img.shields.io/npm/v/layui" alt="Version">
   </a>

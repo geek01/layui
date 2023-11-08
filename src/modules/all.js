@@ -15,9 +15,9 @@ layui.define(function(){
   return mods;
 }(), function(exports){
   "use strict";
-
+  
   var MOD_NAME = 'all';
-
+  
   // 外部接口
   var all = {
     config: {},

@@ -3,16 +3,22 @@
  * 上傳組件
  */
 
-layui.define(['lay','layer'], function(exports){
+layui.define(['lay', 'layer'], function(exports){
   "use strict";
 
   var $ = layui.$;
+  var lay = layui.lay;
   var layer = layui.layer;
   var device = layui.device();
+
+  // 模塊名
+  var MOD_NAME = 'upload';
+  var MOD_INDEX = 'layui_'+ MOD_NAME +'_index'; // 模塊索引名
 
   // 外部接口
   var upload = {
     config: {}, // 全局配置項
+    index: layui[MOD_NAME] ? (layui[MOD_NAME].index + 10000) : 0, // 索引
     // 設置全局項
     set: function(options){
       var that = this;
@@ -26,8 +32,13 @@ layui.define(['lay','layer'], function(exports){
   };
 
   // 操作當前實例
-  var thisUpload = function(){
+  var thisModule = function(){
     var that = this;
+    var options = that.config;
+    var id = options.id;
+
+    thisModule.that[id] = that; // 記錄當前實例對象
+
     return {
       upload: function(files){
         that.upload.call(that, files);
@@ -40,7 +51,6 @@ layui.define(['lay','layer'], function(exports){
   };
 
   // 字符常量
-  var MOD_NAME = 'upload';
   var ELEM = 'layui-upload';
   var THIS = 'layui-this';
   var SHOW = 'layui-show';
@@ -57,6 +67,7 @@ layui.define(['lay','layer'], function(exports){
   // 構造器
   var Class = function(options){
     var that = this;
+    that.index = ++upload.index;
     that.config = $.extend({}, that.config, upload.config, options);
     that.render();
   };
@@ -87,13 +98,49 @@ layui.define(['lay','layer'], function(exports){
     }
   };
 
+  // 重載實例
+  Class.prototype.reload = function(options){
+    var that = this;
+    that.config = $.extend({}, that.config, options);
+    that.render(true);
+  };
+
   // 初始渲染
-  Class.prototype.render = function(){
+  Class.prototype.render = function(rerender){
     var that = this;
     var options = that.config;
 
+    // 若 elem 非唯一
+    var elem = $(options.elem);
+    if (elem.length > 1) {
+      layui.each(elem, function() {
+        upload.render($.extend({}, options, {
+          elem: this
+        }));
+      });
+      return that;
+    }
+
+    // 合併 lay-options 屬性上的配置信息
+    $.extend(options, lay.options(elem[0], {
+      attr: elem.attr('lay-data') ? 'lay-data' : null // 兼容舊版的 lay-data 屬性
+    }));
+
+    // 若重複執行 render，則視為 reload 處理
+    if (!rerender && elem[0] && elem.data(MOD_INDEX)) {
+      var newThat = thisModule.getThis(elem.data(MOD_INDEX));
+      if(!newThat) return;
+
+      return newThat.reload(options);
+    }
+
     options.elem = $(options.elem);
     options.bindAction = $(options.bindAction);
+
+    // 初始化 id 屬性 - 優先取 options > 元素 id > 自增索引
+    options.id = 'id' in options ? options.id : (
+      elem.attr('id') || that.index
+    );
 
     that.file();
     that.events();
@@ -219,11 +266,14 @@ layui.define(['lay','layer'], function(exports){
       var request = function(sets){
         var formData = new FormData();
 
-        // 刪除正在上傳中的文件隊列
-        var removeUploaded = function(index, file) {
-          if (file[UPLOADING]) {
-            delete items[index];
-            return true;
+        // 恢復文件狀態
+        var resetFileState = function(file) {
+          if (sets.unified) {
+            layui.each(items, function(index, file){
+              delete file[UPLOADING];
+            });
+          } else {
+            delete file[UPLOADING];
           }
         };
 
@@ -234,35 +284,36 @@ layui.define(['lay','layer'], function(exports){
         });
 
         /*
-         *添加 file 到表單域
+         * 添加 file 到表單域
          */
 
         // 是否統一上傳
         if (sets.unified) {
           layui.each(items, function(index, file){
-            if (removeUploaded(index, file)) return;
-            file[UPLOADING] = true;
+            if (file[UPLOADING]) return;
+            file[UPLOADING] = true; // 上傳中的標記
             formData.append(options.field, file);
           });
         } else { // 逐一上傳
-          if (removeUploaded(sets.index, sets.file)) return;
+          if (sets.file[UPLOADING]) return;
           formData.append(options.field, sets.file);
+          sets.file[UPLOADING] = true; // 上傳中的標記
         }
-
-        sets.file[UPLOADING] = true; // 上傳中的標記
 
         // ajax 參數
         var opts = {
           url: options.url,
           type: 'post', // 統一採用 post 上傳
           data: formData,
+          dataType: options.dataType || 'json',
           contentType: false,
           processData: false,
           headers: options.headers || {},
           success: function(res){ // 成功回調
             options.unified ? (successful += that.fileLength) : successful++;
             done(sets.index, res);
-            allDone();
+            allDone(sets.index);
+            resetFileState(sets.file);
           },
           error: function(e){ // 異常回調
             options.unified ? (failed += that.fileLength) : failed++;
@@ -271,15 +322,11 @@ layui.define(['lay','layer'], function(exports){
               'status: '+ (e.status || '') +' - '+ (e.statusText || 'error')
             ].join('<br>'));
             error(sets.index);
-            allDone();
+            allDone(sets.index);
+            resetFileState(sets.file);
           }
         };
-        // dataType
-        if (options.dataType) {
-          opts.dataType = options.dataType;
-        } else if (options.force === 'json') {
-          opts.dataType = options.force;
-        }
+
         // 進度條
         if(typeof options.progress === 'function'){
           opts.xhr = function(){
@@ -360,7 +407,7 @@ layui.define(['lay','layer'], function(exports){
     };
 
     // 統一網絡異常回調
-   var error = function(index){
+    var error = function(index){
       if(options.auto){
         elemFile.value = '';
       }
@@ -433,7 +480,8 @@ layui.define(['lay','layer'], function(exports){
       ? ((elemFile.value.match(/[^\/\\]+\..+/g)||[]) || '')
     : value;
 
-    if(value.length === 0) return;
+    // 若文件域值為空
+    if (value.length === 0) return;
 
     // 根據文件類型校驗
     switch(options.accept){
@@ -520,24 +568,6 @@ layui.define(['lay','layer'], function(exports){
     send();
   };
 
-  // 重置方法
-  Class.prototype.reload = function(opts){
-    opts = opts || {};
-    delete opts.elem;
-    delete opts.bindAction;
-
-    var that = this;
-    var options = that.config = $.extend({}, that.config, upload.config, opts);
-    var next = options.elem.next();
-
-    // 更新文件域相關屬性
-    next.attr({
-      name: options.name,
-      accept: options.acceptMime,
-      multiple: options.multiple
-    });
-  };
-
   //事件處理
   Class.prototype.events = function(){
     var that = this;
@@ -568,23 +598,10 @@ layui.define(['lay','layer'], function(exports){
       elemFile.after('<span class="layui-inline '+ ELEM_CHOOSE +'">'+ value +'</span>');
     };
 
-    // 合併 lay-options/lay-data 屬性配置項
-    var extendAttrs = function(){
-      var othis = $(this);
-      var data = othis.attr('lay-data') || othis.attr('lay-options'); // 優先兼容舊版本
-
-      if(data){
-        that.config = $.extend({}, options, lay.options(this, {
-          attr: othis.attr('lay-data') ? 'lay-data' : null
-        }));
-      }
-    };
-
     // 點擊上傳容器
     options.elem.off('upload.start').on('upload.start', function(){
       var othis = $(this);
 
-      extendAttrs.call(this);
       that.config.item = othis;
       that.elemFile[0].click();
     });
@@ -604,7 +621,6 @@ layui.define(['lay','layer'], function(exports){
         var files = param.originalEvent.dataTransfer.files || [];
 
         othis.removeAttr('lay-over');
-        extendAttrs.call(this);
         setChooseFile(files);
 
         options.auto ? that.upload() : setChooseText(files); // 是否自動觸發上傳
@@ -612,12 +628,11 @@ layui.define(['lay','layer'], function(exports){
     }
 
     // 文件選擇
-    that.elemFile.off('upload.change').on('upload.change', function(){
+    that.elemFile.on('change', function(){
       var files = this.files || [];
 
       if(files.length === 0) return;
 
-      extendAttrs.call(this);
       setChooseFile(files);
 
       options.auto ? that.upload() : setChooseText(files); // 是否自動觸發上傳
@@ -628,18 +643,18 @@ layui.define(['lay','layer'], function(exports){
       that.upload();
     });
 
+
     // 防止事件重複綁定
-    if(options.elem.data('haveEvents')) return;
+    if(options.elem.data(MOD_INDEX)) return;
 
-    that.elemFile.on('change', function(){
-      $(this).trigger('upload.change');
-    });
 
+    // 目標元素 click 事件
     options.elem.on('click', function(){
       if(that.isFile()) return;
       $(this).trigger('upload.start');
     });
 
+    // 目標元素 drop 事件
     if(options.drag){
       options.elem.on('dragover', function(e){
         e.preventDefault();
@@ -652,17 +667,29 @@ layui.define(['lay','layer'], function(exports){
       });
     }
 
+    // 手動上傳時觸發上傳的元素 click 事件
     options.bindAction.on('click', function(){
       $(this).trigger('upload.action');
     });
 
-    options.elem.data('haveEvents', true);
+    // 綁定元素索引
+    options.elem.data(MOD_INDEX, options.id);
   };
 
-  // 核心入口
+  // 記錄所有實例
+  thisModule.that = {}; // 記錄所有實例對象
+
+  // 獲取當前實例對象
+  thisModule.getThis = function(id){
+    var that = thisModule.that[id];
+    if(!that) hint.error(id ? (MOD_NAME +' instance with ID \''+ id +'\' not found') : 'ID argument required');
+    return that;
+  };
+  
+  // 核心入口  
   upload.render = function(options){
     var inst = new Class(options);
-    return thisUpload.call(inst);
+    return thisModule.call(inst);
   };
   
   exports(MOD_NAME, upload);

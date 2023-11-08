@@ -299,12 +299,12 @@ layui.define(['jquery', 'lay'], function(exports){
       }, 50);
     }
 
-    // 移除過度類
+    // 移除過渡類
     setTimeout(function(){
       elemItem.removeClass(THIS + ' ' + ELEM_PREV + ' ' + ELEM_NEXT + ' ' + ELEM_LEFT + ' ' + ELEM_RIGHT);
       elemItem.eq(options.index).addClass(THIS);
       that.haveSlide = false; // 解鎖
-    }, 300);
+    }, 350);
 
     // 指示器焦點
     that.elemInd.find('li').eq(options.index).addClass(THIS)
@@ -327,9 +327,9 @@ layui.define(['jquery', 'lay'], function(exports){
   Class.prototype.events = function(){
     var that = this;
     var options = that.config;
-
+    
     if(options.elem.data('haveEvents')) return;
-
+    
     // 移入移出容器
     options.elem.on('mouseenter', function(){
       if (that.config.autoplay === 'always') return;
@@ -338,10 +338,10 @@ layui.define(['jquery', 'lay'], function(exports){
       if (that.config.autoplay === 'always') return;
       that.autoplay();
     });
-
+    
     options.elem.data('haveEvents', true);
   };
-
+  
   // 核心入口
   carousel.render = function(options){
     return new Class(options);

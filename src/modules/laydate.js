@@ -1245,7 +1245,7 @@
       // 現在按鈕
       that.limit({
         elem: lay(that.footer).find(ELEM_NOW),
-        date: that.systemDate(),
+        date: that.systemDate(/^(datetime|time)$/.test(options.type) ? new Date() : null),
         index: 0,
         time: timeParams
       });
@@ -2178,9 +2178,9 @@
     return that;
   };
 
-  //初始執行
+  // 初始執行
   ready.run = function(lay){
-    //綁定關閉控件事件
+    // 綁定關閉控件事件
     lay(document).on('mousedown', function(e){
       if(!laydate.thisId) return;
       var that = thisModule.getThis(laydate.thisId);
@@ -2191,7 +2191,8 @@
       if(
         e.target === options.elem[0] ||
         e.target === options.eventElem[0] ||
-        e.target === lay(options.closeStop)[0]
+        e.target === lay(options.closeStop)[0] ||
+        (options.elem[0] && options.elem[0].contains(e.target))
       ) return;
 
       that.remove();

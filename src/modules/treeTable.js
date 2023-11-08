@@ -301,9 +301,13 @@ layui.define(['table'], function (exports) {
       }
     })
     // 返回頂層節點
-    return Object.values(nodes).filter(function (item) {
-      return rootPid ? item[pIdKey] === rootPid : !item[pIdKey];
-    })
+    return Object.keys(nodes)
+      .map(function(k) {
+        return nodes[k];
+      })
+      .filter(function (item) {
+        return rootPid ? item[pIdKey] === rootPid : !item[pIdKey];
+      })
   }
 
   Class.prototype.flatToTree = function (tableData) {
@@ -421,45 +425,48 @@ layui.define(['table'], function (exports) {
       return;
     }
 
-    // 用index
+    // 用 index
     return that.getNodeByIndex(dataIndex);
   }
 
-  // 通過index獲取節點數據
+  // 通過 index 獲取節點數據
   Class.prototype.getNodeDataByIndex = function (index, clone, newValue) {
     var that = this;
     var options = that.getOptions();
     var treeOptions = options.tree;
     var tableId = options.id;
+    var tableCache = table.cache[tableId];
 
-    var dataCache = table.cache[tableId][index];
+    // 獲取當前行中的數據
+    var dataCache = tableCache[index];
+
+    // 若非刪除操作，則返回合併後的數據
     if (newValue !== 'delete' && dataCache) {
       $.extend(dataCache, newValue);
       return clone ? $.extend({}, dataCache) : dataCache;
     }
 
-    var tableData = that.getTableData();
-    index += '';
-    var indexArr = index.split('-');
+    // 刪除操作
+    var dataRet = tableCache;
+    var indexArr = String(index).split('-');
 
-    var dataRet = tableData;
-    var tableCache = (options.url || indexArr.length > 1) ? null : table.cache[tableId]; // 只有在刪除根節點的時候才需要處理
+    // if (options.url || indexArr.length > 1) tableCache = null // 只有在刪除根節點的時候才需要處理
+
+    // 根據 index 進行數據處理
     for (var i = 0, childrenKey = treeOptions.customName.children; i < indexArr.length; i++) {
       if (newValue && i === indexArr.length - 1) {
-        if (newValue === 'delete') {
-          // 刪除
-          if (tableCache) {
-            // 同步cache
+        if (newValue === 'delete') { // 刪除並返回當前數據
+          // 同步 cache --- 此段代碼註釋緣由：data 屬性模式造成數據重複執行 splice (@Gitee: #I7Z0A/I82E2S)
+          /*if (tableCache) {
             layui.each(tableCache, function (i1, item1) {
               if (item1[LAY_DATA_INDEX] === index) {
                 tableCache.splice(i1, 1);
                 return true;
               }
             })
-          }
+          }*/
           return (i ? dataRet[childrenKey] : dataRet).splice(indexArr[i], 1)[0];
-        } else {
-          // 更新值
+        } else { // 更新值
           $.extend((i ? dataRet[childrenKey] : dataRet)[indexArr[i]], newValue);
         }
       }
@@ -1288,7 +1295,7 @@ layui.define(['table'], function (exports) {
 
     // 若未傳入 LAY_CHECKED 屬性，則繼承父節點的 checked 狀態
     layui.each(newNodes, function(i, item){
-      if(!(checkName in item)){
+      if(!(checkName in item) && parentNode){
         item[checkName] = parentNode[checkName];
       }
     })
@@ -1791,14 +1798,30 @@ layui.define(['table'], function (exports) {
       // 目前只能處理當前頁的數據
       return;
     }
+
+    var collectNeedExpandNodeIndex = function(index){
+      needExpandIndex.push(index);
+      var trElem = tableView.find('tr[lay-data-index="' + index + '"]');
+      if (!trElem.length) {
+        var nodeData = that.getNodeDataByIndex(index);
+        var parentIndex = nodeData[LAY_PARENT_INDEX];
+        parentIndex && collectNeedExpandNodeIndex(parentIndex);
+      }
+    }
+
     // 判斷是否展開過
     var trElem = tableView.find('tr[lay-data-index="' + dataIndex + '"]');
     if (!trElem.length) {
+      var parentIndex = nodeData[LAY_PARENT_INDEX];
+      var needExpandIndex = [];
+      collectNeedExpandNodeIndex(parentIndex);
       // 如果還沒有展開沒有渲染的要先渲染出來
-      treeTable.expandNode(id, {
-        index: nodeData[LAY_PARENT_INDEX],
-        expandFlag: true
-      });
+      layui.each(needExpandIndex.reverse(),function(index, nodeIndex){
+        treeTable.expandNode(id, {
+          index: nodeIndex,
+          expandFlag: true
+        });
+      })
       trElem = tableView.find('tr[lay-data-index="' + dataIndex + '"]');
     }
     checkNode.call(that, trElem, checked, callbackFlag);

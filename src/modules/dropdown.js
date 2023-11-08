@@ -102,7 +102,8 @@ layui.define(['jquery', 'laytpl', 'lay', 'util'], function(exports){
     isSpreadItem: true, // 是否初始展開子菜單
     data: [], // 菜單數據結構
     delay: 300, // 延遲關閉的毫秒數，若 trigger 為 hover 時才生效
-    shade: 0 // 遮罩
+    shade: 0, // 遮罩
+    accordion: false // 手風琴效果，僅菜單組生效。基礎菜單需要在容器上追加 'lay-accordion' 屬性。
   };
 
   // 重載實例
@@ -343,12 +344,12 @@ layui.define(['jquery', 'laytpl', 'lay', 'util'], function(exports){
 
     // 觸發菜單組展開收縮
     that.elemView.find(STR_GROUP_TITLE).on('click', function(e){
-      var othis = $(this)
-      ,elemGroup = othis.parent()
-      ,data = elemGroup.data('item') || {}
+      var othis = $(this);
+      var elemGroup = othis.parent();
+      var data = elemGroup.data('item') || {};
 
       if(data.type === 'group' && options.isAllowSpread){
-        thisModule.spread(elemGroup);
+        thisModule.spread(elemGroup, options.accordion);
       }
     });
 
@@ -442,16 +443,33 @@ layui.define(['jquery', 'laytpl', 'lay', 'util'], function(exports){
   };
 
   // 設置菜單組展開和收縮狀態
-  thisModule.spread = function(othis){
-    // 菜單組展開和收縮
+  thisModule.spread = function(othis, isAccordion){
+    var contentElem = othis.children('ul');
     var needSpread = othis.hasClass(STR_ITEM_UP);
-    var elemIcon = othis.children('.'+ STR_MENU_TITLE).find('.layui-icon-' + (needSpread ? 'down' : 'up'));
-    if(needSpread){
+    var ANIM_MS = 200;
+
+    // 動畫執行完成後的操作
+    var complete = function() {
+      $(this).css({'display': ''}); // 剔除臨時 style，以適配外部樣式的狀態重置;
+    };
+
+    // 動畫是否正在執行
+    if (contentElem.is(':animated')) return;
+
+    // 展開
+    if (needSpread) {
       othis.removeClass(STR_ITEM_UP).addClass(STR_ITEM_DOWN);
-      elemIcon.removeClass('layui-icon-down').addClass('layui-icon-up');
-    } else {
+      contentElem.hide().stop().slideDown(ANIM_MS, complete);
+    } else { // 收縮
+      contentElem.stop().slideUp(ANIM_MS, complete);
       othis.removeClass(STR_ITEM_DOWN).addClass(STR_ITEM_UP);
-      elemIcon.removeClass('layui-icon-up').addClass('layui-icon-down');
+    }
+
+    // 手風琴
+    if (needSpread && isAccordion) {
+      var groupSibs = othis.siblings('.' + STR_ITEM_DOWN);
+      groupSibs.children('ul').stop().slideUp(ANIM_MS, complete);
+      groupSibs.removeClass(STR_ITEM_DOWN).addClass(STR_ITEM_UP);
     }
   };
 
@@ -535,9 +553,10 @@ layui.define(['jquery', 'laytpl', 'lay', 'util'], function(exports){
       var othis = $(this);
       var elemGroup = othis.parents('.'+ STR_ITEM_GROUP +':eq(0)');
       var options = lay.options(elemGroup[0]);
+      var isAccordion = typeof othis.parents('.layui-menu').eq(0).attr('lay-accordion') === 'string';
 
       if(('isAllowSpread' in options) ? options.isAllowSpread : true){
-        thisModule.spread(elemGroup);
+        thisModule.spread(elemGroup, isAccordion);
       }
     });
 

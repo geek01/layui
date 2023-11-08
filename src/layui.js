@@ -16,7 +16,7 @@
   };
 
   var Layui = function(){
-    this.v = '2.8.17'; // Layui 版本號
+    this.v = '2.8.18'; // Layui 版本號
   };
 
   // 識別預先可能定義的指定全局對象

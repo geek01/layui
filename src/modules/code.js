@@ -25,7 +25,6 @@ layui.define(['lay', 'util', 'element', 'form'], function(exports){
     ELEM_LINE: 'layui-code-line',
     ELEM_LINE_NUM: 'layui-code-line-number',
     ELEM_LN_MODE: 'layui-code-ln-mode',
-    CDDE_DATA_CODE: 'LayuiCodeDataCode',
     CDDE_DATA_CLASS: 'LayuiCodeDataClass',
     LINE_RAW_WIDTH: 45, // 行號初始寬度，需與 css 保持一致
   };
@@ -113,11 +112,8 @@ layui.define(['lay', 'util', 'element', 'form'], function(exports){
     // 未使用 codeRender 時若開啟了預覽，則強制開啟編碼
     options.encode = (options.encode || options.preview) && !options.codeRender;
 
-    // 最終顯示的代碼
-    var finalCode;
-
     // 獲得初始 code
-    var rawCode = othis.data(CONST.CDDE_DATA_CODE) || function(){
+    options.code = options.code || function(){
       var arr = [];
       var textarea = othis.children('textarea');
 
@@ -131,11 +127,8 @@ layui.define(['lay', 'util', 'element', 'form'], function(exports){
         arr.push(trim(othis.html()));
       }
 
-      return arr;
+      return arr.join('');
     }();
-
-    // 記錄初始 code
-    othis.data(CONST.CDDE_DATA_CODE, rawCode);
 
     // 創建 code 行結構
     var createCode = function(html) {
@@ -171,13 +164,21 @@ layui.define(['lay', 'util', 'element', 'form'], function(exports){
       };
     };
 
+    // 原始 code
+    var rawCode = options.code;
+
+    // 最終 code
+    var finalCode = function(code) {
+      return typeof options.codeParse === 'function' ?
+        options.codeParse(code, options) :
+      code;
+    };
+
     // 僅重載 code
     if (mode === 'reloadCode') {
-      (function(html) {
-        var rst = createCode(html);
-        othis.children('.layui-code-wrap').html(rst.html);
-      })(rawCode.join(''))
-      return ret;
+      return othis.children('.layui-code-wrap').html(
+        createCode(finalCode(rawCode)).html
+      ), ret;
     }
 
     // 自增索引
@@ -195,21 +196,13 @@ layui.define(['lay', 'util', 'element', 'form'], function(exports){
       othis.data(CONST.CDDE_DATA_CLASS, othis.attr('class'));
     }
 
-    // code
-    var html = finalCode = rawCode.join('');
-
-    // 外部重新解析 code
-    if(typeof options.codeParse === 'function'){
-      html = finalCode = options.codeParse(html);
-    }
-
     // 工具欄
     var tools = {
       copy: {
         className: 'file-b',
         title: ['複製代碼'],
         event: function(obj){
-          var code = util.unescape(finalCode);
+          var code = util.unescape(finalCode(options.code));
 
           // 寫入剪切板
           lay.clipboard.writeText({
@@ -282,19 +275,19 @@ layui.define(['lay', 'util', 'element', 'form'], function(exports){
             var classNameFull = 'layui-icon-'+ this.className;
             var classNameRestore = 'layui-icon-screen-restore';
             var title = this.title;
-            var html = $('html,body');
+            var htmlElem = $('html,body');
             var ELEM_SCROLLBAR_HIDE = 'layui-scrollbar-hide';
 
             if(el.hasClass(classNameFull)){
               elemView.addClass(CONST.ELEM_FULL);
               el.removeClass(classNameFull).addClass(classNameRestore);
               el.attr('title', title[1]);
-              html.addClass(ELEM_SCROLLBAR_HIDE);
+              htmlElem.addClass(ELEM_SCROLLBAR_HIDE);
             } else {
               elemView.removeClass(CONST.ELEM_FULL);
               el.removeClass(classNameRestore).addClass(classNameFull);
               el.attr('title', title[0]);
-              html.removeClass(ELEM_SCROLLBAR_HIDE);
+              htmlElem.removeClass(ELEM_SCROLLBAR_HIDE);
             }
           }
         },
@@ -303,7 +296,7 @@ layui.define(['lay', 'util', 'element', 'form'], function(exports){
           title: ['在新窗口預覽'],
           event: function(obj){
             util.openWin({
-              content: finalCode
+              content: finalCode(options.code)
             });
           }
         }
@@ -329,8 +322,8 @@ layui.define(['lay', 'util', 'element', 'form'], function(exports){
           elem: oi,
           type: type,
           options: options, // 當前屬性選項
-          rawCode: rawCode.join(''), // 原始 code
-          finalCode: util.unescape(finalCode) // 最終 code
+          rawCode: options.code, // 原始 code
+          finalCode: util.unescape(finalCode(options.code)) // 最終 code
         };
 
         // 內部 tools event
@@ -341,8 +334,8 @@ layui.define(['lay', 'util', 'element', 'form'], function(exports){
       });
 
       // 增加工具欄
-      if (options.addTools) {
-        options.tools = [].concat(options.tools || [], options.addTools);
+      if (options.addTools && options.tools) {
+        options.tools = [].concat(options.tools, options.addTools);
       }
 
       // 渲染工具欄
@@ -384,32 +377,33 @@ layui.define(['lay', 'util', 'element', 'form'], function(exports){
       }
 
       // 執行預覽
-      var run = function(thisItemBody){
+      var runPreview = function(thisItemBody){
         var iframe = thisItemBody.children('iframe')[0];
+
+        // 是否 iframe 方式預覽
         if(isIframePreview && iframe){
-          iframe.srcdoc = finalCode;
+          iframe.srcdoc = finalCode(options.code);
         } else {
-          thisItemBody.html(rawCode.join(''));
+          thisItemBody.html(options.code);
         }
-        // 回調的返回參數
-        var params = {
-          container: thisItemBody,
-          render: function(){
-            form.render(thisItemBody.find('.layui-form'));
-            element.render();
-          }
-        };
 
         // 當前實例預覽完畢後的回調
         setTimeout(function(){
-          typeof options.done === 'function' && options.done(params);
+          typeof options.done === 'function' && options.done({
+            container: thisItemBody,
+            options: options,
+            render: function(){
+              form.render(thisItemBody.find('.layui-form'));
+              element.render();
+            }
+          });
         },3);
       };
 
       if(layout[0] === 'preview'){
         elemPreviewView.addClass(CONST.ELEM_SHOW);
         othis.before(elemPreviewView);
-        run(elemPreviewView);
+        runPreview(elemPreviewView);
       } else {
         othis.addClass(CONST.ELEM_SHOW).after(elemPreviewView);
       }
@@ -429,7 +423,7 @@ layui.define(['lay', 'util', 'element', 'form'], function(exports){
         thisItemBody.addClass(CONST.ELEM_SHOW);
 
         if($this.attr('lay-id') === 'preview'){
-          run(thisItemBody);
+          runPreview(thisItemBody);
         }
 
         setCodeLayout();
@@ -461,10 +455,10 @@ layui.define(['lay', 'util', 'element', 'form'], function(exports){
       ].join(' '));
     }
 
-    // 轉義 HTML 標籤
-    if(options.encode) html = util.escape(html); // 編碼
-
-    var createCodeRst = createCode(html);
+    // 獲取 code 行結構
+    var createCodeRst = createCode(
+      options.encode ? util.escape(finalCode(rawCode)) : rawCode // 是否編碼
+    );
     var lines = createCodeRst.lines;
 
     // 插入 code

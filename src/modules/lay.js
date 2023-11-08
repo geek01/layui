@@ -7,7 +7,10 @@
   var MOD_NAME = 'lay'; // 模塊名
   var document = window.document;
 
-  // 元素查找
+  /**
+   * 元素查找
+   * @param {string | HTMLElement | JQuery} selector
+   */
   var lay = function(selector){
     return new Class(selector);
   };
@@ -50,7 +53,14 @@
   Class.fn = Class.prototype = [];
   Class.fn.constructor = Class;
 
-  // 普通對象深度擴展
+  /**
+   * 將兩個或多個對象的內容深度合併到第一個對象中
+   * @callback ExtendFunc
+   * @param {*} target - 一個對象
+   * @param {...*} objectN - 包含額外的屬性合併到第一個參數
+   * @returns {*} 返回合併後的對象
+   */
+  /** @type ExtendFunc*/
   lay.extend = function(){
     var ai = 1;
     var length;
@@ -77,7 +87,10 @@
     return args[0];
   };
 
-  // ie 版本
+  /**
+   * IE 版本
+   * @type {string | boolean} - 如果是 IE 返回版本字符串，否則返回 false
+   */
   lay.ie = function(){
     var agent = navigator.userAgent.toLowerCase();
     return (!!window.ActiveXObject || "ActiveXObject" in window) ? (
@@ -99,7 +112,17 @@
   };
 
 
-  // 數字前置補零
+  /**
+   * 數字前置補零
+   * @param {number | string} num - 原始數字
+   * @param {number} [length=2] - 數字長度，如果原始數字長度小於 length，則前面補零
+   * @returns {string} 返回補 0 後的數字
+   * @example
+   * ```js
+   * lay.digit(6, 2); // "06"
+   * lay.digit('7', 3); // "007"
+   * ```
+   */
   lay.digit = function(num, length){
     if(!(typeof num === 'string' || typeof num === 'number')) return '';
 
@@ -112,7 +135,16 @@
     return num < Math.pow(10, length) ? str + num : num;
   };
 
-  // 創建元素
+  /**
+   * 創建元素
+   * @param {string} elemName - 元素的標籤名
+   * @param {{attrName: string, attrValue:string}} [attr] - 添加到元素上的屬性
+   * @returns {HTMLElement} 返回創建的 HTML 元素
+   * @example
+   * ```js
+   * lay.elem('div', {id: 'test'}) // <div id="test"></div>
+   * ```
+   */
   lay.elem = function(elemName, attr){
     var elem = document.createElement(elemName);
     lay.each(attr || {}, function(key, value){
@@ -121,12 +153,43 @@
     return elem;
   };
 
-  // 當前頁面是否存在滾動條
+  /**
+   * 當前頁面是否存在滾動條
+   * @returns {boolean} 是否存在滾動條
+   * @example
+   * ```
+   * lay.hasScrollbar() // true 或 false
+   * ```
+   */
   lay.hasScrollbar = function(){
     return document.body.scrollHeight > (window.innerHeight || document.documentElement.clientHeight);
   };
 
-  // 獲取 style rules
+  /**
+   * 獲取 style rules
+   * @param {HTMLStyleElement} style - HTMLStyle 元素
+   * @param {(ruleItem: CSSStyleRule, index: number) => boolean} [callback] - 用來返回 style 元素中的每個 `style rule` 的函數，返回 true 終止遍歷
+   * @returns {CSSRuleList } 返回 `style rules`
+   * @example
+   * ```
+   * <style id="test">
+   *   .lay-card{
+   *     color: #000;
+   *   }
+   *   .lay-btn-success{
+   *     color: green;
+   *   }
+   * </style>
+   *
+   * lay.getStyleRules($('#test')[0], function(rule, index){
+   *   if(rule.selectorText === '.lay-card'){
+   *     console.log(index, rule.cssText) // 0 '.lay-card{color: #000}'
+   *     rule.style.color = '#EEE';
+   *     return true; // 終止遍歷
+   *   }
+   * }) // RuleList
+   * ```
+   */
   lay.getStyleRules = function(style, callback) {
     if (!style) return;
 
@@ -142,7 +205,26 @@
     return rules;
   };
 
-  // 創建 style 樣式
+  /**
+   * 創建 style 樣式
+   * @param {Object} options - 可配置的選項
+   * @param {string | HTMLElement | JQuery} [options.target] - 目標容器，指定後會將樣式追加到目標容器
+   * @param {string} [options.id] - 樣式元素的 id，默認自增
+   * @param {string} options.text - 樣式內容
+   * @returns {HTMLStyleElement} 返回創建的樣式元素
+   * @example
+   * ```html
+   * <div id="targetEl">
+   *   <!-- 樣式追加到目標容器 -->
+   *   <style id="LAY-STYLE-DF-0">.card{color: #000}</style>
+   * </div>
+   *
+   * lay.style({
+   *   target: '#targetEl',
+   *   text: '.card{color: #000}'
+   * }) // <style id="LAY-STYLE-DF-0">.card{color: #000}</style>
+   * ```
+   */
   lay.style = function(options){
     options = options || {};
 
@@ -176,7 +258,37 @@
     return style;
   };
 
-  // 元素定位
+  /**
+   * 將元素定位到指定目標元素附近
+   * @param {HTMLElement} target - 目標元素
+   * @param {HTMLElement} elem - 定位元素
+   * @param {Object} [opts] - 可配置的選項
+   * @param {'absolute' | 'fixed'} [opts.position] - 元素的定位類型
+   * @param {'left' | 'right'} [opts.clickType="left"] - 點擊類型，默認為 'left'，如果 {@link target} 是 document 或 body 元素，則為 'right'
+   * @param {'left' | 'right' | 'center'} [opts.align="left"] - 對齊方式
+   * @param {boolean} [opts.allowBottomOut=false] - 頂部沒有足夠區域顯示時，是否允許底部溢出
+   * @param {string | number} [opts.margin=5] - 邊距
+   * @param {Event} [opts.e] - 事件對象，僅右鍵生效
+   * @param {boolean} [opts.SYSTEM_RELOAD] - 是否重載，用於出現滾動條時重新計算位置
+   * @example
+   * ```js
+   * <button id="targetEl">dropdown</button>
+   * <ul id="contentEl" class="dropdown-menu">
+   *   <li>菜單1</li>
+   *   <li>菜單2</li>
+   * </ul>
+   *
+   * // 下拉菜單將被定位到按鈕附近
+   * lay.position(
+   *   $('#targetEl')[0],
+   *   $('#contentEl')[0],
+   *   {
+   *     position: 'fixed',
+   *     align: 'center'
+   *   }
+   * )
+   * ```
+   */
   lay.position = function(target, elem, opts){
     if(!elem) return;
     opts = opts || {};
@@ -276,7 +388,25 @@
     }
   };
 
-  // 獲取元素上的屬性配置項
+  /**
+   * 獲取元素上的屬性配置項
+   * @param {string | HTMLElement | JQuery} elem - HTML 元素
+   * @param {{attr: string} | string} [opts="lay-options"] - 可配置的選項，string 類型指定屬性名
+   * @returns {*} 返回元素上的屬性配置項
+   * @example
+   * ```js
+   * <div id="testEl" lay-options="{color:red}" lay-toc="{hot: true}"></div>
+   *
+   * var elem = $('#testEl')
+   * lay.options(elem) // {color:red}
+   * lay.options(elem[0]) // {color:red}
+   * lay.options('#testEl') // {color:red}
+   * lay.options('#testEl', {attr: 'lay-toc'}) // {hot: true}
+   * lay.options('#testEl', 'lay-toc') // {hot: true}
+   *
+   * $('#testEl').attr('lay-toc') // '{hot: true}'
+   * ```
+   */
   lay.options = function(elem, opts){
     opts = typeof opts === 'object' ? opts : {attr: opts};
 
@@ -297,7 +427,16 @@
     }
   };
 
-  // 元素是否屬於頂級元素（document 或 body）
+
+  /**
+   * 元素是否屬於頂級元素（document 或 body）
+   * @param {HTMLElement} elem - HTML 元素
+   * @returns {boolean} 是否屬於頂級元素
+   * @example
+   * ```js
+   * lay.isTopElem(document) // true
+   * ```
+   */
   lay.isTopElem = function(elem){
     var topElems = [document, lay('body')[0]]
     ,matched = false;
@@ -311,7 +450,21 @@
 
   // 剪切板
   lay.clipboard = {
-    // 寫入文本
+    /**
+     * 寫入文本
+     * @param {Object} options - 可配置的選項
+     * @param {string} options.text - 寫入剪貼板的文本
+     * @param {() => void} [options.done] - 寫入成功/完成回調
+     * @param {(err?: any) => void} [options.error] - 寫入失敗回調
+     * @example
+     * ```js
+     * lay.clipboard.writeText({
+     *   text: '測試文本',
+     *   done: function(){ layer.msg('copied')},
+     *   error: function(){ layer.msg('error')}
+     * })
+     * ```
+     */
     writeText: function(options) {
       var text = String(options.text);
 
@@ -537,5 +690,5 @@
       exports(MOD_NAME, lay);
     });
   }
-
+  
 }(window, window.document); // gulp build: lay-footer

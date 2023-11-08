@@ -64,7 +64,7 @@ layui.define(['jquery', 'lay'],function(exports){
     readonly: false,  //是否只讀
     half: false,  //是否可以半星
     value: 0, //星星選中個數
-    theme: ''
+    theme: '' //主題顏色
   };
 
   //評分渲染

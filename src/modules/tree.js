@@ -853,7 +853,7 @@ layui.define('form', function(exports){
     var that = thisModule.that[id];
     return that.setChecked(checkedId);
   };
-
+    
   // 核心入口
   tree.render = function(options){
     var inst = new Class(options);

@@ -1,6 +1,6 @@
 {
   "name": "layui",
-  "version": "2.8.17",
+  "version": "2.8.18",
   "description": "Classic modular Front-End UI library",
   "main": "dist/layui.js",
   "license": "MIT",
@@ -19,12 +19,14 @@
     "gulp-rename": "^2.0.0",
     "gulp-header": "^2.0.9",
     "gulp-footer": "^2.1.0",
+    "gulp-sourcemaps": "^3.0.0",
     "del": "^2.2.2",
     "minimist": "^1.2.8"
   },
   "bugs": {
     "url": "https://gitee.com/layui/layui/issues"
   },
+  "dependencies": {},
   "keywords": [
     "layui",
     "ui",
@@ -33,10 +35,5 @@
     "components",
     "framework",
     "library"
-  ],
-  "directories": {
-    "doc": "docs",
-    "example": "examples"
-  },
-  "author": ""
+  ]
 }
