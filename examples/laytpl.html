@@ -136,11 +136,11 @@ layui.use(['laytpl', 'util'], function(){
   var util = layui.util;
   var $ = layui.$;
 
-  //獲取模板和數據
+  // 獲取模板和數據
   var get = function(type){
     return {
-      template: $('#demoTPL1').val() //獲取模板
-      ,data: function(){  //獲取數據
+      template: $('#demoTPL1').val(), // 獲取模板
+      data: function(){  // 獲取數據
         try {
           return JSON.parse($('#demoData1').val());
         } catch(e){
@@ -152,52 +152,58 @@ layui.use(['laytpl', 'util'], function(){
 
   var data = get();
 
-  //耗時計算
+  // 耗時計算
   var startTime = new Date().getTime(), timer = function(startTime, title){
     var endTime = new Date().getTime();
     $('#demoViewTime').html((title || '模板解析耗時：')+ (endTime - startTime) + 'ms');
   };
 
-  //渲染模板
+  // 全局設置
+  /*laytpl.config({
+    open: '<%',
+    close: '%>'
+  });*/
+
+  // 渲染模板
   var thisTpl = laytpl(data.template);
 
-  //執行渲染
+  // 執行渲染
   thisTpl.render(data.data, function(view){
     timer(startTime);
     $('#demoView1').html(view);
   });
 
-  //編輯
+  // 編輯
   $('.laytpl-demo textarea').on('input', function(){
     var data = get();
     if(!data.data) return;
 
-    //計算模板渲染耗時
+    // 計算模板渲染耗時
     var startTime = new Date().getTime();
 
-    //若模板有變化，則重新解析模板；若模板沒變，數據有變化，則從模板緩存中直接渲染（效率大增）
+    // 若模板有變化，則重新解析模板；若模板沒變，數據有變化，則從模板緩存中直接渲染（效率大增）
     if(this.id === 'demoTPL1'){
-      thisTpl.parse(data.template, data.data); //解析模板
+      thisTpl.parse(data.template, data.data); // 解析模板
     }
 
-    //執行渲染
+    // 執行渲染
     thisTpl.render(data.data, function(view){
       timer(startTime);
       $('#demoView1').html(view);
     });
   });
 
-  //事件
-  util.event('lay-on', {
-    //性能測試
+  // 事件
+  util.on({
+    // 性能測試
     test1: function(){
-      var dataLen = 1000 //數據量
-      ,renderTimes = 1000; //渲染次數
+      var dataLen = 1000 // 數據量
+      var renderTimes = 1000; // 渲染次數
 
-      //初始化數據
+      // 初始化數據
       var data = {
-        title: '性能測試'
-        ,items: function(items){
+        title: '性能測試',
+        items: function(items){
           for(var i = 0; i < dataLen; i++){
             items.push({
               index: i
@@ -209,7 +215,7 @@ layui.use(['laytpl', 'util'], function(){
         }([])
       };
 
-      //模板
+      // 模板
       var startTime = new Date();
       for(var j = 0; j < renderTimes; j++){
         var template = document.getElementById('laytplTestTpl').innerHTML;

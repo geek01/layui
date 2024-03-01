@@ -375,6 +375,7 @@ layui.define(['lay', 'layer', 'util'], function(exports){
         var CLASS = 'layui-form-select';
         var TITLE = 'layui-select-title';
         var NONE = 'layui-select-none';
+        var CREATE_OPTION = 'layui-select-create-option';
         var initValue = '';
         var thatInput;
         var selects = elem || elemForm.find('select');
@@ -382,14 +383,18 @@ layui.define(['lay', 'layer', 'util'], function(exports){
         // 隱藏 select
         var hide = function(e, clear){
           if(!$(e.target).parent().hasClass(TITLE) || clear){
-            $('.'+CLASS).removeClass(CLASS+'ed ' + CLASS+'up');
+            var elem = $('.' + CLASS);
+            elem.removeClass(CLASS+'ed ' + CLASS+'up');
+            if(elem.hasClass('layui-select-creatable')){
+              elem.children('dl').children('.' + CREATE_OPTION).remove();
+            }
             thatInput && initValue && thatInput.val(initValue);
           }
           thatInput = null;
         };
 
         // 各種事件
-        var events = function(reElem, disabled, isSearch){
+        var events = function(reElem, disabled, isSearch, isCreatable){
           var select = $(this);
           var title = reElem.find('.' + TITLE);
           var input = title.find('input');
@@ -408,6 +413,7 @@ layui.define(['lay', 'layer', 'util'], function(exports){
           var showDown = function(){
             var top = reElem.offset().top + reElem.outerHeight() + 5 - $win.scrollTop();
             var dlHeight = dl.outerHeight();
+            var dds = dl.children('dd');
 
             index = select[0].selectedIndex; // 獲取最新的 selectedIndex
             reElem.addClass(CLASS+'ed');
@@ -432,6 +438,7 @@ layui.define(['lay', 'layer', 'util'], function(exports){
             reElem.removeClass(CLASS+'ed ' + CLASS+'up');
             input.blur();
             nearElem = null;
+            isCreatable && dl.children('.' + CREATE_OPTION).remove();
 
             if(choose) return;
 
@@ -468,7 +475,7 @@ layui.define(['lay', 'layer', 'util'], function(exports){
               dl.scrollTop(posTop + dl.scrollTop() - dlHeight + ddHeight - 5);
             }
 
-            // 若選擇玄素在滾動條不可見頂部
+            // 若選擇元素在滾動條不可見頂部
             if(posTop < 0){
               dl.scrollTop(posTop + dl.scrollTop() - 5);
             }
@@ -562,14 +569,24 @@ layui.define(['lay', 'layer', 'util'], function(exports){
               e.preventDefault();
               dl.children('dd.'+THIS).trigger('click');
             }
+          }).on('paste', function(){
+            showDown();
           });
 
           // 檢測值是否不屬於 select 項
           var notOption = function(value, callback, origin){
             var num = 0;
+            var dds = dl.children('dd');
+            var hasEquals = false;
+            var rawValue = value;
             layui.each(dds, function(){
               var othis = $(this);
               var text = othis.text();
+
+              // 需要區分大小寫
+              if(isCreatable && text === rawValue){
+                hasEquals = true;
+              }
 
               // 是否區分大小寫
               if(laySearch !== 'cs'){
@@ -581,17 +598,18 @@ layui.define(['lay', 'layer', 'util'], function(exports){
               var not = text.indexOf(value) === -1;
 
               if(value === '' || (origin === 'blur') ? value !== text : not) num++;
-              origin === 'keyup' && othis[not ? 'addClass' : 'removeClass'](HIDE);
+              origin === 'keyup' && othis[(not && (isCreatable ? !othis.hasClass(CREATE_OPTION) : true)) ? 'addClass' : 'removeClass'](HIDE);
             });
             // 處理 select 分組元素
             origin === 'keyup' && layui.each(dts, function(){
-              var othis = $(this)
-              ,thisDds = othis.nextUntil('dt').filter('dd') // 當前分組下的dd元素
-              ,allHide = thisDds.length == thisDds.filter('.' + HIDE).length; // 當前分組下所有dd元素都隱藏了
+              var othis = $(this);
+              var thisDds = othis.nextUntil('dt').filter('dd'); // 當前分組下的dd元素
+              if(isCreatable) thisDds = thisDds.not('.' + CREATE_OPTION);
+              var allHide = thisDds.length == thisDds.filter('.' + HIDE).length; // 當前分組下所有dd元素都隱藏了
               othis[allHide ? 'addClass' : 'removeClass'](HIDE);
             });
             var none = num === dds.length;
-            return callback(none), none;
+            return callback(none, hasEquals), none;
           };
 
           // 搜索匹配
@@ -605,11 +623,27 @@ layui.define(['lay', 'layer', 'util'], function(exports){
               return false;
             }
 
-            notOption(value, function(none){
-              if(none){
-                dl.find('.'+NONE)[0] || dl.append('<p class="'+ NONE +'">無匹配項</p>');
-              } else {
-                dl.find('.'+NONE).remove();
+            notOption(value, function(none, hasEquals){
+              if(isCreatable){
+                if(hasEquals){
+                  dl.children('.' + CREATE_OPTION).remove();
+                }else{
+                  // 和初始渲染保持行為一致
+                  var textVal = $('<div>' + value +'</div>').text();
+                  var createOptionElem = dl.children('.' + CREATE_OPTION);
+                  if(createOptionElem[0]){
+                    createOptionElem.attr('lay-value', value);
+                    createOptionElem.text(textVal);
+                  }else{
+                    dl.append('<dd class="' + CREATE_OPTION + '" lay-value="'+ value +'">' + textVal + '</dd>');
+                  }
+                }
+              }else{
+                if(none){
+                  dl.find('.'+NONE)[0] || dl.append('<p class="'+ NONE +'">無匹配項</p>');
+                } else {
+                  dl.find('.'+NONE).remove();
+                }
               }
             }, 'keyup');
 
@@ -620,13 +654,19 @@ layui.define(['lay', 'layer', 'util'], function(exports){
               dl.find('.'+ THIS).removeClass(THIS);
               (select[0].options[0] || {}).value || dl.children('dd:eq(0)').addClass(THIS);
               dl.find('.'+ NONE).remove();
+              isCreatable && dl.children('.' + CREATE_OPTION).remove();
             }
 
             followScroll(); // 定位滾動條
           };
 
           if(isSearch){
-            input.on('input propertychange', search).on('blur', function(e){
+            // #1449: IE10 和 11 中，帶有佔位符的 input 元素獲得/失去焦點時，會觸發 input 事件
+            var eventsType = 'input propertychange';
+            if(lay.ie && (lay.ie === '10' || lay.ie === '11') && input.attr('placeholder')){
+              eventsType = 'keyup';
+            }
+            input.on(eventsType, search).on('blur', function(e){
               var selectedIndex = select[0].selectedIndex;
 
               thatInput = input; // 當前的 select 中的 input 元素
@@ -646,7 +686,7 @@ layui.define(['lay', 'layer', 'util'], function(exports){
           }
 
           // 選擇
-          dds.on('click', function(){
+          dl.on('click', 'dd', function(){
             var othis = $(this), value = othis.attr('lay-value');
             var filter = select.attr('lay-filter'); // 獲取過濾器
 
@@ -657,6 +697,11 @@ layui.define(['lay', 'layer', 'util'], function(exports){
             } else {
               input.val(othis.text());
               othis.addClass(THIS);
+            }
+
+            if(isCreatable && othis.hasClass(CREATE_OPTION)){
+              othis.removeClass(CREATE_OPTION);
+              select.append('<option value="' + value + '">' + value + '</option>');
             }
 
             othis.siblings().removeClass(THIS);
@@ -691,13 +736,15 @@ layui.define(['lay', 'layer', 'util'], function(exports){
           if(typeof othis.attr('lay-ignore') === 'string') return othis.show();
 
           var isSearch = typeof othis.attr('lay-search') === 'string'
+          ,isCreatable = typeof othis.attr('lay-creatable') === 'string' && isSearch
           ,placeholder = optionsFirst ? (
             optionsFirst.value ? TIPS : (optionsFirst.innerHTML || TIPS)
           ) : TIPS;
 
           // 替代元素
           var reElem = $(['<div class="'+ (isSearch ? '' : 'layui-unselect ') + CLASS
-          ,(disabled ? ' layui-select-disabled' : '') +'">'
+          ,(disabled ? ' layui-select-disabled' : '')
+          ,(isCreatable ? ' layui-select-creatable' : '') + '">'
             ,'<div class="'+ TITLE +'">'
               ,('<input type="text" placeholder="'+ util.escape($.trim(placeholder)) +'" '
                 +('value="'+ util.escape($.trim(value ? selected.html() : '')) +'"') // 默認值
@@ -727,7 +774,7 @@ layui.define(['lay', 'layer', 'util'], function(exports){
 
           hasRender[0] && hasRender.remove(); // 如果已經渲染，則Rerender
           othis.after(reElem);
-          events.call(this, reElem, disabled, isSearch);
+          events.call(this, reElem, disabled, isSearch, isCreatable);
         });
       }
 
@@ -948,7 +995,11 @@ layui.define(['lay', 'layer', 'util'], function(exports){
     return that;
   };
 
-  // 主動觸發驗證 --- elem 即要驗證的區域表單選擇器 / return true or false
+  /**
+   * 主動觸發驗證
+   * @param  {(string|HTMLElement|JQuery)} elem - 要驗證的區域表單元素
+   * @return {boolean} 返回結果。若驗證通過，返回 `true`, 否則返回 `false`
+   */
   Form.prototype.validate = function(elem) {
     var that = this;
     var intercept; // 攔截標識

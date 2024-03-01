@@ -138,7 +138,7 @@
   /**
    * 創建元素
    * @param {string} elemName - 元素的標籤名
-   * @param {{attrName: string, attrValue:string}} [attr] - 添加到元素上的屬性
+   * @param {Object.<string, string>} [attr] - 添加到元素上的屬性
    * @returns {HTMLElement} 返回創建的 HTML 元素
    * @example
    * ```js
@@ -392,7 +392,7 @@
    * 獲取元素上的屬性配置項
    * @param {string | HTMLElement | JQuery} elem - HTML 元素
    * @param {{attr: string} | string} [opts="lay-options"] - 可配置的選項，string 類型指定屬性名
-   * @returns {*} 返回元素上的屬性配置項
+   * @returns {Object.<string, any>} 返回元素上的屬性配置項
    * @example
    * ```js
    * <div id="testEl" lay-options="{color:red}" lay-toc="{hot: true}"></div>
@@ -417,6 +417,10 @@
     var attrValue = othis.attr(attrName);
 
     try {
+      /**
+       * 請注意: 開發者在使用 lay-options="{}" 配置組件選項時，需確保屬性值不來自於網頁用戶,
+       * 即屬性值必須在網頁開發者自身的可控範圍內，否則請勿在 HTML 標籤屬性中獲取組件選項。
+       */
       return new Function('return '+ (attrValue || '{}'))();
     } catch(ev) {
       layui.hint().error(opts.errorText || [
@@ -468,11 +472,16 @@
     writeText: function(options) {
       var text = String(options.text);
 
-      try {
-        navigator.clipboard.writeText(text).then(
-          options.done
-        )['catch'](options.error);
-      } catch(e) {
+      if(navigator && 'clipboard' in navigator){
+        navigator.clipboard.writeText(text)
+          .then(options.done, function(){
+            legacyCopy();
+        });
+      }else{
+        legacyCopy();
+      }
+
+      function legacyCopy(){
         var elem = document.createElement('textarea');
 
         elem.value = text;
@@ -495,6 +504,118 @@
       }
     }
   };
+
+  /**
+   * 檢測是否支持 Passive Event Listeners
+   * 引用自 https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
+   * @type {boolean}
+   */
+  lay.passiveSupported = function(){
+    var passiveSupported = false;
+    try {
+      var opts = Object.defineProperty({}, 'passive', {
+        get: function() {
+          passiveSupported = true;
+        }
+      });
+      window.addEventListener('test', null, opts);
+      window.removeEventListener('test', null, opts);
+    } catch (err) {}
+    return passiveSupported;
+  }();
+
+  /**
+   * 是否支持 touch 事件
+   */
+  lay.touchEventsSupported = function(){
+    return 'ontouchstart' in window;
+  };
+
+  /**
+   * @typedef touchSwipeState
+   * @prop {{x: number,y: number}} pointerStart - 初始座標
+   * @prop {{x: number,y: number}} pointerEnd - 結束座標
+   * @prop {number} distanceX - X 軸移動距離
+   * @prop {number} distanceY - Y 軸移動距離
+   * @prop {'none'|'right'|'left'|'up'|'down'} direction - 滑動方向
+   * @prop {Date} timeStart 開始時間
+   */
+  /**
+   * @callback touchSwipeCallback
+   * @param {TouchEvent} e 滑動事件
+   * @param {touchSwipeState} state 滑動相關的狀態
+   */
+  /**
+   * 基於 touch 事件的觸摸滑動
+   * @param {string | HTMLElement | JQuery} elem - HTML 元素
+   * @param {{onTouchStart?: touchSwipeCallback, onTouchMove?: touchSwipeCallback, onTouchEnd?: touchSwipeCallback}} opts - 配置項
+   */
+  lay.touchSwipe = function(elem, opts){
+    var options = opts
+    var targetElem = lay(elem)[0];
+
+    if(!targetElem || !lay.touchEventsSupported()) return;
+
+    var state = {
+      pointerStart: {x:0, y:0},
+      pointerEnd: {x:0, y:0},
+      distanceX: 0,
+      distanceY: 0,
+      direction:'none', // 'up','down','left','right','none
+      timeStart: null
+    }
+
+    var onStart = function(e){
+      if(e.touches.length !== 1) return;
+      bindEvents();
+      // 重置狀態
+      state.timeStart = Date.now();
+      state.pointerStart.x = state.pointerEnd.x = e.touches[0].clientX;
+      state.pointerStart.y = state.pointerEnd.y = e.touches[0].clientY;
+      state.distanceX = state.distanceY = 0;
+      state.direction = 'none'
+
+      options.onTouchStart && options.onTouchStart(e, state);
+    }
+
+    var onMove = function(e){
+      e.preventDefault();
+      state.pointerEnd.x = e.touches[0].clientX;
+      state.pointerEnd.y = e.touches[0].clientY;
+      state.distanceX = state.pointerStart.x - state.pointerEnd.x;
+      state.distanceY = state.pointerStart.y - state.pointerEnd.y;
+      if(Math.abs(state.distanceX) > Math.abs(state.distanceY)){
+        state.direction = state.distanceX > 0 ? 'left' : 'right';
+      }else{
+        state.direction = state.distanceY > 0 ? 'up' : 'down';
+      }
+      options.onTouchMove && options.onTouchMove(e, state);
+    }
+
+    var onEnd = function(e){
+      options.onTouchEnd && options.onTouchEnd(e, state);
+      unbindEvents();
+    }
+
+    var bindEvents = function(){
+      targetElem.addEventListener('touchmove', onMove, lay.passiveSupported ? { passive: false} : false);
+      targetElem.addEventListener('touchend', onEnd);
+      targetElem.addEventListener('touchcancel', onEnd);
+    }
+
+    var unbindEvents = function(){
+      targetElem.removeEventListener('touchmove', onMove);
+      targetElem.removeEventListener('touchend', onEnd, lay.passiveSupported ? { passive: false} : false);
+      targetElem.removeEventListener('touchcancel', onEnd);
+    }
+
+    // 防止事件重複綁定
+    if(targetElem.__lay_touchswipe_cb_){
+      targetElem.removeEventListener('touchstart', targetElem.__lay_touchswipe_cb_);
+    }
+    targetElem.__lay_touchswipe_cb_ = onStart;
+    targetElem.addEventListener('touchstart', onStart);
+  }
 
 
   /*
@@ -690,5 +811,5 @@
       exports(MOD_NAME, lay);
     });
   }
-  
+
 }(window, window.document); // gulp build: lay-footer

@@ -258,6 +258,9 @@ doms.anim = {
 doms.SHADE = 'layui-layer-shade';
 doms.MOVE = 'layui-layer-move';
 
+var SHADE_KEY = 'LAYUI-LAYER-SHADE-KEY';
+var RECORD_HEIGHT_KEY = 'LAYUI_LAYER_CONTENT_RECORD_HEIGHT';
+
 // 默認配置
 Class.pt.config = {
   type: 0,
@@ -398,6 +401,21 @@ Class.pt.creat = function(){
   var conType = typeof content === 'object';
   var body = $('body');
 
+  var setAnim = function(layero){
+    // anim 兼容舊版 shift
+    if(config.shift){
+      config.anim = config.shift;
+    }
+
+    // 為兼容 jQuery3.0 的 css 動畫影響元素尺寸計算
+    if(doms.anim[config.anim]){
+      var animClass = 'layer-anim '+ doms.anim[config.anim];
+      layero.addClass(animClass).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+        $(this).removeClass(animClass);
+      });
+    }
+  }
+
   // 若 id 對應的彈層已經存在，則不重新創建
   if(config.id && $('.'+ doms[0]).find('#'+ config.id)[0]){
     return (function(){
@@ -413,6 +431,10 @@ Class.pt.creat = function(){
       } else if(options.hideOnClose){
         elemShade.show();
         layero.show();
+        setAnim(layero);
+        setTimeout(function(){
+          elemShade.css({opacity: elemShade.data(SHADE_KEY)});
+        }, 10);
       }
     })();
   }
@@ -425,11 +447,6 @@ Class.pt.creat = function(){
   // 初始化 area 屬性
   if(typeof config.area === 'string'){
     config.area = config.area === 'auto' ? ['', ''] : [config.area, ''];
-  }
-
-  // anim 兼容舊版 shift
-  if(config.shift){
-    config.anim = config.shift;
   }
 
   if(layer.ie == 6){
@@ -486,7 +503,9 @@ Class.pt.creat = function(){
   that.shadeo.css({
     'background-color': config.shade[1] || '#000'
     ,'opacity': config.shade[0] || config.shade
+    ,'transition': config.shade[2] || ''
   });
+  that.shadeo.data(SHADE_KEY, config.shade[0] || config.shade);
 
   config.type == 2 && layer.ie == 6 && that.layero.find('iframe').attr('src', content[0]);
 
@@ -518,14 +537,7 @@ Class.pt.creat = function(){
     layer.close(that.index);
   }, config.time);
   that.move().callback();
-
-  // 為兼容 jQuery3.0 的 css 動畫影響元素尺寸計算
-  if(doms.anim[config.anim]){
-    var animClass = 'layer-anim '+ doms.anim[config.anim];
-    that.layero.addClass(animClass).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
-      $(this).removeClass(animClass);
-    });
-  }
+  setAnim(that.layero);
 
   // 記錄配置信息
   that.layero.data('config', config);
@@ -671,13 +683,15 @@ Class.pt.tips = function(){
   };
 
   // 辨別 tips 的方位
+  // 21 為箭頭大小 8*2 + 箭頭相對父元素的top偏移 5
   goal.where = [function(){ // 上
     goal.autoLeft();
     goal.tipTop = goal.top - layArea[1] - 10;
     tipsG.removeClass('layui-layer-TipsB').addClass('layui-layer-TipsT').css('border-right-color', config.tips[1]);
   }, function(){ // 右
     goal.tipLeft = goal.left + goal.width + 10;
-    goal.tipTop = goal.top;
+    goal.tipTop = goal.top - (goal.height * 0.75 < 21 ? 21 - goal.height * 0.5 : 0);
+    goal.tipTop = Math.max(goal.tipTop, 0);
     tipsG.removeClass('layui-layer-TipsL').addClass('layui-layer-TipsR').css('border-bottom-color', config.tips[1]);
   }, function(){ // 下
     goal.autoLeft();
@@ -685,7 +699,8 @@ Class.pt.tips = function(){
     tipsG.removeClass('layui-layer-TipsT').addClass('layui-layer-TipsB').css('border-right-color', config.tips[1]);
   }, function(){ // 左
     goal.tipLeft = goal.left - layArea[0] - 10;
-    goal.tipTop = goal.top;
+    goal.tipTop = goal.top - (goal.height * 0.75 < 21 ? 21 - goal.height * 0.5 : 0);
+    goal.tipTop = Math.max(goal.tipTop, 0);
     tipsG.removeClass('layui-layer-TipsR').addClass('layui-layer-TipsL').css('border-bottom-color', config.tips[1]);
   }];
   goal.where[guide-1]();
@@ -954,14 +969,18 @@ Class.pt.openLayer = function(){
 // 記錄寬高座標，用於還原
 ready.record = function(layero){
   if(!layero[0]) return window.console && console.error('index error');
+  var type = layero.attr('type');
+  var contentElem = layero.find('.layui-layer-content');
+  var contentRecordHeightElem = type === ready.type[2] ? contentElem.children('iframe') : contentElem;
   var area = [
-    layero[0].style.width || layero.width(),
-    layero[0].style.height || layero.height(),
+    layero[0].style.width || ready.getStyle(layero[0], 'width'),
+    layero[0].style.height || ready.getStyle(layero[0], 'height'),
     layero.position().top,
     layero.position().left + parseFloat(layero.css('margin-left'))
   ];
   layero.find('.layui-layer-max').addClass('layui-layer-maxmin');
   layero.attr({area: area});
+  contentElem.data(RECORD_HEIGHT_KEY, ready.getStyle(contentRecordHeightElem[0], 'height'));
 };
 
 // 設置頁面滾動條
@@ -1013,7 +1032,7 @@ layer.iframeSrc = function(index, url){
 // 設定層的樣式
 layer.style = function(index, options, limit){
   var layero = $('#'+ doms[0] + index);
-  var contElem = layero.find('.layui-layer-content');
+  var contentElem = layero.find('.layui-layer-content');
   var type = layero.attr('type');
   var titHeight = layero.find(doms[1]).outerHeight() || 0;
   var btnHeight = layero.find('.'+doms[6]).outerHeight() || 0;
@@ -1041,10 +1060,10 @@ layer.style = function(index, options, limit){
       height: (typeof options.height === 'number' ? options.height : layero.height()) - titHeight - btnHeight
     });
   } else {
-    contElem.css({
+    contentElem.css({
       height: (typeof options.height === 'number' ? options.height : layero.height()) - titHeight - btnHeight
-      - parseFloat(contElem.css('padding-top'))
-      - parseFloat(contElem.css('padding-bottom'))
+      - parseFloat(contentElem.css('padding-top'))
+      - parseFloat(contentElem.css('padding-bottom'))
     })
   }
 };
@@ -1115,9 +1134,11 @@ layer.min = function(index, options){
 layer.restore = function(index){
   var layero = $('#'+ doms[0] + index);
   var shadeo = $('#'+ doms.SHADE + index);
+  var contentElem = layero.find('.layui-layer-content');
   var area = layero.attr('area').split(',');
   var type = layero.attr('type');
   var options = layero.data('config') || {};
+  var contentRecordHeight = contentElem.data(RECORD_HEIGHT_KEY);
 
   layero.removeData('maxminStatus'); // 移除最大最小狀態
 
@@ -1137,6 +1158,13 @@ layer.restore = function(index){
 
   // 恢復頁面滾動條彈層打開時的狀態
   options.scrollbar ? ready.restScrollbar(index) : ready.setScrollbar(index);
+
+  // #1604
+  if(contentRecordHeight !== undefined){
+    contentElem.removeData(RECORD_HEIGHT_KEY);
+    var contentRecordHeightElem = type === ready.type[2] ? contentElem.children('iframe') : contentElem;
+    contentRecordHeightElem.css({height: contentRecordHeight});
+  }
 
   // 恢復遮罩
   shadeo.show();
@@ -1242,11 +1270,15 @@ layer.close = function(index, callback){
     }
   };
   // 移除遮罩
-  var removeShade = (function fn(){
-    $('#'+ doms.SHADE + index)[
-      hideOnClose ? 'hide' : 'remove'
-    ]();
-  })();
+  var shadeo = $('#'+ doms.SHADE + index);
+  if((layer.ie && layer.ie < 10) || !options.isOutAnim){
+    shadeo[hideOnClose ? 'hide' : 'remove']();
+  }else{
+    shadeo.css({opacity: 0});
+    setTimeout(function(){
+      shadeo[hideOnClose ? 'hide' : 'remove']();
+    }, 350);
+  }
 
   // 是否允許關閉動畫
   if(options.isOutAnim){
@@ -1288,9 +1320,19 @@ layer.closeAll = function(type, callback){
 };
 
 // 根據彈層類型關閉最近打開的層
-layer.closeLast = function(type){
-  type = type || 'page';
-  layer.close($('.layui-layer-'+ type +':last').attr("times"));
+layer.closeLast = function(type, callback){
+  var layerIndexList = [];
+  var isArrayType = $.isArray(type);
+  $(typeof type === 'string' ? '.layui-layer-' + type : '.layui-layer').each(function(i, el){
+    var layero = $(el);
+    var shouldSkip = (isArrayType && type.indexOf(layero.attr('type')) === -1) || layero.css('display') === 'none';
+    if(shouldSkip) return true;
+    layerIndexList.push(Number(layero.attr('times')));
+  });
+  if(layerIndexList.length > 0){
+    var layerIndexMax = Math.max.apply(null, layerIndexList);
+    layer.close(layerIndexMax, callback);
+  }
 };
 
 
@@ -1341,7 +1383,7 @@ layer.prompt = function(options, yes){
     yes: function(index){
       var value = prompt.val();
       if(value.length > (options.maxlength||500)) {
-        layer.tips('最多輸入'+ (options.maxlength || 500) +'個字數', prompt, {tips: 1});
+        layer.tips('最多輸入'+ (options.maxlength || 500) +'個字符', prompt, {tips: 1});
       } else {
         yes && yes(value, index, prompt);
       }
@@ -1598,8 +1640,31 @@ layer.photos = function(options, loop, key){
       } else {
         zoomElem.eq(1).trigger('click');
       }
+      e.preventDefault();
     });
 
+    // 滑動切換圖片事件，僅限 layui 中
+    if(window.layui || window.lay){
+      var lay = window.layui.lay || window.lay;
+      var touchEndCallback = function(e, state){
+        var duration = Date.now() - state.timeStart;
+        var speed = state.distanceX / duration;
+        var threshold = win.width() / 3;
+        var shouldSwipe = Math.abs(speed) > 0.25 || Math.abs(state.distanceX) > threshold;
+        if(!shouldSwipe) return;
+        if(state.direction === 'left'){
+          dict.imgnext(true);
+        }else if(state.direction === 'right'){
+          dict.imgprev(true);
+        }
+      }
+
+      $.each([that.shadeo, dict.main], function(i, elem){
+        lay.touchSwipe(elem, {
+          onTouchEnd: touchEndCallback
+        })
+      })
+    }
   };
 
   // 圖片預加載
@@ -1620,7 +1685,7 @@ layer.photos = function(options, loop, key){
   }
 
   dict.loadi = layer.load(1, {
-    shade: 'shade' in options ? false : 0.9,
+    shade: 'shade' in options ? false : [0.9, undefined, 'unset'],
     scrollbar: false
   });
 
@@ -1655,7 +1720,7 @@ layer.photos = function(options, loop, key){
         return [imgarea[0]+'px', imgarea[1]+'px'];
       }(),
       title: false,
-      shade: 0.9,
+      shade: [0.9, undefined, 'unset'],
       shadeClose: true,
       closeBtn: false,
       move: '.layer-layer-photos-main img',
@@ -1719,7 +1784,7 @@ layer.photos = function(options, loop, key){
     }, options));
   }, function(){
     layer.close(dict.loadi);
-    layer.msg('當前圖片地址異常<br>是否繼續查看下一張？', {
+    layer.msg('當前圖片地址異常，<br>是否繼續查看下一張？', {
       time: 30000,
       btn: ['下一張', '不看了'],
       yes: function(){
@@ -1760,7 +1825,7 @@ ready.run = function(_$){
 // 加載方式
 window.layui && layui.define ? (
   layer.ready(),
-  layui.define('jquery', function(exports){ // layui
+  layui.define(['jquery','lay'], function(exports){ // layui
     layer.path = layui.cache.dir;
     ready.run(layui.$);
 

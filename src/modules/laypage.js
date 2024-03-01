@@ -118,7 +118,7 @@ layui.define(function(exports){
 
         // 輸出左分割符
         if(config.first !== false && start > 2){
-          pager.push('<span class="layui-laypage-spr">&#x2026;</span>')
+          pager.push('<span class="layui-laypage-spr">...</span>')
         }
 
         // 輸出連續頁碼
@@ -134,7 +134,7 @@ layui.define(function(exports){
         // 輸出輸出右分隔符 & 末頁
         if(config.pages > groups && config.pages > end && config.last !== false){
           if(end + 1 < config.pages){
-            pager.push('<span class="layui-laypage-spr">&#x2026;</span>');
+            pager.push('<span class="layui-laypage-spr">...</span>');
           }
           if(groups !== 0){
             pager.push('<a class="layui-laypage-last" title="尾頁"  data-page="'+ config.pages +'">'+ (config.last || config.pages) +'</a>');
@@ -152,7 +152,10 @@ layui.define(function(exports){
       }(),
 
       // 數據總數
-      count: '<span class="layui-laypage-count">共 '+ config.count +' 條</span>',
+      count: function(){
+        var countText = typeof config.countText === 'object' ? config.countText : ['共 ', ' 條'];
+        return '<span class="layui-laypage-count">'+ countText[0] + config.count + countText[1] +'</span>'
+      }(),
 
       // 每頁條數
       limit: function(){

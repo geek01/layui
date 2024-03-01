@@ -1,4 +1,4 @@
-﻿/**
+/**
  * laytpl 輕量模板引擎
  */
 
@@ -118,6 +118,10 @@ layui.define(function(exports){
     template = '"use strict";var view = "' + template + '";return view;';
 
     try {
+      /**
+       * 請注意: 開發者在使用模板語法時，需確保模板中的 JS 語句不來自於頁面用戶輸入。
+       * 即模板中的 JS 語句必須在頁面開發者自身的可控範圍內，否則請避免使用該模板解析。
+       */
       that.cache = template = new Function('d, laytpl', template);
       return template(data, tool);
     } catch(e) {
@@ -152,7 +156,7 @@ layui.define(function(exports){
   };
 
   laytpl.v = '2.0.0';
-  
+
   // export
   exports('laytpl', laytpl);
 });

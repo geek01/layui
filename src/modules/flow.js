@@ -16,10 +16,12 @@ layui.define('jquery', function(exports){
     options = options || {};
 
     var elem = $(options.elem); if(!elem[0]) return;
-    var scrollElem = $(options.scrollElem || document); //滾動條所在元素
-    var mb = options.mb || 50; //與底部的臨界距離
-    var isAuto = 'isAuto' in options ? options.isAuto : true; //是否自動滾動加載
-    var end = options.end || '沒有更多了'; //“末頁”顯示文案
+    var scrollElem = $(options.scrollElem || document); // 滾動條所在元素
+    var threshold = 'mb' in options ? options.mb : 50; // 臨界距離
+    var isAuto = 'isAuto' in options ? options.isAuto : true; // 否自動滾動加載
+    var end = options.end || '沒有更多了'; // “末頁”顯示文案
+    var direction = options.direction || 'bottom';
+    var isTop = direction === 'top';
 
     //滾動條所在元素是否為document
     var notDocument = options.scrollElem && options.scrollElem !== document;
@@ -29,18 +31,30 @@ layui.define('jquery', function(exports){
     ,more = $('<div class="layui-flow-more"><a href="javascript:;">'+ ELEM_TEXT +'</a></div>');
 
     if(!elem.find('.layui-flow-more')[0]){
-      elem.append(more);
+      elem[isTop ? 'prepend' : 'append'](more);
     }
 
     //加載下一個元素
     var next = function(html, over){
+      var scrollHeightStart = notDocument ? scrollElem.prop('scrollHeight') : document.documentElement.scrollHeight;
+      var scrollTopStart = scrollElem.scrollTop();
       html = $(html);
-      more.before(html);
+      more[isTop ? 'after' : 'before'](html);
       over = over == 0 ? true : null;
       over ? more.html(end) : more.find('a').html(ELEM_TEXT);
       isOver = over;
       lock = null;
       lazyimg && lazyimg();
+      if(isTop){
+        var scrollHeightEnd = notDocument ? scrollElem.prop('scrollHeight') : document.documentElement.scrollHeight;
+        if(page === 1){
+          // 首次渲染後滑動到底部
+          scrollElem.scrollTop(scrollHeightEnd);
+        }else if(page > 1){
+          var nextElementHeight = scrollHeightEnd - scrollHeightStart;
+          scrollElem.scrollTop(scrollTopStart + nextElementHeight);
+        }
+      }
     };
 
     //觸發請求
@@ -64,6 +78,7 @@ layui.define('jquery', function(exports){
       lazyimg = that.lazyimg({
         elem: options.elem + ' img'
         ,scrollElem: options.scrollElem
+        ,direction: options.direction
       });
     }
 
@@ -85,7 +100,7 @@ layui.define('jquery', function(exports){
         : document.documentElement.scrollHeight;
 
         //臨界點
-        if(scrollHeight - top - height <= mb){
+        if(!isTop ? scrollHeight - top - height <= threshold : top <= threshold){
           lock || done();
         }
       }, 100);
@@ -101,6 +116,8 @@ layui.define('jquery', function(exports){
 
     var scrollElem = $(options.scrollElem || document); //滾動條所在元素
     var elem = options.elem || 'img';
+    var direction = options.direction || 'bottom';
+    var isTop = direction === 'top';
 
     //滾動條所在元素是否為document
     var notDocument = options.scrollElem && options.scrollElem !== document;
@@ -113,7 +130,7 @@ layui.define('jquery', function(exports){
       }() : item.offset().top;
 
       /* 始終只加載在當前屏範圍內的圖片 */
-      if(elemTop >= start && elemTop <= end){
+      if((isTop ? elemTop + item.height() : elemTop) >= start && elemTop <= end){
         if(item.attr('lay-src')){
           var src = item.attr('lay-src');
           layui.img(src, function(){

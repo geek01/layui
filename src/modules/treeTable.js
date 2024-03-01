@@ -93,7 +93,7 @@ layui.define(['table'], function (exports) {
   var updateCache = function (id, childrenKey, data) {
     var tableCache = table.cache[id];
     layui.each(data || tableCache, function (index, item) {
-      var itemDataIndex = item[LAY_DATA_INDEX];
+      var itemDataIndex = item[LAY_DATA_INDEX] || '';
       if (itemDataIndex.indexOf('-') !== -1) {
         tableCache[itemDataIndex] = item
       }
@@ -1037,6 +1037,10 @@ layui.define(['table'], function (exports) {
         trDefaultExpand.find('.layui-table-tree-flexIcon').html(treeOptionsView.flexIconOpen);
         expandNode({trElem: trDefaultExpand.first()}, true);
       });
+      // #1463 expandNode 中已經展開過的節點不會重新渲染
+      debounceFn('renderTreeTable2-' + tableId, function () {
+        form.render($('.layui-table-tree[lay-id="' + tableId + '"]'));
+      }, 0)();
     } else {
       debounceFn('renderTreeTable-' + tableId, function () {
         options.hasNumberCol && formatNumber(that);

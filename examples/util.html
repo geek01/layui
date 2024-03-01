@@ -13,11 +13,18 @@ body{padding: 50px;}
 </head>
 <body>
 
-<button class="layui-btn" lay-active="e1">事件1</button>
-<button class="layui-btn" lay-active="e2">事件2</button>
-<button class="layui-btn" lay-active="e3">事件3</button>
+<button class="layui-btn" lay-on="e1">事件1</button>
+<button class="layui-btn" lay-on="e2">事件2</button>
+<button class="layui-btn" lay-on="e3">事件3</button>
+<button class="layui-btn" lay-active="e4">hover: active - 事件4</button>
+<button class="layui-btn" lay-active1="e4">hover: active1 - 事件4</button>
 
-<button class="layui-btn" lay-active2="e4">事件4</button>
+<br><br>
+
+<div id="ID-util-on-test">
+  <button class="layui-btn" lay-on="e1">新的容器 - 事件1</button>
+  <button class="layui-btn" lay-on="e5">新的容器 - 事件5</button>
+</div>
 
 <hr>
 
@@ -43,10 +50,11 @@ body{padding: 50px;}
 
 <script src="../src/layui.js"></script>
 <script>
-layui.use(['util', 'layer'], function(){
+layui.use(['lay', 'util', 'layer'], function(){
   var $ = layui.$;
   var util = layui.util;
   var layer = layui.layer;
+  var lay = layui.lay;
 
   // 固定塊
   util.fixbar({
@@ -90,45 +98,82 @@ layui.use(['util', 'layer'], function(){
     }
   });
 
-  //倒計時
-  var endTime = new Date(2099,1,1).getTime() //假設為結束日期
-  ,serverTime = new Date().getTime(); //假設為當前服務器時間，這裡採用的是本地時間，實際使用一般是取服務端的
 
-  util.countdown(endTime, serverTime, function(date, serverTime, timer){
-    var str = date[0] + '天' + date[1] + '時' +  date[2] + '分' + date[3] + '秒';
-    $('#test').html('距離2099年1月1日還有：'+ str);
+  // 批量處理事件
+  util.on({
+    e1: function(othis){
+      alert(othis.html())
+    },
+    e2: function(othis){
+      alert(othis.html())
+    }
   });
 
-  //某個時間在當前時間的多久前
+  // Test: 事件集的替換和增加
+  util.on({
+    e1: function(othis){ // 重置事件 e1
+      alert(othis.html() + ' - replace')
+    },
+    e3: function(othis){ // 增加事件 e3
+      alert(othis.html())
+    }
+  });
+
+  // 自定義觸發事件的元素屬性名、自定義觸發事件的方式
+  util.on('lay-active', {
+    e4: layui.throttle(function(othis) {
+      layer.tips(othis.html(), this, { tips: 3 });
+    }, 3000), // 3s 內不重複執行
+    e5: function() {
+      console.log(111);
+    }
+  }, {
+    trigger: 'mouseenter'
+  });
+  // Test: 不同屬性、相同值
+  util.on('lay-active1', {
+    e4: function(othis) {
+      this.innerHTML = 'hover: '+ (Math.random()*100000 | 0);
+    }
+  }, {
+    trigger: 'mouseenter'
+  });
+
+  // 自定義觸發事件的委託元素
+  util.on({
+    // 此處與委託在 body 上的事件共用了 e1 名稱，以測試事件冒泡
+    e1: function(othis, e){
+      this.innerHTML = 'click: '+ (Math.random()*100000 | 0);
+      layui.stope(e); // 阻止事件冒泡
+    },
+    e5: function(othis) {
+      this.innerHTML = 'click: '+ (Math.random()*100000 | 0);
+    }
+  }, {
+    elem: '#ID-util-on-test'
+  });
+
+
+  // 倒計時
+  var countdown = util.countdown({
+    date: '2099-12-31 00:00:00', // 目標時間值
+    now: new Date(), // 當前時間，一般為服務器時間，此處以本地時間為例
+    ready: function(){ // 初始操作
+      clearTimeout(util.countdown.timer); // 清除舊定時器，防止多次渲染時重複執行。實際使用時不常用
+    },
+    clock: function(obj, inst){  // 計時中
+      var str = [obj.d,'天',obj.h,'時',obj.m,'分',obj.s,'秒'].join(' ');
+      lay('#test').html(str);
+      util.countdown.timer = inst.timer; // 記錄當前定時器，以便在重複渲染時清除。實際使用時不常用
+    },
+    done: function(obj, inst){ // 計時完成
+      layer.msg('Time is up');
+    }
+  });
+
+  // 某個時間在當前時間的多久前
   var str = util.timeAgo(new Date(2017,7,15,2,58,0));
   $('#test1').html('示例寫於：'+ str);
-
-  //處理屬性 為 lay-active 的所有元素事件
-  util.event('lay-active', {
-    e1: function(othis){
-      alert(othis.html())
-    }
-    ,e2: function(othis){
-      alert(othis.html())
-    }
-    ,e3: function(othis){
-      alert(othis.html())
-    }
-  });
-
-  //測試是否重複綁定
-  util.event('lay-active', {
-    e1: function(othis){
-      alert(othis.html() + '新事件')
-    }
-  });
-
-  //測試綁定新事件
-  util.event('lay-active2', {
-    e4: function(othis){
-      alert(othis.html())
-    }
-  });
 
   // 轉換日期格式
   var timer = null
@@ -139,7 +184,7 @@ layui.use(['util', 'layer'], function(){
   timer = setInterval(() => {
     toDateString($('#test2').val())
   }, 50)
-  
+
 });
 </script>
 </body>

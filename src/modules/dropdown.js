@@ -101,7 +101,7 @@ layui.define(['jquery', 'laytpl', 'lay', 'util'], function(exports){
     isAllowSpread: true, // 是否允許菜單組展開收縮
     isSpreadItem: true, // 是否初始展開子菜單
     data: [], // 菜單數據結構
-    delay: 300, // 延遲關閉的毫秒數，若 trigger 為 hover 時才生效
+    delay: [200, 300], // 延時顯示或隱藏的毫秒數，若為 number 類型，則表示顯示和隱藏的延遲時間相同，trigger 為 hover 時才生效
     shade: 0, // 遮罩
     accordion: false // 手風琴效果，僅菜單組生效。基礎菜單需要在容器上追加 'lay-accordion' 屬性。
   };
@@ -167,7 +167,7 @@ layui.define(['jquery', 'laytpl', 'lay', 'util'], function(exports){
       if(options.data.length > 0 ){
         eachItemView(elemUl, options.data)
       } else {
-        elemUl.html('<li class="layui-menu-item-none">No data</li>');
+        elemUl.html('<li class="layui-menu-item-none">暫無數據</li>');
       }
       return elemUl;
     };
@@ -377,17 +377,33 @@ layui.define(['jquery', 'laytpl', 'lay', 'util'], function(exports){
   Class.prototype.remove = function(){
     var that = this;
     var options = that.config;
-    var elemPrev = thisModule.prevElem;
+    var prevContentElem = thisModule.prevElem;
 
     // 若存在已打開的面板元素，則移除
-    if(elemPrev){
-      elemPrev.data('prevElem') && (
-        elemPrev.data('prevElem').data(MOD_INDEX +'_opened', false)
-      );
-      elemPrev.remove();
+    if(prevContentElem){
+      var prevId = prevContentElem.attr('lay-id');
+      var prevTriggerElem = prevContentElem.data('prevElem');
+      var prevInstance = thisModule.getThis(prevId);
+      var prevOnClose = prevInstance.config.close;
+
+      prevTriggerElem && prevTriggerElem.data(MOD_INDEX +'_opened', false);
+      prevContentElem.remove();
+      delete thisModule.prevElem;
+      typeof prevOnClose === 'function' && prevOnClose.call(prevInstance.config, prevTriggerElem);
     }
     lay('.' + STR_ELEM_SHADE).remove();
   };
+
+  Class.prototype.normalizedDelay = function(){
+    var that = this;
+    var options = that.config;
+    var delay = [].concat(options.delay);
+
+    return {
+      show: delay[0],
+      hide: delay[1] !== undefined ? delay[1] : delay[0]
+    }
+  }
 
   // 延遲刪除視圖
   Class.prototype.delayRemove = function(){
@@ -397,7 +413,7 @@ layui.define(['jquery', 'laytpl', 'lay', 'util'], function(exports){
 
     thisModule.timer = setTimeout(function(){
       that.remove();
-    }, options.delay);
+    }, that.normalizedDelay().hide);
   };
 
   // 事件
@@ -411,12 +427,22 @@ layui.define(['jquery', 'laytpl', 'lay', 'util'], function(exports){
     // 解除上一個事件
     if(that.prevElem) that.prevElem.off(options.trigger, that.prevElemCallback);
 
+    // 是否鼠標移入時觸發
+    var isMouseEnter = options.trigger === 'mouseenter';
+
     // 記錄被綁定的元素及回調
     that.prevElem = options.elem;
     that.prevElemCallback = function(e){
       clearTimeout(thisModule.timer);
       that.e = e;
-      that.render();
+
+      // 若為鼠標移入事件，則延遲觸發
+      isMouseEnter ? (
+        thisModule.timer = setTimeout(function(){
+          that.render();
+        }, that.normalizedDelay().show)
+      ) : that.render();
+
       e.preventDefault();
     };
 
@@ -424,8 +450,8 @@ layui.define(['jquery', 'laytpl', 'lay', 'util'], function(exports){
     options.elem.on(options.trigger, that.prevElemCallback);
 
     // 如果是鼠標移入事件
-    if(options.trigger === 'mouseenter'){
-      // 直行鼠標移出事件
+    if (isMouseEnter) {
+      // 執行鼠標移出事件
       options.elem.on('mouseleave', function(){
         that.delayRemove();
       });

@@ -80,7 +80,6 @@
   };
 
   // 字符常量
-  var MOD_NAME = 'laydate';
   var ELEM = '.layui-laydate';
   var THIS = 'layui-this';
   var SHOW = 'layui-show';
@@ -1405,11 +1404,27 @@
           that.limit({
             elem: lay(that.footer).find(ELEM_CONFIRM),
             date: that[startEnd],
-            inedx: 0,
+            index: 0,
             time: ['hours', 'minutes', 'seconds']
           });
         }
       };
+
+      var setTimeListVisibility = function(){
+        var showHour = options.format.indexOf('H') !== -1;
+        var showMinute = options.format.indexOf('m') !== -1;
+        var showSecond = options.format.indexOf('s') !== -1;
+        var liElem = ul.children;
+        var hideCount = 0;
+
+        lay.each([showHour, showMinute, showSecond], function(i, isShow){
+          if(!isShow){
+            liElem[i].className += ' layui-hide';
+            hideCount++;
+          }
+        })
+        ul.className += (' laydate-time-list-hide-' + hideCount);
+      }
 
       //初始化時間對象
       if(options.range){
@@ -1430,6 +1445,7 @@
         ul.appendChild(li);
       });
       setTimeStatus();
+      setTimeListVisibility();
     }
 
     //插入容器
@@ -1515,7 +1531,8 @@
       if(haveSpan[0]) haveSpan.remove();
       elemHeader[2].appendChild(span);
 
-      lay(ul).find('ol').each(function(i){
+      var olElem = lay(ul).find('ol');
+      olElem.each(function(i){
         var ol = this;
         //選擇時分秒
         lay(ol).find('li').on('click', function(){
@@ -1538,6 +1555,13 @@
           that.setBtnStatus();
         });
       });
+
+      if(layui.device().mobile){
+        olElem.css({
+          overflowY: 'auto',
+          touchAction: 'pan-y'
+        })
+      }
     }
 
     return that;
@@ -1796,7 +1820,6 @@
         // 重新選擇或者第一次選擇
         index = 0;
         that.endState = false;
-        that.endDate = {};
       } else {
         index = 1;
         that.endState = true;
@@ -1854,18 +1877,22 @@
         if (that.endState && that.autoCalendarModel.auto) {
           isChange = that.autoCalendarModel();
         }
-        if ((isChange || that.rangeLinked && that.endState) && that.newDate(that.startDate) > that.newDate(that.endDate)) {
+        // 判斷是否反選
+        var needSwapDate = (isChange || that.rangeLinked && that.endState) && that.newDate(that.startDate) > that.newDate(that.endDate);
+        if (needSwapDate){
           var isSameDate = that.startDate.year === that.endDate.year && that.startDate.month === that.endDate.month && that.startDate.date === that.endDate.date;
-          // 判斷是否反選
-          var startDate = that.startDate;
-          that.startDate = lay.extend({}, that.endDate, isSameDate ? {} : that.startTime);
+          var startDate;
+          // 如果是同一天並且出現了反選證明是時分秒出現開始時間大於結束時間的現象
+          if(isSameDate){
+            startDate = that.startTime;
+            that.startTime = that.endTime;
+            that.endTime = startDate;
+          }
+          // 當出現反向選擇時（即“後點擊”的日期比“先點擊”的日期小），重新提取區間
+          startDate = that.startDate;
+          that.startDate = lay.extend({}, that.endDate, that.startTime);
           options.dateTime = lay.extend({}, that.startDate);
-          that.endDate = lay.extend({}, startDate, isSameDate ? {} : that.endTime);
-          isSameDate && ( // 如果是同一天並且出現了反選證明是時分秒出現開始時間大於結束時間的現象
-            startDate = that.startTime,
-              that.startTime = that.endTime,
-              that.endTime = startDate
-          )
+          that.endDate = lay.extend({}, startDate, that.endTime);
         }
         isChange && (options.dateTime = lay.extend({}, that.startDate));
       }

@@ -434,7 +434,7 @@ layui.define(['jquery', 'lay'], function(exports){
       }
 
       //回調更改的顏色
-      options.change && options.change(that.elemPicker.find('.' + PICKER_INPUT).find('input').val());
+      options.change && options.change($.trim(that.elemPicker.find('.' + PICKER_INPUT).find('input').val()));
     }
 
     //拖拽元素
@@ -567,6 +567,32 @@ layui.define(['jquery', 'lay'], function(exports){
         change(hsb.h, hsb.s, hsb.b, a);
       })
     });
+
+    if(!lay.touchEventsSupported()) return;
+    // 觸摸事件模擬
+    layui.each([
+      {elem: side, eventType: 'click'},
+      {elem: alphacolor, eventType: 'click'},
+      {elem: basis, eventType: 'mousedown'}
+    ], function(i, obj){
+      lay.touchSwipe(obj.elem, {
+        onTouchMove: function(e){
+          touchHandler(e, obj.eventType)
+        }
+      })
+    })
+
+    function touchHandler(event, eventType) {
+      var pointer = event.touches[0];
+      var simulatedEvent = document.createEvent("MouseEvent");
+
+      simulatedEvent.initMouseEvent(eventType,
+        true, true, window, 1,
+        pointer.screenX, pointer.screenY,pointer.clientX, pointer.clientY,
+        false, false, false, false, 0, null
+      );
+      pointer.target.dispatchEvent(simulatedEvent);
+    }
   };
 
   //顏色選擇器hsb轉換
@@ -614,7 +640,7 @@ layui.define(['jquery', 'lay'], function(exports){
 
       //確認
       ,confirm: function(othis, change){
-        var value = elemPickerInput.val()
+        var value =  $.trim(elemPickerInput.val())
         ,colorValue
         ,hsb;
 
