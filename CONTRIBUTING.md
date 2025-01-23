@@ -1,6 +1,8 @@
-# 🍀 Layui Issue 貢獻指南
+# 🍀 Layui 貢獻指南
 
-為了提升溝通效率，請花幾分鐘時間仔細閱讀本文檔。遵循這些指南有助於表達您尊重管理和開發這個開源項目的貢獻者。作為回報，他們也會以同樣的尊重來處理或評估您的問題和功能請求。
+為了提升溝通效率，請花幾分鐘時間仔細閱讀本文檔。遵循這些指南有助於表達您尊重管理和開發這個開源項目的貢獻者。作為回報，他們也會以同樣的尊重來處理或評估您的 Issue 和 Pull Request。
+
+## Issue
 
 ### 創建 Issue 之前
 
@@ -43,3 +45,31 @@ Layui 的 issue 只受理 「Bug 報告」和「功能請求」。如果是關�
 1. [**貢獻者行為準則**](CODE_OF_CONDUCT.md)
 2. [**提問的智慧**](https://github.com/tvvocold/How-To-Ask-Questions-The-Smart-Way) @tvvocold
 3. [**為什麼需要最小重現**](https://antfu.me/posts/why-reproductions-are-required-zh) @antfu
+
+
+## Pull Request
+
+Layui 採用靈活的分支管理策略，我們鼓勵您直接在對應的分支上提 Pull Request。為了使得 Reivew 和 Merge 的工作流程更加流暢，請仔細閱讀以下說明：
+
+### 分支說明
+
+- `main` 作為主幹分支，代表的是項目當前穩定的最新版本，接受 feature 和 hotfix 。
+- `*.x` 作為歷史穩定版本分支，如 `2.x` 即代表 2.x 系列穩定版本，只接受 hotfix，不接受 feature 。
+- `*-dev` 作為未來大版本開發分支，如 `3.0-dev` 即代表 3.0 的開發版本，接受 feature 和 hotfix，但不保證穩定性。
+
+### Commits 規範
+
+Layui 遵循 [Conventional Commits 規範](https://www.conventionalcommits.org/zh-hans/v1.0.0/)，您的 `git commit` 和 PR title 都應遵循這一規範。
+
+### 操作步驟
+
+1. **創建 PR 前**，請按照上述分支規則說明，拉取項目最新代碼後，基於對應的分支進行開發。
+2. 在項目根目錄下運行 `npm install` 安裝依賴。
+3. 完成開發後，運行 `npm run checks`，確保您的代碼通過了 test, lint 等工具測試。（2.x 分支不支持）
+4. **創建 PR 時**，請在 title 項按照 Commits 規範填寫。並請在 description 項嚴格遵循給出的「內容模板」規範填寫，以提供必要的信息，如本次 PR 的具體變更說明、可供預覽的在線演示地址等。
+5. **提交 PR 後**，確保已通過 Github CI 檢查，若失敗，可查看具體原因進行調整。
+6. 確保以上所有步驟都符合要求後，即可等待項目成員對您的代碼進行 Review 及合併評估。
+
+### 其他參考資料
+
+- [約定式提交](https://www.conventionalcommits.org/zh-hans/v1.0.0/)

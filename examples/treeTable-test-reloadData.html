@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>樹形表格 - layui</title>
+  <link rel="stylesheet" href="../src/css/layui.css">
+</head>
+<body class="layui-padding-5">
+
+<table class="layui-hide" id="test"></table>
+
+<script type="text/html" id="TPL-treeTable-demo">
+  <div class="layui-btn-container">
+    <a class="layui-btn layui-btn-sm" lay-event="reloadData">重載數據</a>
+  </div>
+</script>
+
+
+<script src="../src/layui.js"></script>
+<script>
+layui.use(['treeTable', 'dropdown', 'layer'], function(){
+  var treeTable = layui.treeTable;
+  var dropdown = layui.dropdown;
+  var layer = layui.layer;
+
+  // 渲染
+  var inst = treeTable.render({
+    elem: '#test',
+    url: './json/treeTable/demo-1.json',
+    maxHeight: '700px',
+    toolbar: '#TPL-treeTable-demo',
+    tree: {
+      customName: {
+        name: 'name'
+      },
+      view: {
+        iconLeaf: ''
+      }
+    },
+    cols: [[
+      {type: 'checkbox', fixed: 'left'},
+      {type: 'numbers', fixed: 'left'},
+      {field: 'id', title: 'ID', width: 145, sort: true, fixed: 'left', totalRow: '合計：'},
+      {field: 'name', title: '用戶名', width: 180, fixed: 'left'},
+      {field: 'experience', title: '積分', width: 90, sort: true},
+      {field: 'sex', title: '性別', width: 80, sort: true},
+      {field: 'score', title: '評分', width: 80, sort: true},
+      {field: 'city', title: '城市', width: 150},
+      {field: 'description', title: '描述', minWidth: 200},
+      {field: 'createTime', title: '創建時間', width: 170},
+    ]],
+    page: true
+  });
+
+  // 表頭工具欄工具事件
+  treeTable.on('toolbar('+ inst.config.id +')', function (obj) {
+    var config = obj.config;
+    var tableId = config.id;
+    var status = treeTable.checkStatus(tableId);
+    if (obj.event === "reloadData") {
+      treeTable.reloadData(tableId, {
+        scrollPos: 'fixed'
+      });
+    }
+  });
+
+
+});
+</script>
+</body>
+</html>

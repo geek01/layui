@@ -60,11 +60,12 @@ npm i layui
 
 ### 🌕 第三方 CDN 方式引入：
 
-> UNPKG 和 CDNJS 均為第三方免費 CDN，資源通過 NPM/GitHub 進行同步。另外還可以採用國內的 [Staticfile CDN](https://www.staticfile.org/)。
+> 以下均為知名第三方免費開放的公共資源 CDN，每期版本通過 NPM / GitHub 自動同步。
 
 <div class="layui-btn-container">
   <a class="layui-btn layui-btn-primary layui-border-black" href="https://unpkg.com/browse/layui/dist/" target="_blank" rel="nofollow">UNPKG</a>
-  <a class="layui-btn layui-btn-primary" style="border-color: #E64E3D; color: #E64E3D;" href="https://cdnjs.com/libraries/layui" target="_blank" rel="nofollow">CDNJS</a>
+  <a class="layui-btn layui-btn-primary" style="border-color: #FF6934; color: #FF6934;" href="https://cdnjs.com/libraries/layui" target="_blank" rel="nofollow">CDNJS</a>
+  <a class="layui-btn layui-btn-primary" style="border-color: #E64E3D; color: #E64E3D;" href="https://www.jsdelivr.com/package/npm/layui" target="_blank" rel="nofollow">JSDELIVR</a>
 </div>
 
 

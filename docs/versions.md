@@ -9,10 +9,326 @@ toc: true
 
 <h2 id="2.9.x" lay-toc="{title: '2.9.x'}"></h2>
 
+<h2 id="v2.9.21" class="ws-anchor">
+  v2.9.21
+  <span class="layui-badge-rim" style="color: #16b777;">穩定版</span>
+  <span class="layui-badge-rim">2025-01-03</span>
+</h2>
+
+- #### table
+  - 新增 通過 `ResizeObserver` 自動處理 `table.reisze`，以適應所處容器的尺寸變化 #2411 @Sight-wcg
+  - 修復 未正確導出合計行模板的問題 #2412 @sentsim
+  - 優化 表格在隱藏元素中渲染的寬度問題 #2376 #2402 @Sight-wcg
+  - 修復 IE8 下執行渲染的報錯問題 #2437 @Sight-wcg
+- #### treeTable
+  - 修復 直接賦值 `data` 時切換分頁出現報錯的問題 #2406 @sentsim
+- #### tab
+  - 新增 `element.tabDelete()` 方法的第三個參數，用於強制刪除 tab #2407 @sentsim
+  - 修復 指定元素渲染，添加和刪除選項卡會導致全部 tab 重新渲染的問題 #2386 @Sight-wcg
+  - 修復 出現展開按鈕時，活動選項卡底邊框顯示異常 #2387 @Sight-wcg
+- #### form
+  - 修復 `form.val()` 獲取 `multiple select` 值錯誤 #2425 @Sight-wcg
+  - 修復 IE8 中 `checkbox` 半選異常問題 #2442 @Sight-wcg
+- #### nav
+  - 修復 IE 低版本下執行 `element.render('nav')` 的報錯問題 #2415 @Sight-wcg
+- #### colorpicker
+  - 修復 清空後點擊右側顏色滑塊，出現的顏色值錯誤 #2401 @Sight-wcg
+- #### code
+  - 增強 `onCopy` 可獲取複製狀態和阻止默認提示 #2419 @Sight-wcg
+- #### 其他
+  - 優化 `.layui-body` 和 `.layui-text` 樣式細節 #2395 @sentsim
+
+### 下載： [layui-v2.9.21.zip](https://gitee.com/layui/layui/attach_files/2014210/download)
+
+---
+
+<h2 id="v2.9.20" class="ws-anchor">
+  v2.9.20
+  <span class="layui-badge-rim" style="color: #16b777;">穩定版</span>
+  <span class="layui-badge-rim">2024-11-25</span>
+</h2>
+
+- #### table
+  - 加強 固定列的滾動體驗使得其更接近原生的平滑 #2335 @Sight-wcg
+  - 改進 表格自動調整大小的處理，以修復一些邊緣報錯問題 #2284 @Sight-wcg
+  - 修復 由 #2250 造成的右側固定列偏移問題 #2318 @Sight-wcg
+  - 修復 設置列寬仍然存在的一些邊緣情況 #2332 @Sight-wcg
+  - 修復 排序且重載後 `table.cache` 數據中的 `LAY_INDEX` 丟失的問題 #2340 @sentsim
+- #### layer
+  - 新增 iframe 彈層在初始加載時的 loading 動畫 #2330 @sentsim
+- #### dropdown
+  - 重構 面板打開與關閉的邏輯 #2349 @sentsim
+  - 調整 `closeOnClick` 選項默認值為 `true`，即點擊目標元素時自動切換打開與關閉 #2349 @sentsim
+  - 修復 在元素自定義事件中創建實例並立刻顯示的報錯問題 #2349 @sentsim
+- #### util
+  - 修復 `util.on()` 多個方法並列使用時，同一委託元素的 `trigger` 衝突問題 #2348 @sentsim
+
+### 下載： [layui-v2.9.20.zip](https://gitee.com/layui/layui/attach_files/1973261/download)
+
+---
+
+😹 `2.9.19` 版本因為存在一個小缺陷而被跳過
+
+---
+
+<h2 id="v2.9.18" class="ws-anchor">
+  v2.9.18
+  <span class="layui-badge-rim">2024-10-14</span>
+</h2>
+
+- #### table
+  - 修復 重載時若當前頁超過總頁數，序號列渲染異常 #2247 @Sight-wcg
+  - 修復 表格列寬計算一些邊緣情況 #2250 @Sight-wcg
+  - 修復 table 在 Firefox 中偶現行閃爍的問題 #2260 @Sight-wcg
+- #### layer
+  - 改進 `maxWidth` 和 `maxHeight` 的處理 #2270 @Sight-wcg
+  - 修復 `layer.path` 潛在的缺陷 #2257 @sentsim
+- #### laydate
+  - 優化 `date` 或 `datetime` 類型時點擊年列表換到月選擇器功能 #2235 @Diyar-IT
+- #### dropdown
+  - 新增 `click` 回調中傳遞的事件對象 #2273 @Sight-wcg
+  - 新增 `closeOnClick` 選項，用於點擊觸發元素時是否關閉面板 #2274 @Sight-wcg
+  - 新增 `onClickOutside` 回調函數，點擊下拉麵板外部時觸發 #2274 @Sight-wcg
+  - 修復 `trigger:'contextmenu'` 時點擊自定義 `content` 任意處導致面板異常關閉的問題 #2274 @Sight-wcg
+- #### nav
+  - 修復 動態添加元素渲染異常的問題 #2276 @Sight-wcg
+
+### 下載： [layui-v2.9.18.zip](https://gitee.com/layui/layui/attach_files/1930232/download)
+
+---
+
+<h2 id="v2.9.17" class="ws-anchor">
+  v2.9.17
+  <span class="layui-badge-rim">2024-09-25</span>
+</h2>
+
+- #### table
+  - 修復 表格列寬計算問題 #2187 @Sight-wcg
+  - 優化 慢速網絡下表頭數據加載時的列寬 #2205 @Sight-wcg
+  - 增加 ` table.checkStatus()` 方法返回的 `dataCache`，即包含內部特定字段的緩存數據 #2239 @sentsim
+  - 修復 返回數據均為 `LAY_DISABLED: true` 時默認全選的問題 #2239 @sentsim
+- #### dropdown
+  - 修復 移動端遮罩層點擊穿透問題 #2206 @Sight-wcg
+- #### flow
+  - 回滾 #1852 中加載時自動清除綁定元素內容的改動 #2218 @Sight-wcg
+- #### 重要
+  - 修復 `getPath` 內部方法潛在的 XSS 安全漏洞，建議儘快升級（[詳見低版本修復方式](https://layui.dev/notes/share/security-currentscript.html)） - [f756b41] @jackfromeast
+
+### 下載： [layui-v2.9.17.zip](https://gitee.com/layui/layui/attach_files/1911445/download)
+
+---
+
+<h2 id="v2.9.16" class="ws-anchor">
+  v2.9.16
+  <span class="layui-badge-rim">2024-08-21</span>
+</h2>
+
+- #### select
+  - 改進 `lay-search` 屬性，支持設置「是否大小寫敏感」和「模糊搜索」 #2121 @Sight-wcg
+  - 修復 `lay-append-to` 屬性開啟時在 dropdown 中點擊 select 導致 dropdown 被關閉的問題 #2138 @Sight-wcg
+- #### table
+  - 重構 `table.setRowChecked()` 方法，以優化若干邊緣問題 #2146 @sentsim
+  - 恢復 #1773 的變更，以避免設置自動寬度的列被拖拽時的異常問題 #2169 @Sight-wcg
+- #### tab
+  - 新增 `tabBeforeChange` 事件，tab 切換之前觸發，可用於阻止 tab 切換 #2111 @sunxiaobin89
+- #### element
+  - 新增 指定元素渲染的支持 #2162 @Sight-wcg
+- #### upload
+  - 新增 `error` 回調函數的第四個參數為 xhr 對象 #2151 @sentsim
+- #### carousel
+  - 修復 動態刪除條目至最後一個時調用 `inst.reload` 的異常問題 #2107 @sentsim
+- #### 其他
+  - 微調 `layui-text` 文本區域樣式，以更好地適配 Markdown #2126 @sentsim
+
+### 下載： [layui-v2.9.16.zip](https://gitee.com/layui/layui/attach_files/1878209/download)
+
+---
+
+`2.9.15` 版本因為存在一個小缺陷而被跳過
+
+---
+
+<h2 id="v2.9.14" class="ws-anchor">
+  v2.9.14
+  <span class="layui-badge-rim">2024-07-09</span>
+</h2>
+
+- #### form
+  - 改進 `select` 搜索，支持非連續、亂序字符匹配 #2065 @Sight-wcg
+  - 優化 `checkbox` 的 `checked` 屬性設置為非 `boolean` 類型值時的異常問題 #2033 @Sight-wcg
+  - 修復 `radio` 改變 `checked` 屬性值時，UI 更新異常的問題 #2084 @Sight-wcg
+- #### table
+  - 優化 行單雙擊事件機制，避免與單元格編輯等事件衝突 #2064 @sentsim
+- #### treeTable
+  - 修復 `cols` 的 `exportTemplet` 函數導出異常的問題 #2034 @sentsim
+- #### carousel
+  - 修復 點擊切換按鈕會觸發 `form` 表單 `submit` 事件的問題 #2059 @Pencil-hzp
+
+### 下載： [layui-v2.9.14.zip](https://gitee.com/layui/layui/attach_files/1830626/download)
+
+---
+
+<h2 id="v2.9.13" class="ws-anchor">
+  v2.9.13
+  <span class="layui-badge-rim">2024-06-18</span>
+</h2>
+
+> 頗具看點的一個版本 🎉🎉🎉
+
+- #### form
+  - 新增 `checkbox,radio` 的數據驅動功能，可直接設置 `checked` 屬性更新 UI #2004 @Sight-wcg
+  - 新增 `select` 的 `lay-append-to` 屬性，用於將 `select` 面板追加到給定的元素中 #1926 @Sight-wcg
+- #### table
+  - 重構 `defaultToolbar` 選項，增加 `onClick` 事件，可自定義文件導出等操作 #2019 @sentsim
+  - 優化 表格數據量較大時行選中的性能 #2004 @Sight-wcg
+- #### layer
+  - 新增 `btnAsync` 選項，用於對按鈕進行異步操作 #2002 @Sight-wcg
+- #### laydate
+  - 修復 日期範圍聯動模式中，點擊任一側邊緣日期時，另一側面板未正確切換的問題 #2005 @Diyar-IT @Sight-wcg
+  - 優化 選中主題色 #2018 @sentsim
+- #### upload
+  - 優化 `error` 回調函數的返回參數，增加返回值 #1988 @Pencil-hzp
+  - 修復 `auto` 選項開啟且 `before` 返回 `false` 後再次選擇同一文件不自動上傳的問題 #1991 @langyan1022
+- #### dropdown
+  - 修復 重複 `render` 時未 reload 的問題 #2022 @Sight-wcg
+- #### treeTable
+  - 修復 `treeTable.reloadAsyncNode` 方法重載節點異常 #2014 @Sight-wcg
+- #### tab
+  - 修復 `element.tabAdd()` 第二個參數的 `id` 選項若傳入特殊字符時的異常問題 #1992 @Sight-wcg
+- #### colorpicker
+  - 修復 移動端顏色選取異常的問題 #1986 @Sight-wcg
+
+### 下載： [layui-v2.9.13.zip](https://gitee.com/layui/layui/attach_files/1805830/download)
+
+---
+
+`2.9.12` 版本因為存在缺陷而被跳過
+
+---
+
+<h2 id="v2.9.11" class="ws-anchor">
+  v2.9.11
+  <span class="layui-badge-rim">2024-06-05</span>
+</h2>
+
+- #### tab
+  - 新增 標籤頭 `lay-allowclose="false"` 屬性支持，用於給指定標籤禁用刪除圖標 #1955 @Sight-wcg
+  - 新增 `element.tabAdd()` 第二個參數的 `allowClose` 選項，用於是否顯示關閉圖標 #1955 @Sight-wcg
+  - 新增 `tabBeforeDelete` 事件，返回 `false` 時可阻止關閉對應的選項卡 #1955 @Sight-wcg
+  - 優化 當標籤頭存在 `lay-id` 屬性時，根據其屬性值切換或刪除對應的內容，方便拖拽排序 #1955 @Sight-wcg
+  - 優化 標籤相關事件的返回參數，新增 `id` 屬性 #1955 @Sight-wcg
+- #### layer
+  - 新增 `beforeEnd` 回調函數選項，在彈層關閉之前觸發，可用於阻止彈層關閉 #1968 @Sight-wcg
+  - 修復 在某些瀏覽器的兼容模式下報錯無法彈出的問題 #1940 @meihangbo
+- #### select
+  - 調整 當開啟 `lay-creatable` 時，新創建的 `<option>` 元素顯示在頂部 #1950 @Sight-wcg
+  - 新增 循環切換選中元素的支持 #1950 @Sight-wcg
+  - 修復 開啟 `lay-creatable` 後方向鍵切換選中元素偶現異常 #1950 @Sight-wcg
+- #### upload
+  - 新增 `before` 返回值為 Promise 和 Deferred Promise 對象類型的支持 #1919 @Sight-wcg
+- #### flow
+  - 新增 `moreText` 選項，用於自定義"加載更多"按鈕文本 #1965 @Pencil-hzp
+- #### treeTable
+  - 修復 `data` 模式非深度重載時，若未傳入 `data` 選項導致表格數據被清除的問題 #1938 @Sight-wcg
+- #### colorpicker
+  - 優化 遊標滑動效果 #1923 @Sight-wcg
+- #### lay
+  - 修復 IE8-10 中 `lay.off` 無法解除 `lay.on` 綁定的事件的問題 #1964 @Sight-wcg
+
+### 下載： [layui-v2.9.11.zip](https://gitee.com/layui/layui/attach_files/1793865/download)
+
+---
+
+<h2 id="v2.9.10" class="ws-anchor">
+  v2.9.10
+  <span class="layui-badge-rim">2024-05-20</span>
+</h2>
+
+- #### table
+  - 加強 `loading` 選項，以支持數據加載時的自定義動畫風格 #1893 @Sight-wcg
+  - 修復 上個版本導致的 `table.setRowChecked` 的 `index` 選項為數組值時無法選中的問題 #1914 @Sight-wcg
+- #### treeTable
+  - 修復重載數據時，指定參數 `scrollPos: 'fixed'` 無效的問題 #1892 @jichuanan
+  - 改進內部 `flatToTree` 函數性能 #1912 @Sight-wcg
+- #### colorpicker
+  - 優化遊標顯示效果 #1863 @Sight-wcg
+- #### form
+  - 修復 `form.val()` 為 radio 設置布爾值時的失效問題 #1903 @meihangbo
+- #### 其他
+  - 將部分組件上的 `lay-id` 屬性重命名為 `lay-${MOD_NAME}-id` #1898 @Sight-wcg
+
+### 下載： [layui-v2.9.10.zip](https://gitee.com/layui/layui/attach_files/1773905/download)
+
+---
+
+<h2 id="v2.9.9" class="ws-anchor">
+  v2.9.9
+  <span class="layui-badge-rim">2024-05-05</span>
+</h2>
+
+- #### laydate
+  - 新增 `mark` 和 `holidays` 選項的函數類型支持，以實現更靈活的賦值 #1786 @Sight-wcg
+  - 新增 `cellRender` 選項，用於自定義單元格內容，可實現農曆擴展 #1843 @Sight-wcg
+  - 新增 `formatToDisplay` 選項，僅用於格式化日期顯示的格式 #1788 @Sight-wcg
+  - 修復點擊時間時 `change` 回調未觸發的問題 #1787 @Sight-wcg
+- #### treeTable
+  - 新增對 `tree.view` 的圖標相關選項中的 className 設置功能 #1808 @Sight-wcg
+  - 修復刪除所有行後，再次添加新行失敗的問題 #1758 @Sight-wcg
+  - 修復刪除所有行後，全選按鈕選中的問題 #1759 @Sight-wcg
+  - 修復刪除子節點時，內部緩存未同步的問題 #1760 @Sight-wcg
+  - 修復節點移動後，點擊事件中行索引獲取錯誤的問題 #1760 @Sight-wcg
+  - 修復添加和刪除節點時，未更新節點圖標的問題 #1784 @Sight-wcg
+  - 修復刪除子節點時，內部未更新 `isParentKey` 的問題 #1792 @Sight-wcg
+  - 修復節點移動後，行索引獲取錯誤 #1812 @Sight-wcg
+- #### form
+  - 修復 `select`  組件當設置 `lay-creatable=""` 屬性時的 XSS 問題 #1813 @Sight-wcg
+- #### tree
+  - 修復編輯節點標題時的 XSS 問題 #1845
+- #### upload
+  - 新增 `choose` 回調的 `getChooseFiles` 方法，用於獲取本次選取的文件 #1849 @Sight-wcg
+  - 修復多文件上傳時能選擇已在隊列中的文件的問題 #1757 @Diyar-IT
+- #### dropdown
+  - 將 `id` 選項添加到觸發元素的 `lay-id` 屬性上，以配合其它組件使用 #1761 @Sight-wcg
+- #### element
+  - 改進自定義 tab 的索引獲取 #1853 @Sight-wcg
+- #### colorpicker
+  - 優化遊標顯示問題 #1850 @Sight-wcg
+  - 優化 RGBA 顏色輸入框顯示不全的問題 #1851 @Sight-wcg
+- #### flow
+  - 加強 `flow.load` 以便在重複執行時解除舊的事件 #1852 @Sight-wcg
+
+### 下載： [layui-v2.9.9.zip](https://gitee.com/layui/layui/attach_files/1757745/download)
+
+---
+
+<h2 id="v2.9.8" class="ws-anchor">
+  v2.9.8
+  <span class="layui-badge-rim">2024-03-31</span>
+</h2>
+
+- #### form
+  - 新增 `checkbox, radio` 組件更靈活的多選和單選模板自定義功能 #1686 @Sight-wcg
+  - 新增 `input-number` 組件的 `lay-precision` 屬性值為 `0` 時的取整支持
+  - 修復 `select` 組件的 `lay-creatable` 屬性在舊版微軟拼音輸入法兼容性問題 #1667 @Sight-wcg
+- #### treeTable
+  - 修復 點擊表頭排序後，內部緩存數據和表格顯示數據不一致的問題 #1734 @Sight-wcg
+- #### laydate
+  - 新增 `disabledDate, disabledTime` 選項，用於設置不可選取的日期和時間 #1569 @Sight-wcg
+  - 優化 `holidays` 節假日標註在數字前置為 `0` 失效的問題 #1719 @Sight-wcg
+- #### slider
+  - 新增 `step` 選項的小數支持 #1663 @Sight-wcg
+  - 修復 Firefox 瀏覽器中拖動滑塊時會選中文本的問題 #1716 @Sight-wcg
+- #### dropdown
+  - 新增 `dropdown.open()` 方法，用於外部打開下拉菜單面板 #1693 @Sight-wcg
+- #### upload
+  - 新增 圖片 `.webp` 默認格式支持
+
+### 下載： [layui-v2.9.8.zip](https://gitee.com/layui/layui/attach_files/1720816/download)
+
+---
 
 <h2 id="v2.9.7" class="ws-anchor">
   v2.9.7
-  <!-- <span class="layui-badge-rim" style="color: #16b777;">穩定版</span> -->
   <span class="layui-badge-rim">2024-02-28</span>
 </h2>
 

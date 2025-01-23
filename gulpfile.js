@@ -12,34 +12,34 @@ const minimist = require('minimist');
 const yargs = require('yargs');
 const pkg = require('./package.json');
 
-// 基础配置
+// 基礎配置
 const config = {
-  // 头部注释
+  // 頭部註釋
   comment: [
     '/** v<%= pkg.version %> | <%= pkg.license %> Licensed */<%= js %>',
     {pkg: pkg, js: ';'}
   ],
-  // 全部模块
+  // 全部模塊
   modules: 'lay,laytpl,laypage,laydate,jquery,layer,util,dropdown,slider,colorpicker,element,upload,form,table,treeTable,tree,transfer,carousel,rate,flow,code'
 };
 
-// 获取参数
+// 獲取參數
 const argv = minimist(process.argv.slice(2), {
   default: {
-    version: pkg.version
+    vs: pkg.version
   }
 });
 
-const rlsFileName = `${pkg.name}-v${pkg.version}`; // 发行文件名
-const rlsDest = `./release/zip/${rlsFileName}/${pkg.name}`; // 发行目标路径
-const rlsDirname = path.dirname(rlsDest); // 发行目录名
+const rlsFileName = `${pkg.name}-v${argv.vs}`; // 發行文件名
+const rlsDest = `./release/zip/${rlsFileName}/${pkg.name}`; // 發行目標路徑
+const rlsDirname = path.dirname(rlsDest); // 發行目錄名
 
-// 复制目标路径
+// 複製目標路徑
 const copyDest = argv.dest
-  ? path.join(argv.dest, (argv.vs ? '/' + pkg.version : ''))
+  ? path.join(argv.dest, (argv.vs ? '/' + argv.vs : ''))
 : rlsDest;
 
-// 打包目标路径
+// 打包目標路徑
 const dest = './dist';
 
 // js
@@ -88,39 +88,39 @@ const clean = () => {
   return del([dest]);
 };
 
-// 默认任务
+// 默認任務
 exports.default = gulp.series(clean, gulp.parallel(js, css, files));
 
-// 复制 dist 目录到指定路径
+// 複製 dist 目錄到指定路徑
 exports.cp = gulp.series(() => del(copyDest), () => {
   const src = `${dest}/**/*`;
 
-  // 复制 css js
+  // 複製 css js
   gulp.src(`${src}.{css,js}`)
-  .pipe(replace(/\n\/(\*|\/)\#[\s\S]+$/, '')) // 过滤 css,js 的 map 特定注释
+  .pipe(replace(/\n\/(\*|\/)\#[\s\S]+$/, '')) // 過濾 css,js 的 map 特定註釋
   .pipe(gulp.dest(copyDest));
 
-  // 复制其他文件
+  // 複製其他文件
   return gulp.src([
     src,
-    `!${src}.{css,js,map}` // 过滤 map 文件
+    `!${src}.{css,js,map}` // 過濾 map 文件
   ])
-  .pipe(replace(/\n\/(\*|\/)\#[\s\S]+$/, '')) // 过滤 css,js 的 map 特定注释
+  .pipe(replace(/\n\/(\*|\/)\#[\s\S]+$/, '')) // 過濾 css,js 的 map 特定註釋
   .pipe(gulp.dest(copyDest));
 });
 
-// 发行
+// 發行
 exports.release = gulp.series(
-  () => del([rlsDirname]), // 清理发行目录
-  () => { // 生成说明
+  () => del([rlsDirname]), // 清理髮行目錄
+  () => { // 生成說明
     return gulp.src('./release/introduce/**/*')
-    .pipe(replace(/[^'"]+(\/layui\.css)/, 'layui/css$1')) // 替换 css 引入路径中的本地 path
-    .pipe(replace(/[^'"]+(\/layui\.js)/, 'layui$1')) // 替换 js 引入路径中的本地 path
-    .pipe(gulp.dest(rlsDirname)) // 用于本地
-    .pipe(gulp.dest('./examples/introduce')); // 用于 Github actions
+    .pipe(replace(/[^'"]+(\/layui\.css)/, 'layui/css$1')) // 替換 css 引入路徑中的本地 path
+    .pipe(replace(/[^'"]+(\/layui\.js)/, 'layui$1')) // 替換 js 引入路徑中的本地 path
+    .pipe(gulp.dest(rlsDirname)) // 用於本地
+    .pipe(gulp.dest('./examples/introduce')); // 用於 Github actions
   },
-  exports.cp, // 复制 dist 目录文件
-  () => { // 生成 ZIP 压缩包
+  exports.cp, // 複製 dist 目錄文件
+  () => { // 生成 ZIP 壓縮包
     const base = path.dirname(rlsDirname);
     return gulp.src(rlsDirname + '/**/*', {
       base: base
@@ -136,20 +136,20 @@ exports.help = () => {
   let parser = yargs.usage(usage, {
     dest: {
       type: 'string',
-      desc: '自定义输出路径'
+      desc: '自定義輸出路徑'
     },
     vs: {
       type: 'boolean',
-      desc: '生成一个带版本号的文件夹'
+      desc: '生成一個帶版本號的文件夾'
     }
   });
 
   parser.showHelp(console.log);
   console.log([
     'Tasks:',
-    '  default  默认任务',
-    '  release  发行任务',
-    '  cp  将 dist 目录复制一份到参数 --dest 指向的目录'
-  ].join('\n'), '\n\nExamples:\n  gulp cp --dest ./v --vs', '\n');
+    '  default  默認任務',
+    '  release  發行任務',
+    '  cp  將 dist 目錄複製一份到參數 --dest 指向的目錄'
+  ].join('\n'), '\n\nExamples:\n  gulp cp --dest ./v', '\n');
   return gulp.src('./');
 };

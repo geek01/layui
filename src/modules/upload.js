@@ -323,7 +323,7 @@ layui.define(['lay', 'layer'], function(exports){
               'Upload failed, please try again.',
               'status: '+ (e.status || '') +' - '+ (e.statusText || 'error')
             ].join('<br>'));
-            error(sets.index);
+            error(sets.index, e.responseText, e);
             allDone(sets.index);
             resetFileState(sets.file);
           }
@@ -387,20 +387,40 @@ layui.define(['lay', 'layer'], function(exports){
       }, 30);
     };
 
+    // 強制返回的數據格式
+    var forceConvert = function(src) {
+      if(options.force === 'json'){
+        if(typeof src !== 'object'){
+          try {
+            return {
+              status: "CONVERTED",
+              data: JSON.parse(src)
+            };
+          } catch(e){
+            that.msg(text['data-format-error']);
+            return {
+              status: "FORMAT_ERROR",
+              data: {}
+            };
+          }
+        }
+      }
+      return { status: "DO_NOTHING", data: {} }
+    }
+
     // 統一回調
     var done = function(index, res){
       that.elemFile.next('.'+ ELEM_CHOOSE).remove();
       elemFile.value = '';
 
-      if(options.force === 'json'){
-        if(typeof res !== 'object'){
-          try {
-            res = JSON.parse(res);
-          } catch(e){
-            res = {};
-            return that.msg(text['data-format-error']);
-          }
-        }
+      var convert = forceConvert(res);
+
+      switch(convert.status) {
+        case "CONVERTED":
+          res = convert.data;
+          break;
+        case "FORMAT_ERROR":
+          return;
       }
 
       typeof options.done === 'function' && options.done(res, index || 0, function(files){
@@ -409,13 +429,24 @@ layui.define(['lay', 'layer'], function(exports){
     };
 
     // 統一網絡異常回調
-    var error = function(index){
+    var error = function(index, res, xhr){
       if(options.auto){
         elemFile.value = '';
       }
+
+      var convert = forceConvert(res);
+
+      switch(convert.status) {
+        case "CONVERTED":
+          res = convert.data;
+          break;
+        case "FORMAT_ERROR":
+          return;
+      }
+
       typeof options.error === 'function' && options.error(index || 0, function(files){
         that.upload(files);
-      });
+      }, res, xhr);
     };
 
     var check;
@@ -453,20 +484,42 @@ layui.define(['lay', 'layer'], function(exports){
         var newFile = new File([file], filename);
         that.files = that.files || {};
         that.files[index] = newFile;
+      },
+      // 獲取本次選取的文件
+      getChooseFiles: function(){
+        return that.chooseFiles;
       }
     };
 
     // 提交上傳
     var send = function(){
-      // 上傳前的回調 - 如果回調函數明確返回 false，則停止上傳
-      if(options.before && (options.before(args) === false)) return;
-
-      // IE 兼容處理
-      if(device.ie){
-        return device.ie > 9 ? ajaxSend() : iframeSend();
+      var ready = function(){
+        // IE 兼容處理
+        if(device.ie){
+          return device.ie > 9 ? ajaxSend() : iframeSend();
+        }
+        ajaxSend();
       }
-
-      ajaxSend();
+      // 上傳前的回調 - 如果回調函數明確返回 false 或 Promise.reject，則停止上傳
+      if(typeof options.before === 'function'){
+        upload.util.promiseLikeResolve(options.before(args))
+          .then(function(result){
+            if(result !== false){
+              ready();
+            } else {
+              if(options.auto){
+                elemFile.value = '';
+              }
+            }
+          }, function(error){
+            if(options.auto){
+              elemFile.value = '';
+            }
+            error !== undefined && layui.hint().error(error);
+          })
+      }else{
+        ready();
+      }
     };
 
     // 文件類型名稱
@@ -510,7 +563,7 @@ layui.define(['lay', 'layer'], function(exports){
       break;
       default: // 圖片文件
         layui.each(value, function(i, item){
-          if(!RegExp('.\\.('+ (exts || 'jpg|png|gif|bmp|jpeg|svg') +')$', 'i').test(escape(item))){
+          if(!RegExp('.\\.('+ (exts || 'jpg|png|gif|bmp|jpeg|svg|webp') +')$', 'i').test(escape(item))){
             return check = true;
           }
         });
@@ -600,6 +653,66 @@ layui.define(['lay', 'layer'], function(exports){
       elemFile.after('<span class="layui-inline '+ ELEM_CHOOSE +'">'+ value +'</span>');
     };
 
+    /**
+     * 判斷文件是否加入排隊
+     * @param {File} file
+     * @return {boolean}
+     */
+    var checkFile = function (file) {
+      var result = true;
+      layui.each(that.files, function (index, item) {
+        result = !(item.name === file.name);
+        if(!result) return true;
+      });
+      return result;
+    }
+
+    /**
+     * 擴展文件信息
+     * @template {File | FileList} T
+     * @param {T} obj
+     * @return {T}
+     */
+    var extendInfo = function (obj) {
+
+      var extInfo = function (file) {
+        //文件擴展名
+        file.ext = file.name.substr(file.name.lastIndexOf('.') + 1).toLowerCase();
+        // 文件大小
+        file.sizes = upload.util.parseSize(file.size);
+        // 可以繼續擴展
+      }
+
+      //FileList對象
+      if (obj instanceof FileList) {
+        layui.each(obj, function (index, item) {
+          extInfo(item);
+        });
+      } else {
+        extInfo(obj);
+      }
+
+      return obj;
+    }
+
+    /**
+     * 檢查獲取文件
+     * @param {FileList} files
+     * @return {Array<File>|FileList}
+     */
+    var getFiles = function (files) {
+      files = files || [];
+      if (!files.length) return [];
+      if (!that.files) return extendInfo(files);
+      var result = [];
+      layui.each(files, function (index, item) {
+        if (checkFile(item)) {
+          result.push(extendInfo(item));
+        }
+      });
+      return result;
+    }
+
     // 點擊上傳容器
     options.elem.off('upload.start').on('upload.start', function(){
       var othis = $(this);
@@ -620,7 +733,7 @@ layui.define(['lay', 'layer'], function(exports){
       })
       .off('upload.drop').on('upload.drop', function(e, param){
         var othis = $(this);
-        var files = param.originalEvent.dataTransfer.files || [];
+        var files = getFiles(param.originalEvent.dataTransfer.files);
 
         othis.removeAttr('lay-over');
         setChooseFile(files);
@@ -631,7 +744,7 @@ layui.define(['lay', 'layer'], function(exports){
 
     // 文件選擇
     that.elemFile.on('change', function(){
-      var files = this.files || [];
+      var files = getFiles(this.files);
 
       if(files.length === 0) return;
 
@@ -677,6 +790,44 @@ layui.define(['lay', 'layer'], function(exports){
     // 綁定元素索引
     options.elem.data(MOD_INDEX, options.id);
   };
+
+  /**
+   * 上傳組件輔助方法
+   */
+  upload.util = {
+    /**
+     * 文件大小處理
+     * @param {number | string} size -文件大小
+     * @param {number} [precision] - 數值精度
+     * @return {string}
+     */
+    parseSize: function (size, precision) {
+      precision = precision || 2;
+      if (null == size || !size) {
+        return '0';
+      }
+      var unitArr = ["Bytes", "Kb", "Mb", "Gb", "Tb", "Pb", "Eb", "Zb", "Yb"];
+      var index;
+      var formatSize = typeof size === 'string' ? parseFloat(size) : size;
+      index = Math.floor(Math.log(formatSize) / Math.log(1024));
+      size = formatSize / Math.pow(1024, index);
+      size = size % 1 === 0 ? size : parseFloat(size.toFixed(precision));//保留的小數位數
+      return size + unitArr[index];
+    },
+    /**
+     * 將給定的值轉換為一個 JQueryDeferred 對象
+     */
+    promiseLikeResolve:function(value){
+      var deferred = $.Deferred();
+
+      if(value && typeof value.then === 'function'){
+        value.then(deferred.resolve, deferred.reject);
+      }else{
+        deferred.resolve(value);
+      }
+      return deferred.promise();
+    }
+  }
 
   // 記錄所有實例
   thisModule.that = {}; // 記錄所有實例對象

@@ -270,6 +270,7 @@
    * @param {string | number} [opts.margin=5] - 邊距
    * @param {Event} [opts.e] - 事件對象，僅右鍵生效
    * @param {boolean} [opts.SYSTEM_RELOAD] - 是否重載，用於出現滾動條時重新計算位置
+   * @param {[offsetX:number, offsetY:number]} [opts.offset] - 相對於觸發元素的額外偏移量[x,y]
    * @example
    * ```js
    * <button id="targetEl">dropdown</button>
@@ -370,10 +371,12 @@
     // 定位類型
     var position = opts.position;
     if(position) elem.style.position = position;
+    var offsetX = opts.offset ? opts.offset[0] : 0;
+    var offsetY = opts.offset ? opts.offset[1] : 0;
 
     // 設置座標
-    elem.style.left = left + (position === 'fixed' ? 0 : scrollArea(1)) + 'px';
-    elem.style.top = top + (position === 'fixed' ? 0 : scrollArea()) + 'px';
+    elem.style.left = left + (position === 'fixed' ? 0 : scrollArea(1)) + offsetX + 'px';
+    elem.style.top = top + (position === 'fixed' ? 0 : scrollArea()) + offsetY + 'px';
 
     // 防止頁面無滾動條時，又因為彈出面板而出現滾動條導致的座標計算偏差
     if(!lay.hasScrollbar()){
@@ -617,6 +620,158 @@
     targetElem.addEventListener('touchstart', onStart);
   }
 
+  /** @type {(elem: Element|Document|Window,eventName: string,fn:EventListenerOrEventListenerObject,options: boolean | AddEventListenerOptions) => any}*/
+  lay.addEvent = function(){
+    if(document.addEventListener){
+      return function(elem, eventName, fn, options){
+        elem.addEventListener(eventName, fn, options);
+      }
+    }else{
+      return function(elem, eventName, fn){
+        var prefix = '_lay_on_';
+        var eventsCacheName = prefix + eventName;
+        var listener = function(e){
+          e.target = e.srcElement;
+          fn.call(elem, e);
+        }
+        listener._rawFn = fn;
+        if(!elem[eventsCacheName]){
+          elem[eventsCacheName] = [];
+        }
+        var include = false;
+        lay.each(elem[eventsCacheName], function(_, listener){
+          if(listener._rawFn === fn){
+            include = true;
+            return true;
+          }
+        })
+        if(!include){
+          elem[eventsCacheName].push(listener);
+          elem.attachEvent('on' + eventName, listener);
+        }
+      }
+    }
+  }();
+
+ /** @type {(elem: Element|Document|Window,eventName: string,fn:EventListenerOrEventListenerObject,options: boolean | EventListenerOptions) => any}*/
+  lay.removeEvent = function(){
+    if(document.removeEventListener){
+      return function(elem, eventName, fn, options){
+        elem.removeEventListener(eventName, fn, options);
+      }
+    }else{
+      return function(elem, eventName, fn){
+        var prefix = '_lay_on_';
+        var eventsCacheName = prefix + eventName;
+        var events = elem[eventsCacheName];
+        if(layui.isArray(events)){
+          var newEvents = [];
+          lay.each(events, function(_, listener){
+            if(listener._rawFn === fn){
+              elem.detachEvent('on'+ eventName, listener);
+            }else{
+              newEvents.push(listener);
+            }
+          })
+          elem[eventsCacheName] = newEvents;
+        }
+      }
+    }
+  }();
+
+  /**
+   * 監聽指定元素外部的點擊
+   * @param {HTMLElement} target - 被監聽的元素
+   * @param {(e: Event) => void} handler - 事件觸發時執行的函數
+   * @param {object} [options] - 選項
+   * @param {string} [options.event="pointerdown"] - 監聽的事件類型
+   * @param {HTMLElement | Window} [options.scope=document] - 監聽範圍
+   * @param {Array<HTMLElement | string>} [options.ignore] - 忽略監聽的元素或選擇器字符串
+   * @param {boolean} [options.capture=true] - 對內部事件偵聽器使用捕獲階段
+   * @returns {() => void} - 返回一個停止事件監聽的函數
+   */
+  lay.onClickOutside = function(target, handler, options){
+    options = options || {};
+    var eventType = options.event || ('onpointerdown' in window ? 'pointerdown' : 'mousedown');
+    var scopeTarget = options.scope || document;
+    var ignore = options.ignore || [];
+    var useCapture = 'capture' in options ? options.capture : true;
+
+    var listener = function(event){
+      var el = target;
+      var eventTarget = event.target || event.srcElement;
+      var eventPath = getEventPath(event);
+
+      if (!el || el === eventTarget || eventPath.indexOf(el) !== -1){
+        return;
+      }
+      if(shouldIgnore(event, eventPath)){
+        return;
+      }
+
+      handler(event);
+    };
+
+    function shouldIgnore(event, eventPath){
+      var eventTarget = event.target || event.srcElement;
+      for(var i = 0; i < ignore.length; i++){
+        var target = ignore[i];
+        if(typeof target === 'string'){
+          var targetElements = document.querySelectorAll(target);
+          for(var j = 0; j < targetElements.length; j++){
+            var targetEl = targetElements[i];
+            if(targetEl === eventTarget || eventPath.indexOf(targetEl) !== -1){
+              return true;
+            }
+          }
+        }else{
+          if(target && (target === eventTarget || eventPath.indexOf(target) !== -1)){
+            return true;
+          }
+        }
+      }
+    }
+
+    function getEventPath(event){
+      var path = (event.composedPath && event.composedPath()) || event.path;
+      var eventTarget = event.target || event.srcElement;
+
+      if (path !== null && path !== undefined){
+        return path;
+      }
+
+      function getParents(node, memo){
+        memo = memo || [];
+        var parentNode = node.parentNode;
+
+        return parentNode
+          ? getParents(parentNode, memo.concat([parentNode]))
+          : memo;
+      }
+
+      return [eventTarget].concat(getParents(eventTarget));
+    }
+
+    function bindEventListener(elem, eventName, handler, opts){
+      elem.addEventListener
+        ? elem.addEventListener(eventName, handler, opts)
+        : elem.attachEvent('on' + eventName, handler);
+
+      return function(){
+        elem.removeEventListener
+          ? elem.removeEventListener(eventName, handler, opts)
+          : elem.detachEvent('on' + eventName, handler);
+      }
+    }
+
+    return bindEventListener(
+      scopeTarget,
+      eventType,
+      listener,
+      lay.passiveSupported ? { passive: true, capture: useCapture } : useCapture
+    );
+  };
+
 
   /*
    * lay 元素操作
@@ -784,21 +939,16 @@
   };
 
   // 事件綁定
-  Class.fn.on = function(eventName, fn){
+  Class.fn.on = function(eventName, fn, options){
     return this.each(function(index, item){
-      item.attachEvent ? item.attachEvent('on' + eventName, function(e){
-        e.target = e.srcElement;
-        fn.call(item, e);
-      }) : item.addEventListener(eventName, fn, false);
+      lay.addEvent(item, eventName, fn, options)
     });
   };
 
   // 解除事件
-  Class.fn.off = function(eventName, fn){
+  Class.fn.off = function(eventName, fn, options){
     return this.each(function(index, item){
-      item.detachEvent
-        ? item.detachEvent('on'+ eventName, fn)
-      : item.removeEventListener(eventName, fn, false);
+      lay.removeEvent(item, eventName, fn, options)
     });
   };
 

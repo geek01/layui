@@ -405,8 +405,8 @@ layui.define(['jquery', 'lay'], function(exports){
     ,alphaslider = that.elemPicker.find('.' + PICKER_ALPHA_SLIDER)
 
     ,_h = slider[0].offsetTop/180*360
-    ,_b = 100 - (choose[0].offsetTop + 3)/180*100
-    ,_s = (choose[0].offsetLeft + 3)/260*100
+    ,_b = 100 - (choose[0].offsetTop)/180*100
+    ,_s = (choose[0].offsetLeft)/260*100
     ,_a = Math.round(alphaslider[0].offsetLeft/280*100)/100
 
     ,i = that.elemColorBox.find('.' + PICKER_TRIG_I)
@@ -448,11 +448,16 @@ layui.define(['jquery', 'lay'], function(exports){
         elemMove.remove();
       });
     };
+    // 移動端滑動模擬事件中
+    // 1. 不觸發遊標上綁定的事件，以提高性能，使滑動更流暢
+    // 2. 遊標上的事件需要冒泡到顏色拾取區域，用來模擬拖動遊標的效果
+    var needTrigger = true;
+    var needStopPropagation = true;
 
     //右側主色選擇
-    slider.on('mousedown', function(e){
-      var oldtop = this.offsetTop
-      ,oldy = e.clientY;
+    slider.on('mousedown', function(e, triggerEvent){
+      var oldtop = this.offsetTop;
+      var oldy = e.clientY === undefined ? triggerEvent.clientY : e.clientY;
       var move = function(e){
         var top = oldtop + (e.clientY - oldy)
         ,maxh = side[0].offsetHeight;
@@ -463,13 +468,12 @@ layui.define(['jquery', 'lay'], function(exports){
         change(h, _s, _b, _a);
         e.preventDefault();
       };
-
+      needStopPropagation && layui.stope(e);
       createMoveElem(move);
-      //layui.stope(e);
       e.preventDefault();
     });
 
-    side.on('click', function(e){
+    side.on('mousedown', function(e){
       var top = e.clientY - $(this).offset().top + $win.scrollTop();
       if(top < 0)top = 0;
       if(top > this.offsetHeight) top = this.offsetHeight;
@@ -477,56 +481,57 @@ layui.define(['jquery', 'lay'], function(exports){
       _h = h;
       change(h, _s, _b, _a);
       e.preventDefault();
+      needTrigger && slider.trigger('mousedown', e);
     });
 
     //中間小圓點顏色選擇
-    choose.on('mousedown', function(e){
-      var oldtop = this.offsetTop
-      ,oldleft = this.offsetLeft
-      ,oldy = e.clientY
-      ,oldx = e.clientX;
+    choose.on('mousedown', function(e, triggerEvent){
+      var oldtop = this.offsetTop;
+      var oldleft = this.offsetLeft;
+      var oldy = e.clientY === undefined ? triggerEvent.clientY : e.clientY;
+      var oldx = e.clientX === undefined ?  triggerEvent.clientX : e.clientX;
       var move = function(e){
         var top = oldtop + (e.clientY - oldy)
         ,left = oldleft + (e.clientX - oldx)
-        ,maxh = basis[0].offsetHeight - 3
-        ,maxw = basis[0].offsetWidth - 3;
-        if(top < -3)top = -3;
+        ,maxh = basis[0].offsetHeight
+        ,maxw = basis[0].offsetWidth;
+        if(top < 0)top = 0;
         if(top > maxh)top = maxh;
-        if(left < -3)left = -3;
+        if(left < 0)left = 0;
         if(left > maxw)left = maxw;
-        var s = (left + 3)/260*100
-        ,b = 100 - (top + 3)/180*100;
+        var s = left/260*100
+        ,b = 100 - top/180*100;
         _b = b;
         _s = s;
         change(_h, s, b, _a);
         e.preventDefault();
       };
-      layui.stope(e);
+      needStopPropagation && layui.stope(e);
       createMoveElem(move);
       e.preventDefault();
     });
 
     basis.on('mousedown', function(e){
-      var top = e.clientY - $(this).offset().top - 3 + $win.scrollTop()
-      ,left = e.clientX - $(this).offset().left - 3 + $win.scrollLeft()
-      if(top < -3)top = -3;
-      if(top > this.offsetHeight - 3)top = this.offsetHeight - 3;
-      if(left < -3)left = -3;
-      if(left > this.offsetWidth - 3)left = this.offsetWidth - 3;
-      var s = (left + 3)/260*100
-      ,b = 100 - (top + 3)/180*100;
+      var top = e.clientY - $(this).offset().top + $win.scrollTop()
+      ,left = e.clientX - $(this).offset().left + $win.scrollLeft()
+      if(top < 0)top = 0;
+      if(top > this.offsetHeight)top = this.offsetHeight;
+      if(left < 0)left = 0;
+      if(left > this.offsetWidth)left = this.offsetWidth;
+      var s = left/260*100
+      ,b = 100 - top/180*100;
       _b = b;
       _s = s;
       change(_h, s, b, _a);
       layui.stope(e);
       e.preventDefault();
-      choose.trigger(e, 'mousedown');
+      needTrigger && choose.trigger('mousedown', e);
     });
 
     //底部透明度選擇
-    alphaslider.on('mousedown', function(e){
-      var oldleft = this.offsetLeft
-      ,oldx = e.clientX;
+    alphaslider.on('mousedown', function(e, triggerEvent){
+      var oldleft = this.offsetLeft;
+      var oldx = e.clientX === undefined ? triggerEvent.clientX : e.clientX;
       var move = function(e){
         var left = oldleft + (e.clientX - oldx)
         ,maxw = alphacolor[0].offsetWidth;
@@ -538,10 +543,11 @@ layui.define(['jquery', 'lay'], function(exports){
         e.preventDefault();
       };
 
+      needStopPropagation && layui.stope(e);
       createMoveElem(move);
       e.preventDefault();
     });
-    alphacolor.on('click', function(e){
+    alphacolor.on('mousedown', function(e){
       var left = e.clientX - $(this).offset().left
       if(left < 0)left = 0;
       if(left > this.offsetWidth)left = this.offsetWidth;
@@ -549,6 +555,7 @@ layui.define(['jquery', 'lay'], function(exports){
       _a = a;
       change(_h, _s, _b, a);
       e.preventDefault();
+      needTrigger && alphaslider.trigger('mousedown', e);
     });
 
     //預定義顏色選擇
@@ -571,13 +578,22 @@ layui.define(['jquery', 'lay'], function(exports){
     if(!lay.touchEventsSupported()) return;
     // 觸摸事件模擬
     layui.each([
-      {elem: side, eventType: 'click'},
-      {elem: alphacolor, eventType: 'click'},
+      {elem: side, eventType: 'mousedown'},
+      {elem: alphacolor, eventType: 'mousedown'},
       {elem: basis, eventType: 'mousedown'}
     ], function(i, obj){
       lay.touchSwipe(obj.elem, {
+        onTouchStart: function(){
+          needTrigger = false;
+          needStopPropagation = false;
+        },
         onTouchMove: function(e){
           touchHandler(e, obj.eventType)
+        },
+        onTouchEnd: function(){
+          elemMove.remove();
+          needTrigger = true;
+          needStopPropagation = true;
         }
       })
     })
@@ -602,16 +618,17 @@ layui.define(['jquery', 'lay'], function(exports){
     var hex = HSBToHEX({h:h, s:100, b:100});
     var color = HSBToHEX({h:h, s:s, b:b});
     var sidetop = h/360*180;
-    var top = 180 - b/100*180 - 3;
-    var left = s/100*260 - 3;
+    var top = 180 - b/100*180;
+    var left = s/100*260;
+    var basisElem = that.elemPicker.find('.' + PICKER_BASIS)[0];
 
     that.elemPicker.find('.' + PICKER_SIDE_SLIDER).css("top", sidetop); //滑塊的top
-    that.elemPicker.find('.' + PICKER_BASIS)[0].style.background = '#' + hex; //顏色選擇器的背景
+    basisElem.style.background = '#' + hex; //顏色選擇器的背景
 
     //選擇器的top left
     that.elemPicker.find('.' + PICKER_BASIS_CUR).css({
-      "top": top
-      ,"left": left
+      "top": top / basisElem.offsetHeight * 100 + '%',
+      "left": left / basisElem.offsetWidth * 100 + '%'
     });
 
     // if(type === 'change') return;

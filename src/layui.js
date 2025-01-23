@@ -16,7 +16,7 @@
   };
 
   var Layui = function(){
-    this.v = '2.9.7'; // Layui 版本號
+    this.v = '2.9.21'; // Layui 版本號
   };
 
   // 識別預先可能定義的指定全局對象
@@ -24,8 +24,8 @@
 
   // 獲取 layui 所在目錄
   var getPath = function(){
-    var jsPath = doc.currentScript ? doc.currentScript.src : function(){
-      var js = doc.scripts;
+    var jsPath = (doc.currentScript && doc.currentScript.tagName.toUpperCase() === 'SCRIPT') ? doc.currentScript.src : function(){
+      var js = doc.getElementsByTagName('script');
       var last = js.length - 1;
       var src;
       for(var i = last; i > 0; i--){
@@ -254,9 +254,12 @@
   };
 
   // 獲取節點的 style 屬性值
+  // currentStyle.getAttribute 參數為 camelCase 形式的字符串
   Layui.prototype.getStyle = function(node, name){
     var style = node.currentStyle ? node.currentStyle : win.getComputedStyle(node, null);
-    return style[style.getPropertyValue ? 'getPropertyValue' : 'getAttribute'](name);
+    return style.getPropertyValue
+      ? style.getPropertyValue(name)
+      : style.getAttribute(name.replace(/-(\w)/g, function(_, c){ return c ? c.toUpperCase() : '';}));
   };
 
   // css 外部加載器

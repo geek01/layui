@@ -203,19 +203,27 @@ layui.define(['lay', 'util', 'element', 'form'], function(exports){
         title: ['複製代碼'],
         event: function(obj){
           var code = util.unescape(finalCode(options.code));
+          var hasOnCopy = typeof options.onCopy === 'function';
 
           // 寫入剪切板
           lay.clipboard.writeText({
             text: code,
             done: function() {
+              if(hasOnCopy){
+                var ret = options.onCopy(code, true);
+                if(ret === false) return;
+              }
+
               layer.msg('已複製', {icon: 1});
             },
             error: function() {
+              if(hasOnCopy){
+                var ret = options.onCopy(code, false);
+                if(ret === false) return;
+              }
               layer.msg('複製失敗', {icon: 2});
             }
           });
-
-          typeof options.onCopy === 'function' && options.onCopy(code);
         }
       }
     };

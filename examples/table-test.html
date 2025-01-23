@@ -84,7 +84,7 @@
 (function(off){
   if(!off) return;
   layui.disuse('table').extend({
-    table: '{/}https://cdn.staticfile.org/layui/2.7.6/layui.js'
+    table: '{/}https://cdn.jsdelivr.net/gh/layui/layui@2.7.6/src/modules/table'
   });
 })();
 
@@ -131,11 +131,15 @@ layui.use(['table', 'dropdown'], function(){
 
 
     // lineStyle: 'height: 95px;', // 行樣式
-    css: [ // 自定義樣式
+    css: [ // 對當前實例自定義樣式
       '.layui-table-page{text-align: right;}',
-      '.layui-table-pagebar{float: left;}'
+      '.layui-table-pagebar{float: left;}',
+      // '.layui-table-init{background-color: rgba(255, 255, 255, 0.6);}'
     ].join(''),
     // className: '.demo-table-view',
+
+    // 自定義 loading 模板 --- 2.9.10+
+    // loading: '<i class="layui-icon layui-icon-loading-1 layui-anim layui-anim-rotate layui-anim-loop" style="font-size: 38px;"></i>',
 
     // size: 'sm',
     // skin: 'line',
@@ -149,13 +153,49 @@ layui.use(['table', 'dropdown'], function(){
     },
     limit: 30,
     toolbar: '#toolbarDemo',
-    defaultToolbar: ['filter', 'exports', 'print', {
-      title: '幫助',
-      layEvent: 'LAYTABLE_TIPS',
-      icon: 'layui-icon-tips'
-    }],
+    defaultToolbar: [
+      'filter',
+      {
+        // 自定義導出 --- 2.9.12+
+        name: 'exports',
+        onClick: function(obj) {
+          var data = table.clearCacheKey(obj.data); // 清除臨時字段
+          var options = obj.config;
+
+          // 彈出面板
+          obj.openPanel({
+            list: [
+              '<li data-type="csv">導出 CSV 文件</li>',
+              '<li data-type="xlsx">導出 XLSX 文件</li>'
+            ].join(''),
+            done: function(panel, list) {
+              list.on('click', function(){
+                var type = $(this).data('type')
+                if (type === 'csv') {
+                  table.exportFile(options.id, null, type); // 調用內置導出方法
+                } else if(type === 'xlsx') {
+                  // 自助處理導出 - 如藉助 sheetjs 庫或服務端導出
+                  // …
+                  layer.msg('自助處理導出 xlsx');
+                }
+
+              });
+            }
+          });
+        }
+      },
+      'print',
+      {
+        title: '幫助',
+        layEvent: 'LAYTABLE_TIPS',
+        icon: 'layui-icon-tips',
+        onClick: function(obj) {
+          layer.alert('Table for layui-v'+ layui.v);
+        }
+      }
+    ],
     // escape: false,
-    editTrigger: 'dblclick',
+    // editTrigger: 'dblclick',
     // cellMaxWidth: 320
     // cellExpandedWidth: 160, // 單元格默認展開後的寬度
     // cellExpandedStyle: 'tips', // 單元格默認展開風格
@@ -466,9 +506,6 @@ layui.use(['table', 'dropdown'], function(){
         });
         layer.msg('已設為單行');
         break;
-      case 'LAYTABLE_TIPS':
-        layer.alert('Table for layui-v'+ layui.v);
-        break;
     };
   });
 
@@ -518,18 +555,18 @@ layui.use(['table', 'dropdown'], function(){
   });
 
   // 行單擊事件
-  table.on('row(test)', function(obj){
-    console.log(obj);
-    // layer.closeAll('tips');
+  table.on('row(test)', function(obj) {
+    console.log('onrow', obj); // 查看返回的對象成員
+
+    // 單擊行設置選中
     obj.setRowChecked({
       // type: 'radio'
     });
-    // layer.msg('row 事件')
   });
 
   // 行雙擊事件
-  table.on('rowDouble(test)', function(obj){
-    console.log(obj);
+  table.on('rowDouble(test)', function(obj) {
+    console.log('onrowDouble', obj); // 查看返回的對象成員
   });
 
   // 單元格編輯事件

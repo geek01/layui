@@ -1,19 +1,19 @@
 /** laydate 日期與時間控件 | MIT Licensed */
-
+// @ts-expect-error
 ;!function(window, document){ // gulp build: laydate-header
   "use strict";
 
-  var isLayui = window.layui && layui.define, ready = {
-    getPath: (window.lay && lay.getPath) ? lay.getPath : ''
+  var isLayui = window.layui && layui.define;
+  var ready = {
+    getPath: window.lay && lay.getPath ? lay.getPath : '',
 
     // 載入 CSS 依賴
-    ,link: function(href, fn, cssname){
-
+    link: function (href, fn, cssname) {
       // 未設置路徑，則不主動加載 css
-      if(!laydate.path) return;
+      if (!laydate.path) return;
 
       // 加載 css
-      if(window.lay && lay.layui){
+      if (window.lay && lay.layui) {
         lay.layui.link(laydate.path + href, fn, cssname);
       }
     }
@@ -24,34 +24,34 @@
 
   // 模塊名
   var MOD_NAME = 'laydate';
-  var MOD_ID = 'layui-'+ MOD_NAME +'-id' // 已渲染過的索引標記名
+  var MOD_ID = 'lay-' + MOD_NAME + '-id'; // 已渲染過的索引標記名
 
   // 外部調用
   var laydate = {
-    v: '5.5.0' // layDate 版本號
-    ,config: {
-      weekStart: 0, // 默認週日一週的開始
-    } // 全局配置項
-    ,index: (window.laydate && window.laydate.v) ? 100000 : 0
-    ,path: GLOBAL.laydate_dir || ready.getPath
+    v: '5.6.0', // layDate 版本號
+    config: {
+      weekStart: 0 // 默認週日一週的開始
+    }, // 全局配置項
+    index: window.laydate && window.laydate.v ? 100000 : 0,
+    path: GLOBAL.laydate_dir || ready.getPath,
 
     // 設置全局項
-    ,set: function(options){
+    set: function (options) {
       var that = this;
       that.config = lay.extend({}, that.config, options);
       return that;
-    }
+    },
 
     // 主體 CSS 等待事件
-    ,ready: function(callback){
+    ready: function (callback) {
       var cssname = 'laydate';
-      var ver = ''
-      var path = (isLayui ? 'modules/' : '') + 'laydate.css?v='+ laydate.v + ver;
+      var ver = '';
+      var path = (isLayui ? 'modules/' : '') + 'laydate.css?v=' + laydate.v + ver;
 
       isLayui ? (
-        layui['layui.all']
-          ? (typeof callback === 'function' && callback())
-        : layui.addcss(path, callback, cssname)
+        layui['layui.all'] ?
+          (typeof callback === 'function' && callback()) :
+        layui.addcss(path, callback, cssname)
       ) : ready.link(path, callback, cssname);
 
       return this;
@@ -234,6 +234,20 @@
     return text[options.lang] || text['cn'];
   };
 
+  Class.prototype.markerOfChineseFestivals = {
+    '0-1-1': '元旦',
+    '0-2-14': '情人' ,
+    '0-3-8': '婦女',
+    '0-3-12': '植樹',
+    '0-4-1': '愚人',
+    '0-5-1': '勞動',
+    '0-5-4': '青年',
+    '0-6-1': '兒童',
+    '0-9-10': '教師',
+    '0-10-1': '國慶',
+    '0-12-25': '聖誕'
+  }
+
   // 重載實例
   Class.prototype.reload = function(options){
     var that = this;
@@ -358,20 +372,6 @@
     options.eventElem.attr('lay-key', that.index);
     options.elem.attr(MOD_ID, options.id); // 渲染過的標記
 
-    //記錄重要日期
-    options.mark = lay.extend({}, (options.calendar && options.lang === 'cn') ? {
-      '0-1-1': '元旦'
-      ,'0-2-14': '情人'
-      ,'0-3-8': '婦女'
-      ,'0-3-12': '植樹'
-      ,'0-4-1': '愚人'
-      ,'0-5-1': '勞動'
-      ,'0-5-4': '青年'
-      ,'0-6-1': '兒童'
-      ,'0-9-10': '教師'
-      ,'0-10-1': '國慶'
-      ,'0-12-25': '聖誕'
-    } : {}, options.mark);
 
     //獲取限制內日期
     lay.each(['min', 'max'], function(i, item){
@@ -416,6 +416,19 @@
 
     if(options.show || isStatic) that.render();
     isStatic || that.events();
+
+    // 重定義 input 元素的 get set
+    if(typeof options.formatToDisplay === 'function'){
+      if(that.isInput(options.elem[0])){
+        that.formatToDisplay(options.elem[0], options.formatToDisplay);
+      } else {
+        var rangeElem = that.rangeElem;
+        if(rangeElem){
+          that.formatToDisplay(rangeElem[0][0], options.formatToDisplay);
+          that.formatToDisplay(rangeElem[1][0], options.formatToDisplay);
+        }
+      }
+    }
 
     //默認賦值
     if(options.value && options.isInitValue){
@@ -501,9 +514,9 @@
       }(), function(){ //年月選擇
         var elem = lay.elem('div', {
           "class": 'laydate-set-ym'
-        }), spanY = lay.elem('span'), spanM = lay.elem('span');
-        elem.appendChild(spanY);
-        elem.appendChild(spanM);
+        });
+        elem.appendChild(lay.elem('span'));
+        elem.appendChild(lay.elem('span'));
         return elem;
       }(), function(){ //下一月
         var elem = lay.elem('i', {
@@ -1049,45 +1062,333 @@
     return that;
   };
 
-  // 公曆重要日期與自定義備註
+  /**
+   * 渲染備註
+   * @param {JQuery} tdElem td 元素
+   * @param {[number, number, number]} YMD 年月日
+   * @param {object | string} markers 備註信息
+   */
+  Class.prototype.markRender = function(tdElem, YMD, markers){
+    var markText;
+
+    if(typeof markers === 'object'){
+      lay.each(markers || {}, function(key, title){
+        var keys = key.split('-');
+        if((keys[0] == YMD[0] || keys[0] == 0) //每年的每月
+        && (keys[1] == YMD[1] || keys[1] == 0) //每月的每日
+        && keys[2] == YMD[2]){ //特定日
+          markText = title || YMD[2];
+        }
+      });
+    }else if(typeof markers === 'string'){
+      markText = markers ||  YMD[2];
+    }
+
+    markText && tdElem.find('div').html('<span class="laydate-day-mark">'+ markText +'</span>');
+  }
+
+  /**
+   * 公曆重要日期與自定義備註
+   * @param {JQuery} td
+   * @param {[number, number, number]} YMD
+   * @returns Class
+   */
   Class.prototype.mark = function(td, YMD){
-    var that = this
-    ,mark, options = that.config;
-    lay.each(options.mark, function(key, title){
-      var keys = key.split('-');
-      if((keys[0] == YMD[0] || keys[0] == 0) //每年的每月
-      && (keys[1] == YMD[1] || keys[1] == 0) //每月的每日
-      && keys[2] == YMD[2]){ //特定日
-        mark = title || YMD[2];
-      }
-    });
-    mark && td.find('div').html('<span class="laydate-day-mark">'+ mark +'</span>');
+    var that = this;
+    var options = that.config;
+
+    var render = function(markers){
+      that.markRender(td, YMD, markers);
+    }
+
+    if(options.calendar && options.lang === 'cn'){
+      render(that.markerOfChineseFestivals);
+    }
+
+    if(typeof options.mark === 'function'){
+      options.mark({year: YMD[0], month: YMD[1], date: YMD[2]}, render);
+    }else if(typeof options.mark === 'object'){
+      render(options.mark);
+    }
 
     return that;
   };
 
-  // 標註法定節假日或補假上班
+  /**
+   * 渲染法定節假日或補假上班標記
+   * @param {JQuery} tdElem td 元素
+   * @param {[number, number, number]} YMD 年月日
+   * @param {[Array<string>, Array<string>] | string} markers 標記信息
+   */
+  Class.prototype.holidaysRender = function(tdElem, YMD, markers){
+    var type = ['holidays', 'workdays'];
+
+    var isEquals = function(ymdStr1, ymdStr2){
+      var ymd1 = ymdStr1.split('-');
+      var ymd2 = ymdStr2.split('-');
+
+      lay.each(ymd1, function(i,v){
+        ymd1[i] = parseInt(v, 10);
+      })
+      lay.each(ymd2, function(i,v){
+        ymd2[i] = parseInt(v, 10);
+      })
+
+      return ymd1.join('-') === ymd2.join('-');
+    }
+
+    var insertHtml = function(el, type, text){
+      el.find('div').html([
+        '<span',
+        ' class="laydate-day-holidays"',
+        ' type="'+ type +'"',
+        '>',
+          text,
+        '</span>'
+      ].join(''));
+    }
+
+    if(layui.type(markers) === 'array'){
+      lay.each(markers, function(idx, item) {
+        lay.each(item, function(i, dayStr) {
+          if(isEquals(dayStr, tdElem.attr('lay-ymd'))){
+            insertHtml(tdElem, type[idx], YMD[2])
+          }
+        });
+      });
+    }else if(typeof markers === 'string'){
+      if(type.indexOf(markers) !== -1){
+        insertHtml(tdElem, markers, YMD[2])
+      }
+    }
+  }
+
+  /**
+   * 標註法定節假日或補假上班
+   * @param {JQuery} td
+   * @param {[number, number, number]} YMD
+   * @returns Class
+   */
   Class.prototype.holidays = function(td, YMD) {
     var that = this;
     var options = that.config;
-    var type = ['', 'work'];
 
-    if(layui.type(options.holidays) !== 'array') return that;
+    var render = function(markers){
+      that.holidaysRender(td, YMD, markers);
+    }
 
-    lay.each(options.holidays, function(idx, item) {
-      lay.each(item, function(i, dayStr) {
-        if(dayStr === td.attr('lay-ymd')){
-          td.find('div').html('<span class="laydate-day-holidays"' + (
-            type[idx] ? ('type="'+ type[idx] +'"') : ''
-          ) + '>' + YMD[2] + '</span>');
-        }
-      });
-    });
+    if(typeof options.holidays === 'function'){
+      options.holidays({year: YMD[0], month: YMD[1], date: YMD[2]}, render);
+    }else if(layui.type(options.holidays) === 'array'){
+      render(options.holidays);
+    }
 
     return that;
   };
 
-  // 無效日期範圍的標記
+  /**
+   * 自定義單元格
+   * @param {HTMLElement|Array<HTMLElement>} el - 單元格元素
+   * @param {{year:number, month:number, date:number}} dateObj - 當前單元格對應的日期信息
+   * @param {'year' | 'month' | 'date'} panelMode - 面板模式
+   * @returns
+   */
+  Class.prototype.cellRender = function(el, dateObj, panelMode){
+    var that = this;
+    var options = that.config;
+
+    if(typeof options.cellRender === 'function'){
+      var render = function(content){
+        if(typeof content === 'string'){
+          lay(el).html(content);
+        }else if(typeof content === 'object'){
+          lay(el).html('').append(lay(content)[0]);
+        }
+      }
+      options.cellRender(dateObj, render, {originElem: el, type: panelMode})
+    }
+
+    return that;
+  }
+
+  /**
+   * 給定年份的開始日期
+   * @param {Date} date
+   */
+  Class.prototype.startOfYear = function(date){
+    var newDate = new Date(date);
+    newDate.setFullYear(newDate.getFullYear(), 0, 1);
+    newDate.setHours(0, 0, 0, 0);
+    return newDate;
+  }
+
+  /**
+   * 給定年份的結束日期
+   * @param {Date} date
+   */
+  Class.prototype.endOfYear = function(date){
+    var newDate = new Date(date);
+    var year = newDate.getFullYear();
+    newDate.setFullYear(year + 1, 0, 0);
+    newDate.setHours(23, 59, 59, 999);
+    return newDate;
+  }
+
+  /**
+   * 給定月份的開始日期
+   * @param {Date} date
+   */
+  Class.prototype.startOfMonth = function(date){
+    var newDate =  new Date(date);
+    newDate.setDate(1);
+    newDate.setHours(0, 0, 0, 0);
+    return newDate;
+  }
+
+  /**
+   * 給定月份的結束日期
+   * @param {Date} date
+   */
+  Class.prototype.endOfMonth = function(date){
+    var newDate = new Date(date);
+    var month = newDate.getMonth();
+    newDate.setFullYear(newDate.getFullYear(), month + 1, 0);
+    newDate.setHours(23, 59, 59, 999);
+    return newDate;
+  }
+
+  /**
+   * 將指定的天數添加到給定日期
+   * @param {Date} date 要更改的日期
+   * @param {number} amount 天數
+   */
+  Class.prototype.addDays = function(date, amount){
+    var newDate = new Date(date);
+    if(!amount) return newDate;
+    newDate.setDate(newDate.getDate() + amount);
+    return newDate;
+  }
+
+  /**
+   * 不可選取的年或月。年或月中的所有日期都禁用時，才判定為不可選取。
+   * @param {Date} date 要檢測的年或月
+   * @param {'year' | 'month'} type 面板類型
+   * @param {'start' | 'end'} position 面板位置
+   */
+  Class.prototype.isDisabledYearOrMonth = function(date, type, position){
+    var that = this;
+    var options = that.config;
+    var millisecondsInDay = 24 * 60 * 60 * 1000;
+
+    var startDay = type === 'year' ? that.startOfYear(date) : that.startOfMonth(date);
+    var endDay = type === 'year' ? that.endOfYear(date) : that.endOfMonth(date);
+    var numOfDays = Math.floor((endDay.getTime() - startDay.getTime()) / millisecondsInDay) + 1;
+    var disabledCount = 0;
+
+    for(var i = 0; i < numOfDays; i++){
+      var day = that.addDays(startDay, i);
+      if(options.disabledDate.call(options, day, position)){
+        disabledCount++;
+      }
+    }
+
+    return disabledCount === numOfDays;
+  }
+
+  /**
+   * @typedef limitOptions
+   * @prop {JQuery} [elem] - 檢測的元素, 例如面板中年月日時分秒元素，“現在”，“確認” 按鈕等
+   * @prop {number} [index] - 元素集合中，當前檢測元素的索引，years:0,month:0,date:0-41,hms:0
+   * @prop {['hours', 'minutes', 'seconds'] | ['hours', 'minutes'] | ['hours']} [time] - 是否比較時分秒
+   * @prop {'year'|'month'|string} [type] - 面板類型?
+   * @prop {0 | 1} [rangeType] - 面板索引, 0 表示 start, 1 表示 end
+   * @prop {Partial<{year:number,month: number,date:number,hours:number,minutes:number,seconds:number}>} [date] - 檢測的日期時間對象
+   * @prop {'date' | 'time' | 'datetime'} disabledType - 禁用類型，按鈕應使用 datetime
+   */
+  /**
+   * 不可選取的日期
+   * @param {number} date 當前檢測的日期的時間戳
+   * @param {limitOptions} opts
+   * @returns {boolean}
+   */
+  Class.prototype.isDisabledDate = function(date, opts){
+    opts = opts || {};
+
+    var that = this;
+    var options = that.config;
+    var position = options.range ? (opts.rangeType === 0 ? 'start' : 'end') : 'start';
+
+    if(!options.disabledDate) return false;
+    if(options.type === 'time') return false;
+    if(!(opts.disabledType === 'date' || opts.disabledType === 'datetime')) return false;
+
+    // 不需要時分秒
+    var normalizedDate = new Date(date);
+    normalizedDate.setHours(0, 0, 0, 0);
+
+    return opts.type === 'year' || opts.type === 'month'
+      ? that.isDisabledYearOrMonth(normalizedDate, opts.type, position)
+      : options.disabledDate.call(options, normalizedDate, position);
+  }
+
+  /**
+   * 不可選取的時間
+   * @param {number} date 當前檢測的日期的時間戳
+   * @param {limitOptions} opts
+   * @returns {boolean}
+   */
+  Class.prototype.isDisabledTime = function(date, opts){
+    opts = opts || {};
+
+    var that = this;
+    var options = that.config;
+    var position = options.range ? (opts.rangeType === 0 ? 'start' : 'end') : 'start';
+
+    if(!options.disabledTime) return false;
+    if(!(options.type === "time" || options.type === "datetime")) return false;
+    if(!(opts.disabledType === 'time' || opts.disabledType === 'datetime')) return false;
+
+    var isDisabledItem = function(compareVal, rangeFn, rangeFnParam){
+      return function(){
+        return (typeof rangeFn === 'function' && rangeFn.apply(options, rangeFnParam) || []).indexOf(compareVal) !== -1;
+      }
+    }
+
+    var dateObj = that.systemDate(new Date(date));
+    var disabledTime = options.disabledTime.call(options, that.newDate(dateObj), position) || {};
+
+    // 面板中的時分秒 HTML 元素需要分別檢測是否禁用
+    // 按鈕檢測任意一項是否禁用即可
+    return opts.disabledType === 'datetime'
+      ? isDisabledItem(dateObj.hours, disabledTime.hours)()
+          || isDisabledItem(dateObj.minutes, disabledTime.minutes, [dateObj.hours])()
+          || isDisabledItem(dateObj.seconds, disabledTime.seconds, [dateObj.hours, dateObj.minutes])()
+      : [isDisabledItem(dateObj.hours, disabledTime.hours),
+          isDisabledItem(dateObj.minutes, disabledTime.minutes, [dateObj.hours]),
+          isDisabledItem(dateObj.seconds, disabledTime.seconds, [dateObj.hours, dateObj.minutes])][opts.time.length - 1]();
+  }
+
+  /**
+   * 不可選取的日期時間
+   * @param {number} timestamp 當前檢測的日期的時間戳
+   * @param {limitOptions} opts
+   * @returns
+   */
+  Class.prototype.isDisabledDateTime = function(timestamp, opts){
+    opts = opts || {};
+
+    var that = this;
+    var options = that.config;
+
+    return that.isDisabledDate(timestamp, opts) || that.isDisabledTime(timestamp, opts);
+  }
+
+
+  /**
+   * 無效日期範圍的標記
+   * @param {limitOptions} opts
+   *
+   */
   Class.prototype.limit = function(opts){
     opts = opts || {};
 
@@ -1115,7 +1416,7 @@
       }())).getTime();  //time：是否比較時分秒
     });
 
-    isOut = timestamp.now < timestamp.min || timestamp.now > timestamp.max;
+    isOut = timestamp.now < timestamp.min || timestamp.now > timestamp.max || that.isDisabledDateTime(timestamp.now, opts);
     opts.elem && opts.elem[isOut ? 'addClass' : 'removeClass'](DISABLED);
 
     return isOut;
@@ -1185,13 +1486,18 @@
           month: YMD[1] - 1,
           date: YMD[2]
         },
-        index: index_
+        index: index_,
+        rangeType: index,
+        disabledType: 'date' // 日面板，檢測當前日期是否禁用
       });
+      that.cellRender(item, {year: YMD[0], month: YMD[1], date: YMD[2]}, 'date');
     });
 
     //同步頭部年月
     lay(elemYM[0]).attr('lay-ym', dateTime.year + '-' + (dateTime.month + 1));
     lay(elemYM[1]).attr('lay-ym', dateTime.year + '-' + (dateTime.month + 1));
+    if(!that.panelYM) that.panelYM = {};
+    that.panelYM[index] = {year: dateTime.year, month: dateTime.month};
 
     if(options.lang === 'cn'){
       lay(elemYM[0]).attr('lay-type', 'year').html(dateTime.year + ' 年')
@@ -1246,13 +1552,15 @@
         elem: lay(that.footer).find(ELEM_NOW),
         date: that.systemDate(/^(datetime|time)$/.test(options.type) ? new Date() : null),
         index: 0,
-        time: timeParams
+        time: timeParams,
+        disabledType: 'datetime' // 按鈕，檢測日期和時間
       });
       // 確認按鈕
       that.limit({
         elem: lay(that.footer).find(ELEM_CONFIRM),
         index: 0,
-        time: timeParams
+        time: timeParams,
+        disabledType: 'datetime' // 按鈕，檢測日期和時間
       });
     }
 
@@ -1328,8 +1636,11 @@
           elem: lay(li),
           date: ymd,
           index: index,
-          type: type
+          type: type,
+          rangeType: index,
+          disabledType: 'date' // 年面板，檢測當前年份中的所有日期是否禁用
         });
+        that.cellRender(li, {year: yearNum, month: 1, date: 1}, 'year');
         yearNum++;
       });
 
@@ -1365,8 +1676,11 @@
           elem: lay(li),
           date: ymd,
           index: index,
-          type: type
+          type: type,
+          rangeType: index,
+          disabledType: 'date' // 月面板，檢測當前月份中的所有日期是否禁用
         });
+        that.cellRender(li, {year: listYM[0], month: i + 1, date: 1}, 'month');
       });
 
       lay(elemYM[isCN ? 0 : 1]).attr('lay-ym', listYM[0] + '-' + listYM[1])
@@ -1392,6 +1706,8 @@
                 ,seconds: ii
               }][i],
               index: index,
+              rangeType: index,
+              disabledType: 'time', // 時間面板，分別檢測時分秒列表是否禁用
               time: [
                 ['hours'],
                 ['hours', 'minutes'],
@@ -1405,7 +1721,8 @@
             elem: lay(that.footer).find(ELEM_CONFIRM),
             date: that[startEnd],
             index: 0,
-            time: ['hours', 'minutes', 'seconds']
+            time: ['hours', 'minutes', 'seconds'],
+            disabledType: 'datetime' // 確認按鈕，檢測時分秒列表任意一項是否禁用
           });
         }
       };
@@ -1471,13 +1788,14 @@
         }
 
         //當為年選擇器或者年月選擇器
-        var isYearOrMonth = options.type === 'year' || options.type === 'month';
-        if(isYearOrMonth){
+        var isYearOrMonth = ['year', 'month'].indexOf(options.type) !== -1;
+        var isChangeMonth = type === 'year' && ['date', 'datetime'].indexOf(options.type) !== -1;
+        if (isYearOrMonth || isChangeMonth) {
           lay(ul).find('.'+ THIS).removeClass(THIS);
           lay(this).addClass(THIS);
 
           //如果為年月選擇器，點擊了年列表，則切換到月選擇器
-          if(options.type === 'month' && type === 'year'){
+          if ((options.type === 'month' && type === 'year') || isChangeMonth) {
             that.listYM[index][0] = ym;
             isAlone && ((index ? that.endDate : dateTime).year = ym);
             that.list('month', index);
@@ -1549,7 +1867,7 @@
 
           setTimeStatus();
           scroll();
-          (that.endDate || options.type === 'time' || (options.type === 'datetime' && options.fullPanel)) && that.done(null, 'change');
+          (that.endDate || options.type === 'time' || options.type === 'datetime') && that.done(null, 'change');
 
           //同步按鈕可點狀態
           that.setBtnStatus();
@@ -1587,17 +1905,25 @@
     var that = this
     ,options = that.config
     ,lang = that.lang()
-    ,isOut, elemBtn = lay(that.footer).find(ELEM_CONFIRM);
-    if(options.range && options.type !== 'time'){
+    ,isOut
+    ,elemBtn = lay(that.footer).find(ELEM_CONFIRM)
+    ,timeParams = options.type === 'datetime' || options.type === 'time' ? ['hours', 'minutes', 'seconds'] : undefined;
+    if(options.range){
       start = start || (that.rangeLinked ? that.startDate : options.dateTime);
       end = end || that.endDate;
       isOut = !that.endState || that.newDate(start).getTime() > that.newDate(end).getTime();
 
       //如果不在有效日期內，直接禁用按鈕，否則比較開始和結束日期
       (that.limit({
-        date: start
+        date: start,
+        disabledType: 'datetime', // 按鈕，檢測日期和時間
+        time: timeParams,
+        rangeType: 0
       }) || that.limit({
-        date: end
+        date: end,
+        disabledType: 'datetime', // 按鈕，檢測日期和時間
+        time: timeParams,
+        rangeType: 1
       }))
         ? elemBtn.addClass(DISABLED)
       : elemBtn[isOut ? 'addClass' : 'removeClass'](DISABLED);
@@ -1649,6 +1975,30 @@
     return this.newDate(obj).getTime();
   }
 
+  /**
+   * 格式化輸入框顯示值
+   * @param {HTMLInputElement} elem HTML input 元素
+   * @param {(value: string) => string} displayValueCallback
+   */
+  Class.prototype.formatToDisplay = function (elem, displayValueCallback) {
+    var that = this;
+    var props = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');
+
+    Object.defineProperty(
+      elem,
+      'value',
+      lay.extend({}, props, {
+        get: function () {
+          return this.getAttribute('lay-date');
+        },
+        set: function (value) {
+          props.set.call(this, displayValueCallback.call(that, value));
+          this.setAttribute('lay-date', value);
+        },
+      })
+    );
+  };
+
   //賦值
   Class.prototype.setValue = function(value){
     var that = this
@@ -1674,7 +2024,8 @@
         rangeElem[1].val(value[1] || '');
       } else {
         if(lay(elem).find('*').length === 0){
-          lay(elem).html(value);
+          var displayValue = typeof options.formatToDisplay === 'function' ? options.formatToDisplay(value) : value;
+          lay(elem).html(displayValue);
         }
         lay(elem).attr('lay-date', value);
       }
@@ -1807,6 +2158,45 @@
     return that;
   };
 
+  /**
+   * 判斷日期是否存在面板，用於處理日期範圍選擇的一些邊緣情況
+   * @param {object} datetime 日期時間對象
+   * @param {number} index - 面板索引
+   * @returns
+   */
+  Class.prototype.checkPanelDate = function(datetime, index){
+    var that = this;
+    var options = that.config;
+    // 年月範圍選擇不需要處理
+    if(options.type !== 'date' && options.type !== 'datetime') return;
+
+    var startPanel = index === 0;
+    var month = datetime.month + 1; // 點擊的日期所在月份
+    var panelMonth = that.panelYM[index].month + 1; // 當前面板頭部月份
+
+    // 邊緣日期的處理
+    var firstRenderIndex = that.endState
+      // 二次點擊（一般為結束日期）任意一側面板時：
+      // 1. 左側面板中，點擊的月份屬於下一個月時，應渲染右側面板而不是左側面板;
+      // 2. 左側面板中，點擊的月份屬於上一個月時，應將兩個面板都重新渲染(等效點擊 prevMonth);
+      // 3. 右側面板同理。
+      ? function() {
+        return (startPanel && month > panelMonth) || (!startPanel && month < panelMonth)
+          ? 1 - index
+          : index;
+      }()
+      // 初次點擊（一般為開始日期）任意一側面板時：
+      // 1. 讓該面板自行切換，以保持日期的「選中狀態」在該側；
+      // 2. 另一側面板則根據點擊的面板進行響應式切換，以保持左右面板始終為連續月份。
+      : index;
+
+    // 為簡化實現，只要點擊的月份不等於當前面板頂部顯示的月份時，就重新渲染兩側面板
+    return {
+      needFullRender: month !== panelMonth,
+      index: firstRenderIndex
+    }
+  }
+
   //選擇日期
   Class.prototype.choose = function(td, index){
     if(td.hasClass(DISABLED)) return;
@@ -1871,7 +2261,8 @@
         that.startDate = lay.extend({}, dateTime); // 同步startDate
       }
       // 校驗另外一個日期是否在有效的範圍內
-      if (that.endState && !that.limit({date: that.thisDateTime(1 - index)})) {
+      // 此處為範圍選擇的日期面板點擊選中處理，所以 disabledType 為 date
+      if (that.endState && !that.limit({date: that.rangeLinked ? that.startDate : that.thisDateTime(1 - index), disabledType:'date'})) {
         // 根據選擇之後判斷是否需要切換模式
         var isChange;
         if (that.endState && that.autoCalendarModel.auto) {
@@ -1897,16 +2288,12 @@
         isChange && (options.dateTime = lay.extend({}, that.startDate));
       }
       if (that.rangeLinked) {
+        // 處理日期範圍選擇的一些邊緣情況
+        var checkState = that.checkPanelDate(dateTime, panelIndex);
         var dateTimeTemp = lay.extend({}, dateTime);
-        if (panelIndex && !index && !isChange) { // 處理可能出現的聯動面板中點擊右面板但是判定為開始日期這個時候點擊頭部的切換上下月第一次沒有反應的問題
-          // 選擇了右面板但是判斷之後作為開始時間
-          var YM = that.getAsYM(dateTime.year, dateTime.month, 'sub');
-          lay.extend(options.dateTime, {
-            year: YM[0]
-            ,month: YM[1]
-          });
-        }
-        that.calendar(dateTimeTemp, panelIndex, isChange ? 'init' : null);
+        var renderMode = (isChange || (checkState && checkState.needFullRender)) ? 'init' : null;
+        var panelIdx =  checkState ? checkState.index : panelIndex;
+        that.calendar(dateTimeTemp, panelIdx, renderMode);
       } else {
         that.calendar(null, index, isChange ? 'init' : null);
       }
@@ -1981,9 +2368,15 @@
       //確定
       ,confirm: function(){
         if(options.range){
-          if(lay(btn).hasClass(DISABLED)) return that.hint(
-            options.type === 'time' ? lang.timeout.replace(/日期/g, '時間') : lang.timeout
-          );
+          if(lay(btn).hasClass(DISABLED)){
+            var isTimeout = options.type === 'time'
+              ? that.startTime && that.endTime && that.newDate(that.startTime) > that.newDate(that.endTime)
+              : that.startDate && that.endDate && that.newDate(lay.extend({},that.startDate, that.startTime || {})) > that.newDate(lay.extend({},that.endDate, that.endTime || {}));
+
+            return isTimeout
+              ? that.hint(options.type === 'time' ? lang.timeout.replace(/日期/g, '時間') : lang.timeout)
+              : that.hint(lang.invalidDate);
+          }
         } else {
           if(lay(btn).hasClass(DISABLED)) return that.hint(lang.invalidDate);
         }
@@ -2029,7 +2422,8 @@
           elem: lay(that.footer).find(ELEM_CONFIRM),
           date: {
             year: listYM[0]
-          }
+          },
+          disabledType: 'datetime' // 按鈕，檢測日期和時間
         });
       }
 
@@ -2051,32 +2445,37 @@
         }
       }
       ,prevMonth: function(){
-        if (that.rangeLinked) {
-          dateTime = options.dateTime;
-        }
-        var YM = that.getAsYM(dateTime.year, dateTime.month, 'sub');
-        lay.extend(dateTime, {
-          year: YM[0]
-          ,month: YM[1]
-        });
+        // rangeLinked 模式非實時選擇日期，不需要同步 options.dateTime，應根據面板顯示日期切換
+        if(that.rangeLinked){
+          var panelYM = that.panelYM[0];
+          var YM = that.getAsYM(panelYM.year, panelYM.month, 'sub');
+          var dateTimeTemp = lay.extend({}, options.dateTime, that.panelYM[0], {year: YM[0], month: YM[1]});
+          that.checkDate('limit').calendar(dateTimeTemp, null, 'init');
+        }else{
+          var YM = that.getAsYM(dateTime.year, dateTime.month, 'sub');
+          lay.extend(dateTime, {
+            year: YM[0]
+            ,month: YM[1]
+          });
 
-        that.checkDate('limit').calendar(null, null, 'init');
-        if (!that.rangeLinked) {
+          that.checkDate('limit').calendar(null, null, 'init');
           that.autoCalendarModel.auto ? that.choose(lay(elemCont).find('td.layui-this'), index) : that.done(null, 'change');
         }
       }
       ,nextMonth: function(){
-        if (that.rangeLinked) {
-          dateTime = options.dateTime;
-        }
-        var YM = that.getAsYM(dateTime.year, dateTime.month);
-        lay.extend(dateTime, {
-          year: YM[0]
-          ,month: YM[1]
-        });
+        if(that.rangeLinked){
+          var panelYM = that.panelYM[0];
+          var YM = that.getAsYM(panelYM.year, panelYM.month);
+          var dateTimeTemp = lay.extend({}, options.dateTime, that.panelYM[0], {year: YM[0],month: YM[1]});
+          that.checkDate('limit').calendar(dateTimeTemp, null, 'init');
+        }else{
+          var YM = that.getAsYM(dateTime.year, dateTime.month);
+          lay.extend(dateTime, {
+            year: YM[0]
+            ,month: YM[1]
+          });
 
-        that.checkDate('limit').calendar(null, null, 'init');
-        if (!that.rangeLinked) {
+          that.checkDate('limit').calendar(null, null, 'init');
           that.autoCalendarModel.auto ? that.choose(lay(elemCont).find('td.layui-this'), index) : that.done(null, 'change');
         }
       }
@@ -2358,4 +2757,3 @@
   );
 
 }(window, window.document);
-

@@ -10,6 +10,7 @@ layui.define(['lay', 'layer', 'util'], function(exports){
   var util = layui.util;
   var hint = layui.hint();
   var device = layui.device();
+  var needCheckboxFallback = lay.ie && parseFloat(lay.ie) === 8;
 
   var MOD_NAME = 'form';
   var ELEM = '.layui-form';
@@ -24,7 +25,7 @@ layui.define(['lay', 'layer', 'util'], function(exports){
       // 內置的驗證規則
       verify: {
         required: function(value) {
-          if (!/[\S]+/.test(value)) {
+          if (!/[\S]+/.test(value) || value === undefined || value === null) {
             return '必填項不能為空';
           }
         },
@@ -117,7 +118,7 @@ layui.define(['lay', 'layer', 'util'], function(exports){
           itemElem[0].checked = value;
         } else if(type === 'radio') { // 如果為單選框
           itemElem.each(function(){
-            this.checked = this.value == value;
+            this.checked = this.value == value + '';
           });
         } else { // 其它類型的表單
           itemElem.val(value);
@@ -154,7 +155,7 @@ layui.define(['lay', 'layer', 'util'], function(exports){
       }
 
       if(/^(checkbox|radio)$/.test(item.type) && !item.checked) return;  // 複選框和單選框未選中，不記錄字段
-      field[init_name || item.name] = item.value;
+      field[init_name || item.name] = othis.val();
     });
 
     return field;
@@ -201,13 +202,19 @@ layui.define(['lay', 'layer', 'util'], function(exports){
 
           precision = precision >= 0 ? precision : Math.max(decimals(step), decimals(rawValue));
 
-          if(!noAction){
+          // 賦值
+          if (!noAction) {
             // 初始渲染時只處理數字精度
-            if(!isInit){
+            if (!isInit) {
               if(value <= min) value = min;
               if(value >= max) value = max;
             }
-            if(precision) value = value.toFixed(precision);
+            // 若 `lay-precision` 為 0, 則表示只保留整數
+            if (precision === 0) {
+              value = parseInt(value);
+            } else if(precision > 0) { // 小數位精度
+              value = value.toFixed(precision);
+            }
             elem.val(value);
           }
 
@@ -376,50 +383,66 @@ layui.define(['lay', 'layer', 'util'], function(exports){
         var TITLE = 'layui-select-title';
         var NONE = 'layui-select-none';
         var CREATE_OPTION = 'layui-select-create-option';
-        var initValue = '';
-        var thatInput;
+        var PANEL_WRAP = 'layui-select-panel-wrap'
+        var PANEL_ELEM_DATA = 'layui-select-panel-elem-data';
         var selects = elem || elemForm.find('select');
 
-        // 隱藏 select
-        var hide = function(e, clear){
-          if(!$(e.target).parent().hasClass(TITLE) || clear){
-            var elem = $('.' + CLASS);
-            elem.removeClass(CLASS+'ed ' + CLASS+'up');
-            if(elem.hasClass('layui-select-creatable')){
-              elem.children('dl').children('.' + CREATE_OPTION).remove();
-            }
-            thatInput && initValue && thatInput.val(initValue);
-          }
-          thatInput = null;
-        };
-
         // 各種事件
-        var events = function(reElem, disabled, isSearch, isCreatable){
+        var events = function(reElem, titleElem, disabled, isSearch, isCreatable, isAppendTo){
           var select = $(this);
-          var title = reElem.find('.' + TITLE);
+          var title = titleElem;
           var input = title.find('input');
           var dl = reElem.find('dl');
           var dds = dl.children('dd');
           var dts = dl.children('dt'); // select 分組dt元素
           var index =  this.selectedIndex; // 當前選中的索引
-          var nearElem; // select 組件當前選中的附近元素，用於輔助快捷鍵功能
+          var initValue = '';
+          var removeClickOutsideEvent;
 
           if(disabled) return;
 
-          // 搜索項
-          var laySearch = select.attr('lay-search');
+          /**
+           * 搜索項
+           * @typedef searchOption
+           * @prop {boolean} [caseSensitive=false] 是否區分大小寫
+           * @prop {boolean} [fuzzy=false] 是否開啟模糊匹配，開啟後將會忽略模式出現在字符串中的位置。
+           */
+          /** @type {searchOption} */
+          var laySearch = select.attr('lay-search') === 'cs' ? {caseSensitive:true} : lay.options(select, {attr:'lay-search'});
+          // 目前只支持 body
+          var appendTarget = select.attr('lay-append-to') || 'body';
+          var appendPosition = select.attr('lay-append-position');
+
+          // #1449
+          // IE10 和 11 中，帶有佔位符的 input 元素獲得/失去焦點時，會觸發 input 事件
+          // 當鼠標按下時，根據 input 元素上的 __ieph 標識忽略 input 事件
+          var needPlaceholderPatch = !!(lay.ie && (lay.ie === '10' || lay.ie === '11') && input.attr('placeholder'));
 
           // 展開下拉
           var showDown = function(){
+            if(isAppendTo){
+              // 如果追加面板元素後出現滾動條，觸發元素寬度可能會有變化，所以先追加面板元素
+              reElem.appendTo(appendTarget).css({width: title.width() + 'px'});
+
+              var updatePosition = function(){
+                lay.position(title[0], reElem[0], {
+                  position: appendPosition,
+                  allowBottomOut: true,
+                  offset: [0, 5]
+                });
+              }
+
+              updatePosition();
+              $(window).on('resize.lay_select_resize', updatePosition);
+            }
             var top = reElem.offset().top + reElem.outerHeight() + 5 - $win.scrollTop();
             var dlHeight = dl.outerHeight();
             var dds = dl.children('dd');
 
             index = select[0].selectedIndex; // 獲取最新的 selectedIndex
-            reElem.addClass(CLASS+'ed');
+            title.parent().addClass(CLASS+'ed');
             dds.removeClass(HIDE);
             dts.removeClass(HIDE);
-            nearElem = null;
 
             // 初始選中樣式
             dds.removeClass(THIS);
@@ -431,14 +454,36 @@ layui.define(['lay', 'layer', 'util'], function(exports){
             }
 
             followScroll();
+
+            if(needPlaceholderPatch){
+              dl.off('mousedown.lay_select_ieph').on('mousedown.lay_select_ieph', function(){
+                input[0].__ieph = true;
+                setTimeout(function(){
+                  input[0].__ieph = false;
+                }, 60)
+              });
+            }
+
+            removeClickOutsideEvent = lay.onClickOutside(
+              isAppendTo ? reElem[0] : dl[0],
+              function(){
+                hideDown();
+                initValue && input.val(initValue);
+              },
+              {ignore: title}
+            );
           };
 
           // 隱藏下拉
           var hideDown = function(choose){
-            reElem.removeClass(CLASS+'ed ' + CLASS+'up');
+            title.parent().removeClass(CLASS+'ed ' + CLASS+'up');
             input.blur();
-            nearElem = null;
             isCreatable && dl.children('.' + CREATE_OPTION).remove();
+            removeClickOutsideEvent && removeClickOutsideEvent();
+            if(isAppendTo){
+              reElem.detach();
+              $(window).off('resize.lay_select_resize');
+            }
 
             if(choose) return;
 
@@ -483,10 +528,9 @@ layui.define(['lay', 'layer', 'util'], function(exports){
 
           // 點擊標題區域
           title.on('click', function(e){
-            reElem.hasClass(CLASS+'ed') ? (
+            title.parent().hasClass(CLASS+'ed') ? (
               hideDown()
             ) : (
-              hide(e, true),
               showDown()
             );
             dl.find('.'+NONE).remove();
@@ -514,50 +558,27 @@ layui.define(['lay', 'layer', 'util'], function(exports){
             }
 
             // 標註 dd 的選中狀態
-            var setThisDd = function(prevNext, thisElem1){
-              var nearDd, cacheNearElem
+            var setThisDd = function(prevNext){
               e.preventDefault();
+              var allDisplayedElem = dl.children('dd:not(.'+ HIDE +',.'+ DISABLED +')');
+              if(!allDisplayedElem.length) return;
+              var firstIndex = 0;
+              var lastIndex = allDisplayedElem.length - 1;
+              var selectedIndex = -1;
 
-              // 得到當前隊列元素
-              var thisElem = function(){
-                var thisDd = dl.children('dd.'+ THIS);
-
-                // 如果是搜索狀態，且按 Down 鍵，且當前可視 dd 元素在選中元素之前，
-                // 則將當前可視 dd 元素的上一個元素作為虛擬的當前選中元素，以保證遞歸不中斷
-                if(dl.children('dd.'+  HIDE)[0] && prevNext === 'next'){
-                  var showDd = dl.children('dd:not(.'+ HIDE +',.'+ DISABLED +')')
-                  ,firstIndex = showDd.eq(0).index();
-                  if(firstIndex >=0 && firstIndex < thisDd.index() && !showDd.hasClass(THIS)){
-                    return showDd.eq(0).prev()[0] ? showDd.eq(0).prev() : dl.children(':last');
-                  }
+              layui.each(allDisplayedElem, function(index, el){
+                if($(el).hasClass(THIS)){
+                  selectedIndex = index;
+                  return true;
                 }
+              })
 
-                if(thisElem1 && thisElem1[0]){
-                  return thisElem1;
-                }
-                if(nearElem && nearElem[0]){
-                  return nearElem;
-                }
+              var nextIndex = prevNext === 'prev'
+                ? (selectedIndex - 1 < firstIndex ? lastIndex : selectedIndex - 1)
+                : (selectedIndex + 1 > lastIndex ? firstIndex : selectedIndex + 1)
 
-                return thisDd;
-                // return dds.eq(index);
-              }();
-
-              cacheNearElem = thisElem[prevNext](); // 當前元素的附近元素
-              nearDd =  thisElem[prevNext]('dd:not(.'+ HIDE +')'); // 當前可視元素的 dd 元素
-
-              // 如果附近的元素不存在，則停止執行，並清空 nearElem
-              if(!cacheNearElem[0]) return nearElem = null;
-
-              // 記錄附近的元素，讓其成為下一個當前元素
-              nearElem = thisElem[prevNext]();
-
-              // 如果附近不是 dd ，或者附近的 dd 元素是禁用狀態，則進入遞歸查找
-              if((!nearDd[0] || nearDd.hasClass(DISABLED)) && nearElem[0]){
-                return setThisDd(prevNext, nearElem);
-              }
-
-              nearDd.addClass(THIS).siblings().removeClass(THIS); // 標註樣式
+              var selectedElem = allDisplayedElem.eq(nextIndex);
+              selectedElem.addClass(THIS).siblings().removeClass(THIS); // 標註樣式
               followScroll(); // 定位滾動條
             };
 
@@ -579,26 +600,33 @@ layui.define(['lay', 'layer', 'util'], function(exports){
             var dds = dl.children('dd');
             var hasEquals = false;
             var rawValue = value;
+            var fuzzyMatchRE;
+            if(!laySearch.caseSensitive){
+              value = value.toLowerCase();
+            }
+            if(laySearch.fuzzy){
+              fuzzyMatchRE = fuzzyMatchRegExp(value, laySearch.caseSensitive);
+            }
             layui.each(dds, function(){
               var othis = $(this);
               var text = othis.text();
+              var isCreateOption = isCreatable && othis.hasClass(CREATE_OPTION);
 
               // 需要區分大小寫
-              if(isCreatable && text === rawValue){
+              if(isCreatable && !isCreateOption && text === rawValue){
                 hasEquals = true;
               }
 
               // 是否區分大小寫
-              if(laySearch !== 'cs'){
+              if(!laySearch.caseSensitive){
                 text = text.toLowerCase();
-                value = value.toLowerCase();
               }
 
               // 匹配
-              var not = text.indexOf(value) === -1;
+              var not = laySearch.fuzzy ? !fuzzyMatchRE.test(text) : text.indexOf(value) === -1;
 
               if(value === '' || (origin === 'blur') ? value !== text : not) num++;
-              origin === 'keyup' && othis[(not && (isCreatable ? !othis.hasClass(CREATE_OPTION) : true)) ? 'addClass' : 'removeClass'](HIDE);
+              origin === 'keyup' && othis[(isCreatable ? (not && !isCreateOption) : not) ? 'addClass' : 'removeClass'](HIDE);
             });
             // 處理 select 分組元素
             origin === 'keyup' && layui.each(dts, function(){
@@ -623,19 +651,25 @@ layui.define(['lay', 'layer', 'util'], function(exports){
               return false;
             }
 
+            if(needPlaceholderPatch && e.target.__ieph){
+              e.target.__ieph = false;
+              return false;
+            }
+
             notOption(value, function(none, hasEquals){
               if(isCreatable){
                 if(hasEquals){
                   dl.children('.' + CREATE_OPTION).remove();
                 }else{
-                  // 和初始渲染保持行為一致
-                  var textVal = $('<div>' + value +'</div>').text();
                   var createOptionElem = dl.children('.' + CREATE_OPTION);
                   if(createOptionElem[0]){
-                    createOptionElem.attr('lay-value', value);
-                    createOptionElem.text(textVal);
+                    createOptionElem.attr('lay-value', value).html(util.escape(value));
                   }else{
-                    dl.append('<dd class="' + CREATE_OPTION + '" lay-value="'+ value +'">' + textVal + '</dd>');
+                    // 臨時顯示在頂部
+                    var ddElem = $('<dd>').addClass(CREATE_OPTION).attr('lay-value', value).html(util.escape(value));
+                    var firstOptionELem = dl.children().eq(0);
+                    var hasTips = firstOptionELem.hasClass('layui-select-tips');
+                    firstOptionELem[hasTips ? 'after' : 'before'](ddElem);
                   }
                 }
               }else{
@@ -661,15 +695,9 @@ layui.define(['lay', 'layer', 'util'], function(exports){
           };
 
           if(isSearch){
-            // #1449: IE10 和 11 中，帶有佔位符的 input 元素獲得/失去焦點時，會觸發 input 事件
-            var eventsType = 'input propertychange';
-            if(lay.ie && (lay.ie === '10' || lay.ie === '11') && input.attr('placeholder')){
-              eventsType = 'keyup';
-            }
-            input.on(eventsType, search).on('blur', function(e){
+            input.on('input propertychange', layui.debounce(search, 50)).on('blur', function(e){
               var selectedIndex = select[0].selectedIndex;
 
-              thatInput = input; // 當前的 select 中的 input 元素
               initValue = $(select[0].options[selectedIndex]).text(); // 重新獲得初始選中值
 
               // 如果是第一項，且文本值等於 placeholder，則清空初始值
@@ -699,9 +727,11 @@ layui.define(['lay', 'layer', 'util'], function(exports){
               othis.addClass(THIS);
             }
 
+            // 將新增的 option 元素添加到末尾
             if(isCreatable && othis.hasClass(CREATE_OPTION)){
-              othis.removeClass(CREATE_OPTION);
-              select.append('<option value="' + value + '">' + value + '</option>');
+              dl.append(othis.removeClass(CREATE_OPTION));
+              var optionElem = $('<option>').attr('value', value).text(othis.text());
+              select.append(optionElem);
             }
 
             othis.siblings().removeClass(THIS);
@@ -717,43 +747,63 @@ layui.define(['lay', 'layer', 'util'], function(exports){
             return false;
           });
 
+          // 用於開啟 lay-append-to 時兼容 dropdown
+          dl.on('mousedown pointerdown touchstart', function(e){
+            layui.stope(e);
+          })
+
           reElem.find('dl>dt').on('click', function(e){
             return false;
           });
 
-          $(document).off('click', hide).on('click', hide); // 點擊其它元素關閉 select
+          if(isAppendTo){
+            titleElem.on('_lay-select-destroy', function(){
+              reElem.remove();
+            })
+          }
         }
+
+        // 僅 appendTo 使用，移除觸發元素時，自動移除面板元素
+        $.event.special['_lay-select-destroy'] = {
+          remove: function( handleObj ) {
+            handleObj.handler();
+          }
+        };
 
         // 初始渲染 select 組件選項
         selects.each(function(index, select){
-          var othis = $(this)
-          ,hasRender = othis.next('.'+CLASS)
-          ,disabled = this.disabled
-          ,value = select.value
-          ,selected = $(select.options[select.selectedIndex]) // 獲取當前選中項
-          ,optionsFirst = select.options[0];
+          var othis = $(this);
+          var hasRender = othis.next('.'+CLASS);
+          var disabled = this.disabled;
+          var value = select.value;
+          var selected = $(select.options[select.selectedIndex]); // 獲取當前選中項
+          var optionsFirst = select.options[0];
 
           if(typeof othis.attr('lay-ignore') === 'string') return othis.show();
 
           var isSearch = typeof othis.attr('lay-search') === 'string'
-          ,isCreatable = typeof othis.attr('lay-creatable') === 'string' && isSearch
-          ,placeholder = optionsFirst ? (
-            optionsFirst.value ? TIPS : (optionsFirst.innerHTML || TIPS)
-          ) : TIPS;
+          var isCreatable = typeof othis.attr('lay-creatable') === 'string' && isSearch
+          var isAppendTo = typeof othis.attr('lay-append-to') === 'string'
+          var placeholder = optionsFirst
+            ? (optionsFirst.value ? TIPS : (optionsFirst.innerHTML || TIPS))
+            : TIPS;
 
           // 替代元素
           var reElem = $(['<div class="'+ (isSearch ? '' : 'layui-unselect ') + CLASS
-          ,(disabled ? ' layui-select-disabled' : '')
-          ,(isCreatable ? ' layui-select-creatable' : '') + '">'
-            ,'<div class="'+ TITLE +'">'
+          ,(disabled ? ' layui-select-disabled' : '') + '"></div>'].join(''));
+
+          var triggerElem = $([
+            '<div class="'+ TITLE +'">'
               ,('<input type="text" placeholder="'+ util.escape($.trim(placeholder)) +'" '
                 +('value="'+ util.escape($.trim(value ? selected.html() : '')) +'"') // 默認值
                 +((!disabled && isSearch) ? '' : ' readonly') // 是否開啟搜索
                 +' class="layui-input'
                 +(isSearch ? '' : ' layui-unselect')
               + (disabled ? (' ' + DISABLED) : '') +'">') // 禁用狀態
-            ,'<i class="layui-edge"></i></div>'
-            ,'<dl class="layui-anim layui-anim-upbit'+ (othis.find('optgroup')[0] ? ' layui-select-group' : '') +'">'
+              ,'<i class="layui-edge"></i>'
+            ,'</div>'].join(''));
+
+          var contentElem = $(['<dl class="layui-anim layui-anim-upbit'+ (othis.find('optgroup')[0] ? ' layui-select-group' : '') +'">'
             ,function(options){
               var arr = [];
               layui.each(options, function(index, item){
@@ -770,11 +820,27 @@ layui.define(['lay', 'layer', 'util'], function(exports){
               arr.length === 0 && arr.push('<dd lay-value="" class="'+ DISABLED +'">沒有選項</dd>');
               return arr.join('');
             }(othis.find('*')) +'</dl>'
-          ,'</div>'].join(''));
+          ].join(''));
 
-          hasRender[0] && hasRender.remove(); // 如果已經渲染，則Rerender
-          othis.after(reElem);
-          events.call(this, reElem, disabled, isSearch, isCreatable);
+          // 如果已經渲染，則Rerender
+          if(hasRender[0]){
+            if(isAppendTo){
+              var panelWrapElem = hasRender.data(PANEL_ELEM_DATA);
+              panelWrapElem && panelWrapElem.remove();
+            }
+            hasRender.remove();
+          }
+          if(isAppendTo){
+            reElem.append(triggerElem);
+            othis.after(reElem);
+            var contentWrapElem = $('<div class="'+ CLASS + ' ' + PANEL_WRAP +'"></div>').append(contentElem);
+            reElem.data(PANEL_ELEM_DATA, contentWrapElem); // 將面板元素對象記錄在觸發元素 data 中，重新渲染時需要清理舊面板元素
+            events.call(this, contentWrapElem, triggerElem, disabled, isSearch, isCreatable, isAppendTo);
+          }else{
+            reElem.append(triggerElem).append(contentElem);
+            othis.after(reElem);
+            events.call(this, reElem, triggerElem, disabled, isSearch, isCreatable, isAppendTo);
+          }
         });
       }
 
@@ -795,20 +861,13 @@ layui.define(['lay', 'layer', 'util'], function(exports){
         // 事件
         var events = function(reElem, RE_CLASS){
           var check = $(this);
+          var skin = check.attr('lay-skin') || 'primary';
+          var isSwitch = skin === 'switch';
+          var isPrimary = skin === 'primary';
 
           // 勾選
           reElem.on('click', function(){
-            var othis = $(this);
             var filter = check.attr('lay-filter') // 獲取過濾器
-            var title = (
-              othis.next('*[lay-checkbox]')[0]
-                ? othis.next().html()
-              : check.attr('title') || ''
-            );
-            var skin = check.attr('lay-skin') || 'primary';
-
-            // 開關
-            title = skin === 'switch' ? title.split('|') : [title];
 
             // 禁用
             if(check[0].disabled) return;
@@ -816,19 +875,10 @@ layui.define(['lay', 'layer', 'util'], function(exports){
             // 半選
             if (check[0].indeterminate) {
               check[0].indeterminate = false;
-              reElem.find('.'+ CLASS.SUBTRA).removeClass(CLASS.SUBTRA).addClass('layui-icon-ok');
             }
 
             // 開關
-            check[0].checked ? (
-              check[0].checked = false,
-              reElem.removeClass(RE_CLASS[1]),
-              skin === 'switch' && reElem.children('div').html(title[1])
-            ) : (
-              check[0].checked = true,
-              reElem.addClass(RE_CLASS[1]),
-              skin === 'switch' && reElem.children('div').html(title[0])
-            );
+            check[0].checked = !check[0].checked
 
             // 事件
             layui.event.call(check[0], MOD_NAME, RE_CLASS[2]+'('+ filter +')', {
@@ -837,6 +887,27 @@ layui.define(['lay', 'layer', 'util'], function(exports){
               othis: reElem
             });
           });
+
+          that.syncAppearanceOnPropChanged(this, 'checked', function(){
+            if(isSwitch){
+              var title = (reElem.next('*[lay-checkbox]')[0]
+                ? reElem.next().html()
+                : check.attr('title') || ''
+              ).split('|');
+              reElem.children('div').html(this.checked ? title[0] : title[1] || title[0]);
+            }
+            reElem.toggleClass(RE_CLASS[1], this.checked);
+          });
+
+          if(isPrimary){
+            that.syncAppearanceOnPropChanged(this, 'indeterminate', function(){
+              if(this.indeterminate){
+                reElem.children('.layui-icon-ok').removeClass('layui-icon-ok').addClass(CLASS.SUBTRA);
+              }else{
+                reElem.children('.'+ CLASS.SUBTRA).removeClass(CLASS.SUBTRA).addClass('layui-icon-ok');
+              }
+            })
+          }
         };
 
         // 遍歷複選框
@@ -856,14 +927,30 @@ layui.define(['lay', 'layer', 'util'], function(exports){
           hasRender[0] && hasRender.remove(); // 若已經渲染，則 Rerender
 
           // 若存在標題模板，則優先讀取標題模板
+          var titleTplAttrs = [];
           if(othis.next('[lay-checkbox]')[0]){
-            title = othis.next().html() || '';
+            var titleTplElem = othis.next();
+            title = titleTplElem.html() || '';
+            if(titleTplElem[0].attributes.length > 1){
+              layui.each(titleTplElem[0].attributes, function(i, attr){
+                if(attr.name !== 'lay-checkbox'){
+                  titleTplAttrs.push(attr.name + '="' + attr.value + '"')
+                }
+              })
+            }
           }
+          titleTplAttrs = titleTplAttrs.join(' ');
 
           // 若為開關，則對 title 進行分隔解析
           title = skin === 'switch' ? title.split('|') : [title];
 
           if(typeof othis.attr('lay-ignore') === 'string') return othis.show();
+
+          // 處理 IE8 indeterminate 屬性重新定義 get set 後無法設置值的問題
+          if(needCheckboxFallback){
+            toggleAttribute.call(check, 'lay-form-sync-checked', check.checked);
+            !check.checked && toggleAttribute.call(check, 'lay-form-sync-indeterminate', check.indeterminate);
+          }
 
           // 替代元素
           var reElem = $(['<div class="layui-unselect '+ RE_CLASS[0],
@@ -876,11 +963,11 @@ layui.define(['lay', 'layer', 'util'], function(exports){
             var type = {
               // 複選框
               "checkbox": [
-                (title[0] ? ('<div>'+ title[0] +'</div>') : (skin === 'primary' ? '' : '<div></div>')),
+                (title[0] ? ('<div ' + titleTplAttrs +'>'+ title[0] +'</div>') : (skin === 'primary' ? '' : '<div></div>')),
                 '<i class="layui-icon '+(skin === 'primary' && !check.checked && othis.get(0).indeterminate ? CLASS.SUBTRA : 'layui-icon-ok')+'"></i>'
               ].join(''),
               // 開關
-              "switch": '<div>'+ ((check.checked ? title[0] : title[1]) || '') +'</div><i></i>'
+              "switch": '<div>'+ ((check.checked ? title[0] : (title[1] || title[0])) || '') +'</div><i></i>'
             };
             return type[skin] || type['checkbox'];
           }(),
@@ -903,22 +990,11 @@ layui.define(['lay', 'layer', 'util'], function(exports){
           var ANIM = 'layui-anim-scaleSpring';
 
           reElem.on('click', function(){
-            var name = radio[0].name, forms = radio.parents(ELEM);
             var filter = radio.attr('lay-filter'); // 獲取過濾器
-            var sameRadio = forms.find('input[name='+ name.replace(/(\.|#|\[|\])/g, '\\$1') +']'); // 找到相同name的兄弟
 
             if(radio[0].disabled) return;
 
-            layui.each(sameRadio, function(){
-              var next = $(this).next('.' + CLASS);
-              this.checked = false;
-              next.removeClass(CLASS + 'ed');
-              next.children('.layui-icon').removeClass(ANIM + ' ' + ICON[0]).addClass(ICON[1]);
-            });
-
             radio[0].checked = true;
-            reElem.addClass(CLASS + 'ed');
-            reElem.children('.layui-icon').addClass(ANIM + ' ' + ICON[0]);
 
             layui.event.call(radio[0], MOD_NAME, 'radio('+ filter +')', {
               elem: radio[0],
@@ -926,28 +1002,62 @@ layui.define(['lay', 'layer', 'util'], function(exports){
               othis: reElem
             });
           });
+
+          that.syncAppearanceOnPropChanged(this, 'checked', function(){
+            var radioEl = this;
+            if(radioEl.checked){
+              reElem.addClass(CLASS + 'ed');
+              reElem.children('.layui-icon').addClass(ANIM + ' ' + ICON[0]);
+              var forms = radio.parents(ELEM);
+              var sameRadios = forms.find('input[name='+ radioEl.name.replace(/(\.|#|\[|\])/g, '\\$1') +']'); // 找到相同name的兄弟
+              layui.each(sameRadios, function(){
+                if(radioEl === this)return;
+                this.checked = false;
+              });
+            }else{
+              reElem.removeClass(CLASS + 'ed');
+              reElem.children('.layui-icon').removeClass(ANIM + ' ' + ICON[0]).addClass(ICON[1]);
+            }
+          })
         };
 
         // 初始渲染
         radios.each(function(index, radio){
           var othis = $(this), hasRender = othis.next('.' + CLASS);
           var disabled = this.disabled;
+          var skin = othis.attr('lay-skin');
 
           if(typeof othis.attr('lay-ignore') === 'string') return othis.show();
+
+          if(needCheckboxFallback){
+            toggleAttribute.call(radio, 'lay-form-sync-checked', radio.checked);
+          }
+
           hasRender[0] && hasRender.remove(); // 如果已經渲染，則Rerender
+
+          var title = util.escape(radio.title || '');
+          var titleTplAttrs = [];
+          if(othis.next('[lay-radio]')[0]){
+            var titleTplElem = othis.next();
+            title = titleTplElem.html() || '';
+            if(titleTplElem[0].attributes.length > 1){
+              layui.each(titleTplElem[0].attributes, function(i, attr){
+                if(attr.name !== 'lay-radio'){
+                  titleTplAttrs.push(attr.name + '="' + attr.value + '"')
+                }
+              })
+            }
+          }
+          titleTplAttrs = titleTplAttrs.join(' ');
 
           // 替代元素
           var reElem = $(['<div class="layui-unselect '+ CLASS,
             (radio.checked ? (' '+ CLASS +'ed') : ''), // 選中狀態
-          (disabled ? ' layui-radio-disabled '+DISABLED : '') +'">', // 禁用狀態
+          (disabled ? ' layui-radio-disabled '+DISABLED : '') +'"', // 禁用狀態
+          (skin ? ' lay-skin="'+ skin +'"' : ''),
+          '>',
           '<i class="layui-anim layui-icon '+ ICON[radio.checked ? 0 : 1] +'"></i>',
-          '<div>'+ function(){
-            var title = util.escape(radio.title || '');
-            if(othis.next('[lay-radio]')[0]){
-              title = othis.next().html();
-            }
-            return title;
-          }() +'</div>',
+          '<div ' + titleTplAttrs +'>'+ title +'</div>',
           '</div>'].join(''));
 
           othis.after(reElem);
@@ -996,6 +1106,53 @@ layui.define(['lay', 'layer', 'util'], function(exports){
   };
 
   /**
+   * checkbox 和 radio 指定屬性變化時自動更新 UI
+   * 只能用於 boolean 屬性
+   * @param {HTMLInputElement} elem - HTMLInput 元素
+   * @param {'checked' | 'indeterminate'} propName - 屬性名
+   * @param {() => void} handler - 屬性值改變時執行的回調
+   * @see https://learn.microsoft.com/zh-cn/previous-versions//ff382725(v=vs.85)?redirectedfrom=MSDN
+   */
+  Form.prototype.syncAppearanceOnPropChanged = function(){
+    // 處理 IE8 indeterminate 屬性重新定義 get set 後無法設置值的問題
+    // 此處性能敏感，不希望每次賦值取值時都判斷是否需要 fallback
+    if (needCheckboxFallback) {
+      return function(elem, propName, handler) {
+        var originProps = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, propName);
+
+        Object.defineProperty(elem, propName,
+          lay.extend({}, originProps, {
+            // 此處的 get 是為了兼容 IE<9
+            get: function(){
+              return typeof this.getAttribute('lay-form-sync-' + propName) === 'string';
+            },
+            set: function (newValue) {
+              toggleAttribute.call(this, 'lay-form-sync-' + propName, newValue);
+              handler.call(this);
+            }
+          })
+        );
+      }
+    }
+    return function(elem, propName, handler){
+      var originProps = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, propName);
+
+      Object.defineProperty(elem, propName,
+        lay.extend({}, originProps, {
+          // 此處的 get 是為了兼容 IE<9
+          get: function(){
+            return originProps.get.call(this);
+          },
+          set: function (newValue) {
+            originProps.set.call(this, newValue);
+            handler.call(this);
+          }
+        })
+      );
+    }
+  }()
+
+  /**
    * 主動觸發驗證
    * @param  {(string|HTMLElement|JQuery)} elem - 要驗證的區域表單元素
    * @return {boolean} 返回結果。若驗證通過，返回 `true`, 否則返回 `false`
@@ -1026,7 +1183,8 @@ layui.define(['lay', 'layer', 'util'], function(exports){
       var verifyStr = othis.attr('lay-verify') || '';
       var vers = verifyStr.split('|');
       var verType = othis.attr('lay-vertype'); // 提示方式
-      var value = $.trim(othis.val());
+      var value = othis.val();
+      value = typeof value === 'string' ? $.trim(value) : value;
 
       othis.removeClass(DANGER); // 移除警示樣式
 
@@ -1127,6 +1285,57 @@ layui.define(['lay', 'layer', 'util'], function(exports){
     // 事件
     return layui.event.call(this, MOD_NAME, 'submit('+ layFilter +')', params);
   };
+
+  function fuzzyMatchRegExp(keyword, caseSensitive) {
+    var wordMap = {};
+    var regexPattern = ['^'];
+    var escapeRegExp = function(str){
+      return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    if(!caseSensitive)keyword = keyword.toLowerCase();
+
+    // 統計關鍵字中各字符出現次數
+    var wordArr = keyword.trim().split('');
+    for (var i = 0; i < wordArr.length; i++) {
+      var c = wordArr[i];
+      wordMap[c] = (wordMap[c] || 0) + 1;
+    }
+
+    // 構建正則表達式模式
+    for (c in wordMap) {
+      regexPattern.push('(?=.*');
+      for (var i = 0; i < wordMap[c]; i++) {
+        regexPattern.push(escapeRegExp(c));
+        if (i !== wordMap[c] - 1) {
+          regexPattern.push('.*'); // 在字符之間添加任意字符匹配
+        }
+      }
+      regexPattern.push(')');
+    }
+    regexPattern.push('.*');
+
+    return new RegExp(regexPattern.join(''), !caseSensitive ? 'i' : undefined);
+  }
+
+  // 引用自 https://github.com/msn0/mdn-polyfills/blob/master/src/Element.prototype.toggleAttribute/toggleattribute.js
+  function toggleAttribute(name, force) {
+    var forcePassed = arguments.length === 2;
+    var forceOn = !!force;
+    var forceOff = forcePassed && !force;
+
+    if (this.getAttribute(name) !== null) {
+        if (forceOn) return true;
+
+        this.removeAttribute(name);
+        return false;
+    } else {
+        if (forceOff) return false;
+
+        this.setAttribute(name, '');
+        return true;
+    }
+  }
 
   var form = new Form();
   var $dom = $(document);
